@@ -1,29 +1,19 @@
-<input type="button" id="item-factory" value="Добавить">
-<input type="submit" id="" value="Добавить">
-
 <!-- Block for add post categories -->
 <div id="post-category" class="side-block">
 	<div class="block-title">Категории <?=$options['common']?></div>
 	<div class="block-content">
 		<div id="category">
 			<?php 
-				/*if(isset($data['_category'])):
-					foreach($data['_category'] as $categoryId => $categoryData):?>
-						<label><input type="checkbox" name="_categories[]" value="<?=$categoryData['slug']?>" /> <?=$categoryData['name']?></label><br>
-			<?php 
-					endforeach;
-				endif;*/
-			?>
-			
-			<?php 
 				if(isset($data['terms'])):
-					foreach($data['terms'] as $categoryData):
+					foreach($data['terms'] as $key => $categoryData):
 						if($categoryData['taxonomy'] != $options['category_slug']) continue;
+						$checked = isset($data['selfTerms']) && in_array($categoryData['id'], $data['selfTerms']) ? 'checked' : '';
 			?>
-						<label><input type="checkbox" name="_categories[]" value="<?=$categoryData['slug']?>" /> <?=$categoryData['name']?></label><br>
+						<label><input type="checkbox" name="_categories[]" value="<?=$categoryData['id']?>" <?=$checked?> /> <?=$categoryData['name']?></label><br>
 			<?php 
+						unset($data['terms'][$key]);
 					endforeach;
-				endif;exit;
+				endif;
 			?>
 		</div>
 		<div><input type="text" id="new-category"></div>
@@ -37,18 +27,11 @@
 	<div class="block-content">
 		<div id="tag">
 			<?php 
-				/*if(isset($data['_tag'])):
-					foreach($data['_tag'] as $tagId => $tagData):?>
-						<label><input type="checkbox" name="_tags[]" value="<?=$tagData['slug']?>" /> <?=$tagData['name']?></label><br>
-			<?php 
-					endforeach;
-				endif;*/
+				if(isset($data['terms'])):
+					foreach($data['terms'] as $tagId => $tagData):
+						$checked = isset($data['selfTerms']) && in_array($tagData['id'], $data['selfTerms']) ? 'checked' : '';
 			?>
-			
-			<?php 
-				if(isset($data['_tag'])):
-					foreach($data['_tag'] as $tagId => $tagData):?>
-						<label><input type="checkbox" name="_tags[]" value="<?=$tagData['slug']?>" /> <?=$tagData['name']?></label><br>
+						<label><input type="checkbox" name="_tags[]" value="<?=$tagData['id']?>" <?=$checked?> /> <?=$tagData['name']?></label><br>
 			<?php 
 					endforeach;
 				endif;

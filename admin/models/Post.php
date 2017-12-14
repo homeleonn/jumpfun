@@ -95,18 +95,84 @@ class Post extends Model{
 	
 	public function editForm($id){
 		$data = $this->db->getRow('Select * from posts where id = ?s', $id);
-		$data['selfCateg'] = $this->db->getRow('Select * from posts where id = ?s', $id);
+		$data['selfTerms'] = $this->getTermsIdByPostId($id);
 		return array_merge($data, $this->getFormattedTermList());
 	}
 	
-	public function edit(){var_dump($_POST);exit;
+	public function edit(){//var_dump($_POST);exit;
 		$params = $this->di->get('request')->post;
 		if($params['title'] == '' || $params['url'] == '') return;
 		if($this->checkUrlExists($params['url'], $params['id'])) Msg::json('Введенный адрес уже существует!', 0);
 		
+		// Обновлям запись
 		$this->db->query('UPDATE posts SET title = ?s, url = ?s, content = ?s, modified = ?s where id = ?i', $params['title'], $params['url'], $params['content'], MyDate::getDateTime(), $params['id']);
 		
-		Msg::json(array('link' => ROOT_URI . $this->options['slug'] . $params['url'] . '/'));
+		
+		// Добавляем новые термины или удаляем ненужные
+		$this->editTerms(
+			$params['id'], 
+			isset($params['_categories']) ? $params['_categories'] : [], 
+			isset($params['_tags']) ? $params['_tags'] : []
+		);
+		
+		
+		Msg::json(array('link' => ROOT_URI . $this->options['slug'] . '/' . $params['url'] . '/'));
+	}
+	
+	// Добавляем новые термины или удаляем ненужные
+	private function editTerms($postId, $comeCategories, $comeTags){
+		// Проверяем пришедшие категории и теги и пишем или удаляем
+		// Берем старые отношения
+		$oldRelations = $this->db->getAll('Select term_taxonomy_id from term_relationships where object_id = ?i', $postId);
+		
+		// Сформируем пришедшие
+		$comeRelationships = array_merge($comeCategories, $comeTags);
+		// Формируем новые и удаляемые
+		$del = [];
+		
+		if($oldRelations){
+			foreach($oldRelations as $old){
+				$find = false;
+				foreach($comeRelationships as $key => $come){
+					// Если в пришедших есть старый, значит с ним ничего делать не надо, исключаем
+					if($old['term_taxonomy_id'] == $come){
+						unset($comeRelationships[$key]);
+						$find = true;
+					}
+				}
+				
+				// Если не нашли старый в пришедших, значит этот термин надо удалить
+				if(!$find){
+					$del[] = $old['term_taxonomy_id'];
+				}
+			}
+		}
+			
+		// Все пришедшие за исключением старых - новые
+		$new = $comeRelationships;
+		
+		if(!empty($new)){
+			$this->db->query('INSERT INTO term_relationships (object_id, term_taxonomy_id) VALUES (' . $postId . ',' . implode('),(' . $postId . ',', $new) . ')');
+			$this->changeTermTaxonomyCount($new, true);
+		}
+			
+		if(!empty($del)){
+			$this->db->query('Delete from term_relationships where object_id = ' . $postId . ' and term_taxonomy_id IN(' . implode(',', $del) . ')');
+			$this->changeTermTaxonomyCount($del, false);
+		}
+			
+		
+		// if(!empty($new))
+			// var_dump('INSERT INTO term_relationships (object_id, term_taxonomy_id) VALUES (' . $postId . ',' . implode('),(' . $postId . ',', $new) . ')');
+		// if(!empty($del))
+			// var_dump('Delete from term_relationships where object_id = ' . $postId . ' and term_taxonomy_id IN(' . implode(',', $del) . ')');
+		// var_dump([$new, $del]);exit;
+		// exit;
+	}
+	
+	private function changeTermTaxonomyCount($ids, $mark = true){
+		$mark = $mark ? '+' : '-';
+		$this->db->query("Update term_taxonomy SET count = count {$mark} 1 where term_taxonomy_id IN(" . implode(',', $ids) . ")");
 	}
 	
 	
@@ -142,7 +208,15 @@ class Post extends Model{
 	}
 	
 	public function getTermsIdByPostId($postId){
-		return $this->db->getAll('Select tt.term_id from term_taxonomy as tt, term_relationships as tr where tt.term_taxonomy_id = tr.term_taxonomy_id and tr.object_id = ?i order by tt.term_id', $postId);
+		$terms = $this->db->getAll('Select tt.term_id from term_taxonomy as tt, term_relationships as tr where tt.term_taxonomy_id = tr.term_taxonomy_id and tr.object_id = ?i order by tt.term_id', $postId);
+		
+		$data = [];
+		if($terms)
+			foreach($terms as $term){
+				$data[] = $term['term_id'];
+			}
+		
+		return $data;
 	}
 	
 	public function getFormattedTermList(){

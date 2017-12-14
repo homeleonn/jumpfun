@@ -1,6 +1,6 @@
 <?php  
 //var_dump(admin\AdminController::$postType);
-var_dump($data);
+//var_dump($data);
 ?>
 <h2><?=$options['edit']?></h2>
 <form method="POST" id="edit-<?=admin\AdminController::$postType?>" class="post-from-admin" name="" autocomplete="off">

@@ -26,6 +26,9 @@
 	<!-- Block for add post categories -->
 	<!-- Block for add post tags -->
 	<div id="sidebar-right">
+		<input type="button" id="item-factory" value="Добавить">
+		<input type="submit" id="" value="Добавить">
+
 		<?php include $this->getFile('sidebarRight');?>
 	</div>
 	
