@@ -130,8 +130,9 @@ function item(act, data){
 
 
 /*удалить*/
-function delItem(el, act, id){
-	$.post(root + 'admin/'+act+'/del/'+id+'/', function(data){
+function delItem(el, slug, id, type){
+	var type = type || 'post';
+	$.post(root + 'admin/'+slug+'/del/'+type+'/'+id+'/', function(data){
 		if(data.substr(0, 2) == 'OK'){
 			alert('Действие выполнено успешно');
 			$(el).closest('tr').remove();
@@ -182,7 +183,7 @@ function addTerm(type){
 		return;
 	}
 	
-	$.get(root+'admin/' + postSlug + '/add-' + type + '/' + newTerm + '/', function(data){
+	$.post(root + 'admin/' + postSlug + '/add-term/' ,{type: type, name: newTerm, async: 1}, function(data){
 		if(data)
 			$('#post-' + type).find('#' + type).append('<input type="checkbox" value="'+newTerm+'" /> '+newTerm + '<br>');
 		else

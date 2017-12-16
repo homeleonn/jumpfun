@@ -10,16 +10,18 @@ abstract class Model{
 	protected $di;
 	protected $db;
 	protected $config;
+	protected $request;
 	
-    protected $postType;
     protected $options;
+    protected $post;
 	
-	public function __construct(DI $di){
+	public function __construct(DI $di, $postOptions){
 		$this->di = $di;
+		$this->options = $postOptions;
 		$this->db = $this->di->get('db');
 		$this->config = $this->di->get('config');
-		$this->postType = $this->di->get('config')->postType;
-		$this->options = $this->di->get('config')->getCurrentPageOptions();
+		$this->request = $this->di->get('request');
 		Common::loadCurrentPostOptions();
+		
 	}
 }

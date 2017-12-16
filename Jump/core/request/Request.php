@@ -93,4 +93,16 @@ class Request{
 		return $permissibleMethod == $this->server['REQUEST_METHOD'];
 	}
 	
+	public function location($url, $code = false){
+		$codes = [
+			404 => 'Not Found',
+			301 => 'Moved Permanently',
+		];
+		if($code)
+			header("HTTP/1.1 {$code} {$codes[$code]}");
+		
+		header('Location:' . $url);
+		exit;
+	}
+	
 }

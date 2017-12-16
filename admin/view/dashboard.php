@@ -5,17 +5,18 @@ $sections = array(
 	'Страницы||' => [
 		'Все страницы' => 'pages',
 		'Добавить новую' => 'pages/add',
-		'Категории' => 'pages/categories',
 	],
 	'Педагоги||' => [
 		'Все педагоги' => 'educators',
 		'Добавить новую' => 'educators/add',
-		'Категории' => 'educators/categories',
+		'Категории' => 'educators/terms/?type=category',
+		'Теги' => 'educators/terms/?type=tag',
 	],
 	'Новости||' => [
 		'Все новости' => 'news',
 		'Добавить новую' => 'news/add',
-		'Категории' => 'news/categories',
+		'Категории' => 'news/terms/?type=category',
+		'Теги' => 'news/terms/?type=tag',
 	],
 	'Настройки||cog' => [
 		'Меню' => 'menu',
@@ -49,7 +50,7 @@ function menu1($menu, $title = 0, $stage = 0){
 }
 
 function drawLink($path, $name, $parent = 1){
-	if($path) $path .= '/';
+	if($path && strpos($path, '?') === false) $path .= '/';
 	$path = $path !== false ? SITE_URL.'admin/'.$path : 'javascript:void(0);';
 	
 	if($parent){

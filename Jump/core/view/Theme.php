@@ -20,7 +20,8 @@ class Theme
 	}
 	
 	public function template($template){
-		return (ENV != 'admin') ? preg_replace('/^\w+(\/.*)/', $this->config->getCurrentPageOptions()['slug'] .  '$1', $template) : $template;
+		$options = $this->config->getCurrentPageOptions();
+		return (ENV != 'admin' && isset($options['slug'])) ? preg_replace('/^\w+(\/.*)/', $options['slug'] .  '$1', $template) : $template;
 	}
 	
 	public function title(){

@@ -2,34 +2,38 @@
 	margin: 10px auto;
 }
 
-.new > .title{
+.new .title{
 	background: #090;
 	border-radius: 5px 5px 0 0;
 }
 
-.new > .content{
+.new .content{
 	background: #555;
 	padding: 5px;
 	border-radius: 0 0 5px 5px;
 	clear: both;
 }
 
-.new > .content > .thumb{
+.new .content > .thumb{
 	float: left;
 	margin: 5px;
 	margin-left: 0;
 }
 
 
-.new > .content > .text:after{
+.new .content > .text:after{
 	content: '';
 	display: table;
 	clear: both;
 }
 
-.new a{
+.new .title > a{
 	text-decoration: none;
 	display: block;
 	font-weight: bold;
 	padding: 5px;
+}
+
+.new .list-item{
+	margin: 10px 0;
 }

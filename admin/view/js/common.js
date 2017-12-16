@@ -13,7 +13,7 @@ $(function(){
 	});
 	
 	// select active menu element
-	var $active = $('#menu a[href="'+document.URL.split('?')[0]+'"]');
+	var $active = $('#menu a[href="'+document.URL+'"]');
 	$active.closest('li.top').find('div > a').click();
 	if(!$active.parent('li').length){
 		$active.closest('li.top').addClass('active');

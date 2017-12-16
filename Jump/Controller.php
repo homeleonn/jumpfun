@@ -20,11 +20,14 @@ class Controller{
 
     protected $load;
 	
+    protected $options;
+	
 	
 	public function __construct(DI $di, $model){
 		$this->di = $di;
 		
 		$this->initVars();
+		$this->options = $this->config->getCurrentPageOptions();
 		
 		$calledClass = static::class;
 		$defaultModel = isset($calledClass::$modelName) ? $calledClass::$modelName : false;
@@ -35,7 +38,8 @@ class Controller{
 		if(!class_exists($model)){
 			throw new \Exception('Model '.$model.' not found');
 		}
-		$this->model = new $model($di);
+		//var_dump($this->options);exit;
+		$this->model = new $model($di, $this->options);
 	}
 	
 	public function initVars()

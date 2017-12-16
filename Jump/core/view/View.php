@@ -40,7 +40,7 @@ class View
 		$contentFile = $this->path . 'templates/' . $templateFile . '.php';
 		//var_dump($templateFile, $template, $this->template);exit;
 		if(!is_file($contentFile)){
-			var_dump('File ' . $contentFile . ' not exists!');
+			//var_dump('File ' . $contentFile . ' not exists!');
 			$contentFile = $this->path . 'index.php';
 		}
 		

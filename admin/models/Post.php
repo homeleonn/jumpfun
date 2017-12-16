@@ -8,12 +8,17 @@ use Jump\helpers\MyDate;
 use Jump\helpers\Common;
 
 class Post extends Model{
+	
+	private $answers = [
+		'not_found' => 'Произошла ошибка: Возможно данной записи не существует'
+	];
+	
 	public function postList(){
-		return $this->db->getAll('Select * from posts where post_type = ?s', $this->postType);
+		return $this->db->getAll('Select * from posts where post_type = ?s', $this->options['type']);
 	}
 	
-	public function categoryList(){
-		return $this->getCategoryList();
+	public function termList($type){
+		return $type == 'tag' ? $this->getTagList() : $this->getCategoryList();
 	}
 	
 	// ADD
@@ -22,70 +27,59 @@ class Post extends Model{
 		return $this->getFormattedTermList($this->options['category_slug'], $this->options['tag_slug']);
 	}
 	
+	public function addTermForm($type){
+		$data['type'] = $type;
+		$data['add']  = $type == 'tag' ? 'тег' : 'категорию';
+		return $data;
+	}
+	
+	public function addTerm($name, $type, $whisper = false, $slug = '', $description = ''){
+		return $this->addTermHelper($name, $type, $whisper, $slug, $description);
+	}
+	
 	public function add(){
-		$params = $this->di->get('request')->post;
-		if($params['title'] == '' || $params['url'] == '') exit;
-		if($this->checkUrlExists($params['url'])) Msg::json('Введенный адрес уже существует!', 0);
+		if($this->request->post['title'] == '' || $this->request->post['url'] == '') exit;
+		if($this->checkUrlExists($this->request->post['url'])) Msg::json('Введенный адрес уже существует!', 0);
 		
-		// Проверим валидность пришедших категорий, в которые пользователь хочет занести пост
-		$categoryValid = false;
-		if(isset($params['_categories'])){
-			
-			// Возьмем все возможные категории для данного типа поста
-			$terms = $this->getTermList($this->options['category_slug']);
-			
-			// Кол-во пришедших категорий
-			$countParams = count($params['_categories']);
-			
-			// Проходим по валидным категориям и смотрим есть ли они в пришедших
-			// Если есть, декрементируем количество, если останется 0 значит порядок
-			$categoriesId = [];
-			foreach($terms as $term){
-				if(in_array($term['slug'], $params['_categories'])){
-					$countParams--;
-					$categoriesId[$term['slug']] = $term['term_taxonomy_id'];
-				}
-			}
-			
-			if(0 == $countParams) $categoryValid = true;
-		}
-		
-		
-		
-		$query = "INSERT INTO posts (title, url, content, post_type) VALUES (?s, ?s, ?s, ?s)";
 				
-		$this->db->query($query, $params['title'], $params['url'], $params['content'], $this->postType);
+		$this->db->query('INSERT INTO posts (title, url, content, post_type) VALUES (?s, ?s, ?s, ?s)', $this->request->post['title'], $this->request->post['url'], $this->request->post['content'], $this->options['type']);
 		
 		$postId = $this->db->insertId();
 		
-		
-		if($categoryValid){
-			$values = $ids = '';
-			foreach($params['_categories'] as $category){
-				$values .= "({$postId}, {$categoriesId[$category]}),";
-				$ids .= $categoriesId[$category] . ',';
-			}
-			$this->db->query('INSERT INTO term_relationships (object_id, term_taxonomy_id) VALUES ' . substr($values, 0, -1));
-			$this->db->query('Update term_taxonomy SET count = count + 1 where term_taxonomy_id IN('.substr($ids, 0, -1).')');
-		}
+		// Добавляем новые термины
+		$this->editTerms(
+			$postId, 
+			isset($this->request->post['_categories']) ? $this->request->post['_categories'] : [], 
+			isset($this->request->post['_tags']) ? $this->request->post['_tags'] : []
+		);
 		
 		Msg::json(array('id' => $postId), 10);
 	}
 	
 	
-	public function addTerm($termName, $type){
+	public function addTermHelper($name, $type, $whisper = false, $slug = '', $description = ''){
+		$termSlug = $type . '_slug';
 		// Checking on duplicate term for this taxonomy
-		$duplicate = $this->db->getOne('Select t.id from terms t, term_taxonomy tt where t.id = tt.term_id and t.slug = ?s and tt.taxonomy = \'' . $this->options[($type . '_slug')] .'\'', $termName);
+		$duplicate = $this->db->getOne('Select t.id from terms t, term_taxonomy tt where t.id = tt.term_id and t.slug = ?s and tt.taxonomy = \'' . $this->options[$termSlug] .'\'', $name);
 		
-		if($duplicate) exit;
+		if($duplicate){
+			if($whisper)
+				return false;
+			exit;
+		}
 		
 		// Add new term
-		$result = $this->db->query('INSERT INTO terms (name, slug) VALUES (?s, ?s)', $termName, $termName);
+		$result = $this->db->query('INSERT INTO terms (name, slug) VALUES (?s, ?s)', $name, $slug ?: $name);
 		
 		if($result){
-			$result = $this->db->query('INSERT INTO term_taxonomy (term_id, taxonomy) VALUES (?s, ?s)', $this->db->insertId(), $this->options[($type . '_slug')]);
-			if($result) echo 1;
+			$result = $this->db->query('INSERT INTO term_taxonomy (term_id, taxonomy, description) VALUES (?s, ?s, ?s)', $this->db->insertId(), $this->options[$termSlug], $description);
 		}
+		
+		if($whisper)
+			return $result;
+			
+		if($result)
+			echo 1;
 		
 		exit;
 	}
@@ -94,49 +88,54 @@ class Post extends Model{
 	// EDIT
 	
 	public function editForm($id){
-		$data = $this->db->getRow('Select * from posts where id = ?s', $id);
+		if(!$data = $this->db->getRow('Select * from posts where id = ?s', $id)) return 0;
 		$data['selfTerms'] = $this->getTermsIdByPostId($id);
 		return array_merge($data, $this->getFormattedTermList());
 	}
 	
+	public function editTermForm($id){
+		return $this->db->getRow('Select t.*, tt.* from terms as t, term_taxonomy as tt where t.id = tt.term_id and t.id = ?i', $id);
+	}
+	
 	public function edit(){//var_dump($_POST);exit;
-		$params = $this->di->get('request')->post;
-		if($params['title'] == '' || $params['url'] == '') return;
-		if($this->checkUrlExists($params['url'], $params['id'])) Msg::json('Введенный адрес уже существует!', 0);
+		if($this->request->post['title'] == '' || $this->request->post['url'] == '') return;
+		if($this->checkUrlExists($this->request->post['url'], $this->request->post['id'])) Msg::json('Введенный адрес уже существует!', 0);
 		
 		// Обновлям запись
-		$this->db->query('UPDATE posts SET title = ?s, url = ?s, content = ?s, modified = ?s where id = ?i', $params['title'], $params['url'], $params['content'], MyDate::getDateTime(), $params['id']);
+		$this->db->query('UPDATE posts SET title = ?s, url = ?s, content = ?s, modified = ?s where id = ?i', $this->request->post['title'], $this->request->post['url'], $this->request->post['content'], MyDate::getDateTime(), $this->request->post['id']);
 		
 		
 		// Добавляем новые термины или удаляем ненужные
 		$this->editTerms(
-			$params['id'], 
-			isset($params['_categories']) ? $params['_categories'] : [], 
-			isset($params['_tags']) ? $params['_tags'] : []
+			$this->request->post['id'], 
+			isset($this->request->post['_categories']) ? $this->request->post['_categories'] : [], 
+			isset($this->request->post['_tags']) ? $this->request->post['_tags'] : []
 		);
 		
 		
-		Msg::json(array('link' => ROOT_URI . $this->options['slug'] . '/' . $params['url'] . '/'));
+		Msg::json(array('link' => ROOT_URI . ($this->options['slug'] != 'pages' ? $this->options['slug'] . '/' : '') . $this->request->post['url'] . '/'));
 	}
 	
 	// Добавляем новые термины или удаляем ненужные
 	private function editTerms($postId, $comeCategories, $comeTags){
-		// Проверяем пришедшие категории и теги и пишем или удаляем
-		// Берем старые отношения
-		$oldRelations = $this->db->getAll('Select term_taxonomy_id from term_relationships where object_id = ?i', $postId);
-		
+		// -Безопасность- Проверим пришедшие термины на валидность. Невалидные отбросим.
 		// Сформируем пришедшие
-		$comeRelationships = array_merge($comeCategories, $comeTags);
-		// Формируем новые и удаляемые
+		$comeTerms = array_merge($comeCategories, $comeTags);
+		$comeTerms = $this->checkTermExists($comeTerms);
+		
+		
+		// Проверяем пришедшие категории и теги и пишем или удаляем
+		// Берем старые термины
+		$oldTerms = $this->db->getAll('Select term_taxonomy_id from term_relationships where object_id = ?i', $postId);
 		$del = [];
 		
-		if($oldRelations){
-			foreach($oldRelations as $old){
+		if($oldTerms){
+			foreach($oldTerms as $old){
 				$find = false;
-				foreach($comeRelationships as $key => $come){
+				foreach($comeTerms as $key => $come){
 					// Если в пришедших есть старый, значит с ним ничего делать не надо, исключаем
 					if($old['term_taxonomy_id'] == $come){
-						unset($comeRelationships[$key]);
+						unset($comeTerms[$key]);
 						$find = true;
 					}
 				}
@@ -149,8 +148,7 @@ class Post extends Model{
 		}
 			
 		// Все пришедшие за исключением старых - новые
-		$new = $comeRelationships;
-		
+		$new = $comeTerms;
 		if(!empty($new)){
 			$this->db->query('INSERT INTO term_relationships (object_id, term_taxonomy_id) VALUES (' . $postId . ',' . implode('),(' . $postId . ',', $new) . ')');
 			$this->changeTermTaxonomyCount($new, true);
@@ -160,15 +158,36 @@ class Post extends Model{
 			$this->db->query('Delete from term_relationships where object_id = ' . $postId . ' and term_taxonomy_id IN(' . implode(',', $del) . ')');
 			$this->changeTermTaxonomyCount($del, false);
 		}
-			
-		
-		// if(!empty($new))
-			// var_dump('INSERT INTO term_relationships (object_id, term_taxonomy_id) VALUES (' . $postId . ',' . implode('),(' . $postId . ',', $new) . ')');
-		// if(!empty($del))
-			// var_dump('Delete from term_relationships where object_id = ' . $postId . ' and term_taxonomy_id IN(' . implode(',', $del) . ')');
-		// var_dump([$new, $del]);exit;
-		// exit;
 	}
+	
+	public function editTerm($id, $name, $slug, $description){
+		$this->db->query("Update terms SET name = '{$name}', slug = '{$slug}' where id = ?i", $id);
+		$this->db->query("Update term_taxonomy SET description = '{$description}' where term_id = ?i", $id);
+		$this->request->location(SITE_URL . URI . '?msg=успешно');
+	}
+	
+	// Проверяет пришедшие термины на валидность
+	// Принимает пришедшие термины
+	// Возвращает идентификаторы валидных терминов
+	public function checkTermExists($comeTerms){
+		$termsId = [];
+		if(!empty($comeTerms)){
+			// Возьмем все возможные термины(категории и теги) для данного типа поста
+			$termsExists = $this->getTermList($this->options['category_slug'], $this->options['tag_slug']);
+			
+			
+			// Проходим по валидным категориям и смотрим есть ли они в пришедших
+			// Оставляем лишь валидные
+			
+			foreach($termsExists as $term){
+				if(in_array($term['id'], $comeTerms)){
+					$termsId[] = $term['id'];
+				}
+			}
+		}
+		return $termsId;
+	}
+	
 	
 	private function changeTermTaxonomyCount($ids, $mark = true){
 		$mark = $mark ? '+' : '-';
@@ -178,21 +197,47 @@ class Post extends Model{
 	
 	// DELETE
 	
-	public function del($id){
+	public function del($id, $type){
+		if($type == 'post')
+			$this->delPost($id);
+		else
+			$this->delTerm($id);
+		
+	}
+	
+	private function delPost($id){
 		$id = $this->db->getOne('Select id from posts where id = ?i', $id);
 		
-		if($id){
-			$result = $this->db->query('Delete from posts where id = ' . $id);
-			$this->db->query('Delete from postmeta where post_id = ' . $id);
-			$this->db->query('Delete from term_relationships where object_id = ' . $id);
-		}
-			
-		if($result) Msg::success();
+		if(!$id)
+			exit($this->answers['not_found']);
 		
-		exit('Произошла ошибка: Возможно данной записи не существует');
+		
+		
+		$this->db->query('Delete from posts where id = ' . $id);
+		$this->db->query('Delete from postmeta where post_id = ' . $id);
+		$this->db->query('Update term_taxonomy SET count = count - 1 where term_taxonomy_id IN(Select term_taxonomy_id from term_relationships where object_id = ?i)', $id);
+		$this->db->query('Delete from term_relationships where object_id = ' . $id);
+		Msg::success();
+		
+	}
+	
+	private function delTerm($id){
+		$term_taxonomy_id = $this->db->getOne('Select term_taxonomy_id from term_taxonomy as tt, terms as t where tt.term_id = t.id and t.id = ?i',  $id);
+		
+		if(!$term_taxonomy_id)
+			exit($this->answers['not_found']);
+		
+		$this->db->query('Delete from terms where id = ?i', $id);
+		$this->db->query('Delete from term_taxonomy where term_taxonomy.term_id = ?i',  $id);
+		$this->db->query('Delete from term_relationships where term_taxonomy_id = ?i', $term_taxonomy_id);
+		Msg::success();
 	}
 	
 	
+	
+	public function getTermById($id){
+		return $this->db->getAll('Select t.id, t.slug, t.name, tt.taxonomy, tt.term_taxonomy_id, tt.count from terms t, term_taxonomy tt where t.id = tt.term_id and t.id = ?i', $id);
+	}
 	
 	public function getCategoryList(){
 		return $this->getTermList($this->options['category_slug']);
@@ -234,13 +279,11 @@ class Post extends Model{
 		return $data;
 	}
 	
-	public function checkTermExists($taxonomy, $terms){
-		return $this->db->getAll('Select count(*) from terms t, term_taxonomy tt where t.id = tt.term_id and (tt.taxonomy = \''.$taxonomy.'\') and t.slug IN('.$terms.') order by t.id ASC');
-	}
-	
 	
 	private function checkUrlExists($url, $id = ''){
 		if(is_numeric($id)) $id = ' and id != ' . $id;
-		return $this->db->getOne('Select id from posts where url = ?s and post_type = ?s' . $id, $url, $this->postType) ? true : false;
+		return $this->db->getOne('Select id from posts where url = ?s and post_type = ?s' . $id, $url, $this->options['type']) ? true : false;
 	}
+	
+	
 }

@@ -61,10 +61,18 @@ class Config{
 	}
 	
 	public function getCurrentPageOptions(){
-		return isset($this->options['jump_pageTypes'][$this->postType]) ? $this->options['jump_pageTypes'][$this->postType] :false;
+		$options = isset($this->options['jump_pageTypes'][$this->postType]) ? $this->options['jump_pageTypes'][$this->postType] :$this->postType;
+		
+		if(!is_array($options))
+			$option['type'] = $options;
+		else
+			$option = $options;
+		
+		return $option;
 	}
 	
 	private function addRewrite($slug, $type){
+		//var_dump(1);
 		$router = $this->di->get('router');
 		
 			if(ENV != 'admin'){
@@ -79,23 +87,23 @@ class Config{
 					->add($slug . '/(' . URL_PATTERN . ')', $type . ':single/$1');
 			}else{
 				$router
-					->add($slug . '/categories', $type . ':categoryList', 'GET')
+					->add($slug . '/terms', $type . ':termList', 'GET')
 					->add($slug . '/add', $type . ':addForm', 'GET')
 					->add($slug . '/add', $type . ':add', 'POST')
-					->add($slug . '/add-category/(' . URL_PATTERN . ')', $type . ':add/category/$1', 'GET')
-					->add($slug . '/add-tag/(' . URL_PATTERN . ')', $type . ':add/tag/$1', 'GET')
+					->add($slug . '/add-term', $type . ':addTermForm', 'GET')
+					->add($slug . '/add-term', $type . ':addTerm', 'POST')
 					->add($slug . '/edit/(\d+)', $type . ':editForm/$1', 'GET')
 					->add($slug . '/edit', $type . ':edit', 'POST')
-					->add($slug . '/del/(\d+)', $type . ':del/$1', 'POST')
-					->add($slug . '/del-category/(\d+)', $type . ':delCategory/$1', 'GET')
-					->add($slug . '/del-tag/(\d+)', $type . ':delTag/$1', 'GET')
+					->add($slug . '/edit-term/(\d+)', $type . ':editTermForm/$1', 'GET')
+					->add($slug . '/edit-term/(\d+)', $type . ':editTerm', 'POST')
+					->add($slug . '/del/(post|category|tag)/(\d+)', $type . ':del/$2/$1', 'POST')
 					->add($slug, $type . ':list', 'GET');
 			}
 		}
 		
 	
 	
-	public function __get($option){
+	public function __get($option){//var_dump($option, $this->getOption($option));
 		return $this->getOption($option);
 	}
 	
