@@ -27,7 +27,7 @@ class Filter{
 		$filtersNew = [];
 		foreach($filters as $key => $value){
 			// Проверяем проходит ли валидацию по формату
-			if(preg_match('/^([a-zA-Z0-9-]+)=([a-zA-Z0-9-,]+)$/', $value, $match)){
+			if(preg_match('/^([a-zA-Z0-9-]+)=([a-zA-Z0-9-,]+)$/', $value, $match)){	
 				// Проходит ли валидацию по переданным правилам
 				if(isset($rules[$match[1]]) && !preg_match($rules[$match[1]], $match[2])) continue;
 				$filtersNew[$match[1]] = $match[2];
@@ -56,6 +56,7 @@ class Filter{
 		
 		$string = '';
 		foreach($validFilters as $filter => $value){
+			$value = preg_replace('/,+/', ',', $value);
 			$string .= $filter . '=' . $value . ';';
 		}
 		

@@ -16,8 +16,9 @@ abstract class Model{
     protected $post;
 	
 	public function __construct(DI $di, $postOptions){
+		global $post;
 		$this->di = $di;
-		$this->options = $postOptions;
+		$this->options = $post = $postOptions;
 		$this->db = $this->di->get('db');
 		$this->config = $this->di->get('config');
 		$this->request = $this->di->get('request');

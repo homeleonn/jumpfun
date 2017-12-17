@@ -6,6 +6,7 @@ use Jump\Model;
 use Jump\helpers\Filter;
 
 class Post extends Model{
+	use \Jump\helpers\CurrentWork;
 	
 	private $filters = [];
 	private $filtersRules = [
@@ -41,7 +42,7 @@ class Post extends Model{
 	
 	
 	public function getPostList($category, $catValue, $tag, $tagValue, $filters){//var_dump(func_get_args());exit;
-	
+		
 		
 		$perPage 	= 10;
 		$page		= 1;
@@ -72,7 +73,11 @@ class Post extends Model{
 	}
 	
 	public function getPostsByTerm($taxonomy, $value, $filters = false){
+		
 		$data = $this->options;
+		return array_merge($data, $this->getPostsByFilters($filters));
+		
+		
 		
 		if(!$taxonomy){
 			$data[$this->options['type'] . 's_list'] = $this->db->getAll('Select * from posts where post_type = ?s order by id DESC', $this->options['type']);
