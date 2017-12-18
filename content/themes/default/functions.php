@@ -23,3 +23,15 @@ $di->get('config')->addPageType('educators',
 		'common' => 'педагогов',
 	]
 );
+
+$di->get('config')->addPageType('events', 
+	[
+		'type' => 'event',
+		'title' => 'Мероприятия',
+		'description' => 'Мероприятия',
+		'add' => 'Добавить Мероприятие',
+		'edit' => 'Редактировать Мероприятие',
+		'delete' => 'Удалить Мероприятие',
+		'common' => 'мероприятия',
+	]
+);

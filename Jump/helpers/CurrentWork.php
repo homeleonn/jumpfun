@@ -4,66 +4,61 @@ namespace Jump\helpers;
 use Jump\helpers\Filter;
 
 trait CurrentWork{
-	private function getPostsByFilters($filters){
-		//$filtersFullOriginal = $filters;
+	private function getPostsByFilters($filters, $postType){
 		$sqlFilters = '';
 		// Соберем таксономии и проверим их валидность
 		// Если найдутся невалидные, нужно вырезать из запроса данный фильтр и перенаправить
 		// Если валидных меньше чем присланных, проходимся по валидным, сверяемся с присланными, сохраняем невалидные присланные, формируем и режем
-		$validFilters = $this->taxonomyValidation(array_keys($filters));
-		if(count($filters) > count($validFilters)){
-			// Удалим валидные из присланных, те что останутся - вырезаются
-			foreach($validFilters as $filter){
-				$taxonomy = str_replace($this->options['type'] . '-', '', $filter['taxonomy']);
-				if(isset($filters[$taxonomy])){
-					unset($filters[$taxonomy]);
-				}
-			}
-			$this->cleaningInvalidFiltersAndRelocation(Filter::stringFromValidFilters($this->filters), Filter::stringFromValidFilters($filters));
-		}
-		//var_dump($filters, $validFilters);exit;
+		$validFilters = $this->taxonomyValidation($filters, $postType);
 		
-		//var_dump($filters, $validFilters);exit;
+		$filtersAsString = Filter::stringFromFilters($filters);
+		$validFiltersAsString = Filter::stringFromFilters($validFilters);
+	
+		//var_dump($filters, $validFilters, $filtersAsString, $validFiltersAsString);
 		
-		foreach($filters as $taxonomy => $slugs){
-			$slugs = str_replace(',', '\' OR t.slug = \'', $slugs);
-			$sqlFilters .= " (tt.taxonomy = '{$this->options['type']}-{$taxonomy}' and (t.slug = '" . $slugs . "')) OR";
+		if(strcmp($filtersAsString, $validFiltersAsString) !== 0){
+			$this->request->location(str_replace($filtersAsString . (!$validFiltersAsString ? '/' : ''), $validFiltersAsString, FULL_URL), 301);
 		}
 		
-		$sqlFilters = substr($sqlFilters, 0, -3);
-		//var_dump($sqlFilters, $filters);exit;
+		// Формируем условие из валидных фильтров
+		foreach($validFilters as $taxonomy => $slugs){
+			$sqlFilters .= " (tt.taxonomy = '{$postType}-{$taxonomy}' and t.slug IN('" . str_replace(',', "','", $slugs) . "')) OR";
+		}
+		$q = 'Select * from posts where id IN(Select DISTINCT p.id from posts p, terms t, term_taxonomy tt, term_relationships tr where t.id = tt.term_id and tt.term_taxonomy_id = tr.term_taxonomy_id and p.id = tr.object_id and ('.substr($sqlFilters, 0, -3).')) order by id DESC';
 		
-		//var_dump($sqlFilters);
-		$data[$this->options['type'] . 's_list'] = $this->db->getAll('Select * from posts where id IN(Select DISTINCT p.id from posts p, terms t, term_taxonomy tt, term_relationships tr where t.id = tt.term_id and tt.term_taxonomy_id = tr.term_taxonomy_id and p.id = tr.object_id and '.$sqlFilters.') order by id DESC');
-			
-		
-		
-		
-		
-		//var_dump($data);exit;
-			
-		
+		$data = $this->db->getAll($q);
+		//var_dump($q, $data);exit;
 		return $data;
 	}
 	
-	private function taxonomyValidation($taxonomies){
+	// Поиск валидных фильтров и их значений из присланных
+	private function taxonomyValidation($filters, $postType){
 		$type = $this->options['type'] . '-';
-		return $this->db->getAll('Select DISTINCT taxonomy from term_taxonomy where taxonomy = \'' . $type . implode('\' OR taxonomy = \'' . $type, $taxonomies) . '\'');
+		$taxonomies = '';
+		
+		// Формируем условие из фильтров и их значений
+		// Узнаем ваилидные фильтры, и валидные значения
+		foreach($filters as $taxonomy => $values){
+			$taxonomies .= "(tt.taxonomy = '{$type}{$taxonomy}' AND t.slug IN('" . str_replace(',', "','", $values) . "')) OR ";
+		}
+		
+		$validTaxonomies = $this->db->getAll('Select DISTINCT tt.taxonomy as filter, t.slug as value from term_taxonomy as tt, terms as t where tt.term_taxonomy_id = t.id and ' . substr($taxonomies, 0, -3));
+		
+		return $this->creatingValidFilters($validTaxonomies, $postType);
 	}
 	
-	private function cleaningInvalidFiltersAndRelocation($fullFilters, $invalidFilters){
-		$copyFullFilters = $fullFilters;
-		if(strcmp($fullFilters, $invalidFilters) === 0){
-			$url = str_replace($fullFilters . '/', '', FULL_URL);
-		}else{
-			foreach(explode(';', $invalidFilters) as $filter){
-				$len = mb_strlen($fullFilters);
-				$fullFilters = str_replace($filter.';', '', $fullFilters);
-				if(mb_strlen($fullFilters) == $len) $fullFilters = str_replace(';'.$filter, '', $fullFilters);
-				if(mb_strlen($fullFilters) == $len) $fullFilters = str_replace($filter, '', $fullFilters);
-			}
-			$url = str_replace($copyFullFilters, $fullFilters, FULL_URL);
+	// Форматирование новых валидных фильтров и их значеий
+	private function creatingValidFilters($validFilters, $postType){
+		$newValidFilters = [];
+		
+		foreach($validFilters as $filter){
+			$newValidFilters[str_replace($postType . '-', '', $filter['filter'])][] = $filter['value'];
 		}
-		$this->request->location($url);
+		
+		foreach($newValidFilters as $filters => $values){
+			$newValidFilters[$filters] = implode(',', $values);
+		}
+		
+		return $newValidFilters;
 	}
 }

@@ -55,7 +55,6 @@ class Request{
 			$uri = 'post/' . $params[1];
 		}
 			
-		
 		$params = explode('/', trim($uri, '/'));
 		
 		if($needController) $result[] = $params[0] ?: 'index';

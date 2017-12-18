@@ -43,7 +43,6 @@ class Post extends Model{
 	
 	public function getPostList($category, $catValue, $tag, $tagValue, $filters){//var_dump(func_get_args());exit;
 		
-		
 		$perPage 	= 10;
 		$page		= 1;
 		
@@ -75,12 +74,15 @@ class Post extends Model{
 	public function getPostsByTerm($taxonomy, $value, $filters = false){
 		
 		$data = $this->options;
-		return array_merge($data, $this->getPostsByFilters($filters));
+		$list = $this->options['type'] . 's_list';
 		
-		
+		if($filters){
+			$data[$list] = $this->getPostsByFilters($filters, $this->options['type']);
+			return $data;
+		}
 		
 		if(!$taxonomy){
-			$data[$this->options['type'] . 's_list'] = $this->db->getAll('Select * from posts where post_type = ?s order by id DESC', $this->options['type']);
+			$data[$list] = $this->db->getAll('Select * from posts where post_type = ?s order by id DESC', $this->options['type']);
 		}else{
 			$filtersSql = '';
 			if($filters){
@@ -94,7 +96,7 @@ class Post extends Model{
 			
 			$query = 'Select DISTINCT p.id from posts p, terms t, term_taxonomy tt, term_relationships tr where t.id = tt.term_id and tt.term_taxonomy_id = tr.term_taxonomy_id and p.id = tr.object_id and t.slug = ?s and tt.taxonomy = ?s';
 			
-			$data[$this->options['type'] . 's_list'] = $this->db->getAll('Select * from posts where id IN('. $query .') order by id DESC', $value, $taxonomy);
+			$data[$list] = $this->db->getAll('Select * from posts where id IN('. $query .') order by id DESC', $value, $taxonomy);
 		}
 		
 		

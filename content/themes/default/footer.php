@@ -15,11 +15,11 @@
 				<div class="a_dot marg-t" onclick="note.get('Задать вопрос менеджеру', 2);">Задать вопрос менеджеру «Дива»</div>
 			</div>
 			<div class="col-4 col-12 r" style=" text-align: right;">
-				<!-- Yandex.Metrika informer
+				<?php /*<!-- Yandex.Metrika informer
 				<a href="https://metrika.yandex.ua/stat/?id=37536575&amp;from=informer"
 				target="_blank" rel="nofollow"><img src="https://informer.yandex.ru/informer/37536575/3_1_ECFFFFFF_CCFFFFFF_0_pageviews"
 				style="width:88px; height:31px; border:0;" alt="Яндекс.Метрика" title="Яндекс.Метрика: данные за сегодня (просмотры, визиты и уникальные посетители)" onclick="try{Ya.Metrika.informer({i:this,id:37536575,lang:'ru'});return false}catch(e){}" /></a>
-				<!-- /Yandex.Metrika informer -->
+				<!-- /Yandex.Metrika informer -->*/?>
 				<br>Мы в Вконтакте:<br>
 				<a href="https://vk.com/limuzin_arenda_odessa" target="_blank" class="my-link">Лимузины</a><br>
 				<a href="https://vk.com/arenda_avtobus_odessa" target="_blank" class="my-link">Автобусы</a>	
@@ -37,7 +37,7 @@
 	</footer>
 	
 	<!-- Yandex.Metrika counter -->
-	<script type="text/javascript">/*
+	<script type="text/javascript"><?php /*
 		(function (d, w, c) {
 			(w[c] = w[c] || []).push(function() {
 				try {
@@ -89,7 +89,7 @@
 			"https://www.instagram.com/15diva/",
 			"https://ok.ru/group/54674360107021"
 		  ]
-		}*/
+		}*/?>
 	</script>
 	
 	

@@ -11,15 +11,13 @@ class Filter{
 		}
 		
 		$validFilters 			= self::validation($filters, $rules);
-		$validFiltersAsString 	= self::stringFromValidFilters($validFilters);
+		$validFiltersAsString 	= self::stringFromFilters($validFilters);
 		
 		if(strcmp($filtersAsString, $validFiltersAsString) !== 0){
 			header("HTTP/1.1 301 Moved Permanently");
 			header('Location:' . str_replace($filtersAsString . (!$validFiltersAsString ? '/' : ''), $validFiltersAsString, FULL_URL));
 		}
 		
-		//var_dump($validFilters);
-		//exit;
 		return $validFilters;
     }
 	
@@ -49,7 +47,7 @@ class Filter{
 		return $sqlString;
 	}
 	
-	public static function stringFromValidFilters($validFilters){
+	public static function stringFromFilters($validFilters){
 		if(!is_array($validFilters)){
 			throw new \InvalidArgumentException('invalid filters');
 		}
@@ -61,5 +59,9 @@ class Filter{
 		}
 		
 		return substr($string, 0, -1);
+	}
+	
+	public static function clearInvalidFilter($filters, $invalidFilter, $limiter){
+		return str_replace([$invalidFilter . $limiter, $limiter . $invalidFilter, $invalidFilter], '', $filters);
 	}
 }
