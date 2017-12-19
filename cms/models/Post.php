@@ -8,102 +8,119 @@ use Jump\helpers\Filter;
 class Post extends Model{
 	use \Jump\helpers\CurrentWork;
 	
-	private $filters = [];
-	private $filtersRules = [
-		'page' => '/^([2-9]|\d{2,})$/',
-	];
+	private $id;
+	private $url;
+	private $title;
+	private $content;
+	private $tags;
+	private $post_type;
+	private $parent;
+	private $autor;
+	private $status;
+	private $comment_status;
+	private $comment_count;
+	private $visits;
+	private $created;
+	private $modified;
+	
+	private $filters;
+	private $limit;
+	private $page;
+	private $start;
+	private $select = 'Select * from posts where ';
+	private $relationship = 'posts p, terms t, term_taxonomy tt, term_relationships tr where t.id = tt.term_id and tt.term_taxonomy_id = tr.term_taxonomy_id and p.id = tr.object_id ';
 	
 	public function single($url, $id = NULL){
-		$post = ($id ? $this->getPostById($id) : $this->getPostByUrl($url)) ?: 0;
-		
-		if($post && isset($post['id']))
-			$post['meta'] = $this->getMeta($post['id']);
-		
-		return $post;
+		return $id ? $this->getPostById($id) : $this->getPostByUrl($url);
 	}
 	
 	public function getPostById($id){
-		return $this->db->getRow('Select * from posts where id = ?i', $id);
+		return $this->db->getRow($this->select . 'id = ?i', $id);
 	}
 	
 	public function getPostByUrl($url){
-		//var_dump();exit;
-		$data = $this->db->getRow('Select * from posts where url = ?s and post_type = ?s', $url, $this->options['type']);
-		if($data){
-			if(isset($this->options['slug']))
-				$this->config->addBreadCrumbs($this->options['slug'], $this->options['title']);
-			$this->config->addBreadCrumbs($data['url'], $data['title']);
-			
-			if(isset($this->options['slug']))
-				$data['title'] .= ' - ' . $this->options['title'];
+		return $this->db->getRow($this->select . 'url = ?s and post_type = ?s', $url, $this->options['type']);
+	}
+	
+	public function getPostsByPostType(){
+		$query = $this->select . 'post_type = ?s order by id DESC';
+		$this->checkInLimit($query, [$this->options['type']]);
+		return $this->db->getAll($query . $this->limit, $this->options['type']);
+	}
+	
+	public function getPostsByFilters($filters, $postType){
+		$sqlFilters = '';
+		// Соберем таксономии и проверим их валидность
+		// Если найдутся невалидные, нужно вырезать из запроса данный фильтр и перенаправить
+		// Если валидных меньше чем присланных, проходимся по валидным, сверяемся с присланными, сохраняем невалидные присланные, формируем и режем
+		$validFilters = $this->taxonomyValidation($filters, $postType);
+		
+		$filtersAsString = Filter::stringFromFilters($filters);
+		$validFiltersAsString = Filter::stringFromFilters($validFilters);
+	
+		//var_dump($filters, $validFilters, $filtersAsString, $validFiltersAsString);
+		
+		if(strcmp($filtersAsString, $validFiltersAsString) !== 0){echo 1;exit;
+			$this->request->location(str_replace($filtersAsString . (!$validFiltersAsString ? '/' : ''), $validFiltersAsString, FULL_URL), 301);
 		}
+		
+		// Формируем условие из валидных фильтров
+		foreach($validFilters as $taxonomy => $slugs){
+			$sqlFilters .= " (tt.taxonomy = '{$postType}-{$taxonomy}' and t.slug IN('" . str_replace(',', "','", $slugs) . "')) OR";
+		}
+		
+		$query = $this->select . 'id IN(Select DISTINCT p.id from ' . $this->relationship . ' and ('.substr($sqlFilters, 0, -3).')) order by id DESC';
+		$this->checkInLimit($query, []);
+		$data = $this->db->getAll($query . $this->limit);
+		//var_dump($q, $data);exit;
 		return $data;
 	}
 	
-	
-	public function getPostList($category, $catValue, $tag, $tagValue, $filters){//var_dump(func_get_args());exit;
+	// Поиск валидных фильтров и их значений из присланных
+	private function taxonomyValidation($filters, $postType){
+		$type = $this->options['type'] . '-';
+		$taxonomies = '';
 		
-		$perPage 	= 10;
-		$page		= 1;
-		
-		if($this->filters = Filter::analisys($filters, $this->filtersRules)){
-			$page = $this->getFilter('page', true) ?: 1;
+		// Формируем условие из фильтров и их значений
+		// Узнаем ваилидные фильтры, и валидные значения
+		foreach($filters as $taxonomy => $values){
+			$taxonomies .= "(tt.taxonomy = '{$type}{$taxonomy}' AND t.slug IN('" . str_replace(',', "','", $values) . "')) OR ";
 		}
 		
+		$validTaxonomies = $this->db->getAll('Select DISTINCT tt.taxonomy as filter, t.slug as value from term_taxonomy as tt, terms as t where tt.term_taxonomy_id = t.id and ' . substr($taxonomies, 0, -3));
 		
-		$data = call_user_func_array([$this, 'getPostsByTerm'], $category ? [$category, $catValue, $this->filters] : [$tag, $tagValue, $this->filters]);
-		
-		if(!$data) return 0;
-			
-		if($data)
-			$this->config->addBreadCrumbs($this->options['slug'], $this->options['title']);
-		
-		if($category){
-			$this->config->addBreadCrumbs($category, $catValue);
-			$data['title'] = $catValue . ' - категория ' . $data['title'];
-		}
-		
-		if($tag){
-			$this->config->addBreadCrumbs($tag, 'Метка: ' . $tagValue);
-			$data['title'] = $tagValue . ' - метка ' . $data['title'];
-		}
-		
-		return $data;
+		return $this->creatingValidFilters($validTaxonomies, $postType);
 	}
 	
-	public function getPostsByTerm($taxonomy, $value, $filters = false){
+	// Форматирование новых валидных фильтров и их значеий
+	private function creatingValidFilters($validFilters, $postType){
+		$newValidFilters = [];
 		
-		$data = $this->options;
-		$list = $this->options['type'] . 's_list';
-		
-		if($filters){
-			$data[$list] = $this->getPostsByFilters($filters, $this->options['type']);
-			return $data;
+		foreach($validFilters as $filter){
+			$newValidFilters[str_replace($postType . '-', '', $filter['filter'])][] = $filter['value'];
 		}
 		
-		if(!$taxonomy){
-			$data[$list] = $this->db->getAll('Select * from posts where post_type = ?s order by id DESC', $this->options['type']);
-		}else{
-			$filtersSql = '';
-			if($filters){
-				foreach($filters as $key => $fvalue){
-					$filtersSql .= ' and meta_key = \'' . $key . '\' and meta_value = \'' . $fvalue . '\'';
-				}
-			}
-			
-			// Проверим есть ли вообще такой термин
-			if(!$this->db->getOne('Select t.id from terms as t, term_taxonomy as tt where t.id = tt.term_id and t.slug = ?s and tt.taxonomy = ?s', $value, $taxonomy)) return 0;
-			
-			$query = 'Select DISTINCT p.id from posts p, terms t, term_taxonomy tt, term_relationships tr where t.id = tt.term_id and tt.term_taxonomy_id = tr.term_taxonomy_id and p.id = tr.object_id and t.slug = ?s and tt.taxonomy = ?s';
-			
-			$data[$list] = $this->db->getAll('Select * from posts where id IN('. $query .') order by id DESC', $value, $taxonomy);
+		foreach($newValidFilters as $filters => $values){
+			$newValidFilters[$filters] = implode(',', $values);
 		}
 		
-		
-		return $data;
+		return $newValidFilters;
 	}
 	
-	private function getMeta($postId){
+	public function getPostList($taxonomy, $value){
+		// Проверим есть ли вообще такой термин
+		if(!$this->checkTermExists($taxonomy, $value)) 
+			return 0;
+		$query = $this->select . 'id IN(Select DISTINCT p.id from ' . $this->relationship . ' and t.slug = ?s and tt.taxonomy = ?s) order by id DESC';
+		$this->checkInLimit($query, [$value, $taxonomy]);
+		return $this->db->getAll($query . $this->limit, $value, $taxonomy);
+	}
+	
+	private function checkTermExists($taxonomy, $value){
+		return $this->db->getOne('Select t.id from terms as t, term_taxonomy as tt where t.id = tt.term_id and t.slug = ?s and tt.taxonomy = ?s', $value, $taxonomy);
+	}
+	
+	public function getMeta($postId){
 		return $this->metaProcessing($this->db->getAll('Select meta_key, meta_value from postmeta where post_id = ?i', $postId));
 	}
 	
@@ -119,16 +136,25 @@ class Post extends Model{
 		return $metaNew;
 	}
 	
-	private function getFilter($name, $delete = false){
-		$filterNecessary = false;
-		
-		if(isset($this->filters[$name])){
-			$filterNecessary = $this->filters[$name];
-			if($delete)
-				unset($this->filters[$name]);
+	private function checkInLimit($query, $params){
+		$countItems = (int)call_user_func_array([$this->db, 'getOne'], array_merge([str_replace('Select *', 'Select COUNT(*) as count', $query)], $params));
+			//var_dump($countItems, $this->start, Filter::clearInvalidFilter(FULL_URL, 'page=' . $this->page, ';'));exit;
+		if($countItems <= $this->start){
+			$newUrl = Filter::clearInvalidFilter(FULL_URL, 'page=' . $this->page, ';');
+			if(!$this->filters)
+				$newUrl = substr($newUrl, 0, -1);
+			//var_dump($countItems, $this->start, $newUrl);exit;
+			$this->request->location($newUrl);
 		}
-		
-		return $filterNecessary;
 	}
 	
+	public function setLimit($page, $perPage){
+		$this->page = (int)$page;
+		$this->start = ($this->page - 1 ) * 1;
+		$this->limit = ' LIMIT ' . $this->start . ',' . $perPage;
+	}
+	
+	public function setFilters($filters){
+		$this->filters = $filters;
+	}
 }

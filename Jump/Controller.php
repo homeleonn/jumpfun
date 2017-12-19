@@ -22,6 +22,11 @@ class Controller{
 	
     protected $options;
 	
+	protected $filtersRules = [
+		'page' => '/^([2-9]|\d{2,})$/',
+		'view' => '/^list$/',
+	];
+	
 	
 	public function __construct(DI $di, $model){
 		$this->di = $di;

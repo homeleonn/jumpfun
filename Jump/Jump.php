@@ -24,5 +24,6 @@ class Jump{
 			header('HTTP/1.1 404 Not Found');
 			exit('Page not found');
 		}
+		var_dump($this->di->get('db')->getStats());
 	}
 }

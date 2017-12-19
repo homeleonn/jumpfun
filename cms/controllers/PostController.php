@@ -3,17 +3,82 @@
 namespace cms\controllers;
 
 use Jump\Controller;
+use Jump\helpers\Filter;
 
 class PostController extends Controller{
 	public function actionIndex(){
-		return $this->model->single(NULL, $this->config->front_page);
+		return $this->actionSingle(NULL, $this->config->front_page);
 	}
 	
-	public function actionList($category = null, $catValue = null, $tag = null, $tagValue = null, $filters = null){
-		return $this->model->getPostList($category, $catValue, $tag, $tagValue, $filters);
+	public function actionSingle($url, $id = NULL){
+		if(!$post = $this->model->single($url, $id)) return 0;
+		if(isset($post['id'])) 
+			$post['meta'] = $this->model->getMeta($post['id']);
+		$this->addBreadCrumbs($post);
+		return $post;
 	}
 	
-	public function actionSingle($url){//var_dump($url);
-		return $this->model->single($url);
+	public function actionList($taxonomy = null, $value = null, $type = null, $filters = null){
+		$this->filters = $filters;
+		global $viewParams;
+		$list 	  = $this->options;
+		$listMark = $list['type'] . 's_list';
+		$page = 1;
+		$perPage = 1;
+		
+		if($this->filters = Filter::analisys($filters, $this->filtersRules)){
+			$page = $this->getFilter('page', true) ?: 1;
+			$viewParams['view'] = $this->getFilter('view', true) ?: 'item';
+		}
+		
+		$this->model->setLimit($page, $perPage);
+		$this->model->setFilters($this->filters);
+		
+		if($this->filters){
+			$list[$listMark] = $this->model->getPostsByFilters($this->filters, $this->options['type']);
+		}elseif(!$taxonomy){
+			$list[$listMark] = $this->model->getPostsByPostType();
+		}else
+			$list[$listMark] = $this->model->getPostList($taxonomy, $value);
+		
+		$this->addBreadCrumbs($list, $taxonomy, $value, $type);
+		
+		return $list;
+	}
+	
+	private function getFilter($name, $delete = false){
+		$filterNecessary = false;
+		
+		if(isset($this->filters[$name])){
+			$filterNecessary = $this->filters[$name];
+			if($delete)
+				unset($this->filters[$name]);
+		}
+		
+		return $filterNecessary;
+	}
+	
+	
+	/*******************/
+	/*** BreadCrumbs ***/
+	/*******************/
+	
+	private function addBreadCrumbs(&$post, $taxonomy = null, $value = null, $type = null){
+		if(isset($this->options['slug']))
+			$this->config->addBreadCrumbs($this->options['slug'], $this->options['title']);
+		
+		if($type){
+			$this->addBreadCrumbsHelper($taxonomy, $value, ($type == 'category' ? 'категория' : 'метка'), $post['title']);
+		}elseif(isset($post['id']) && $this->config->front_page != $post['id']){
+			$this->config->addBreadCrumbs($post['url'], $post['title']);
+			if(isset($this->options['slug']))
+				$post['title'] .= ' - ' . $this->options['title'];
+		}
+			
+	}
+	
+	private function addBreadCrumbsHelper($taxonomy, $value, $text, &$postTitle){
+		$this->config->addBreadCrumbs($taxonomy, $text . ': ' . $value);
+		$postTitle = $value . " - {$text} " . $postTitle;
 	}
 }
