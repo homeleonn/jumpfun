@@ -20,7 +20,7 @@ $data['type'] = $data['taxonomy'] == $options['category_slug'] ? 'category' : 't
 		
 		<div class="block1">
 			<div>Описание</div>
-			<div><textarea name="description" id="description" value="" style="width: 100%;height: 600px;"><?=$data['description']?></textarea></div>
+			<div><textarea class="nonEditor" name="description" id="description" value="" style="width: 100%;height: 600px; visibility:hidden;"><?=$data['description']?></textarea></div>
 		</div>
 	</div>
 	<div id="sidebar-right">

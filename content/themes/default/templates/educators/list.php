@@ -29,7 +29,7 @@ if(!isset($educators_list) || empty($educators_list)) {
 			if($filters){
 				echo '<a href="', SITE_URL ,  $slug, '/">Cбросить фильтр</a><br>';
 				foreach($filters as $filter){
-					echo '<a href="', SITE_URL , $filter['taxonomy'], '/' . $filter['slug'], '/">', $filter['name'], '</a><br>';
+					echo '<a href="', SITE_URL , $filter['taxonomy'], '/' . $filter['slug'], '/">', $filter['name'], '</a> (', $filter['count'],')<br>';
 				}
 			}
 			
@@ -38,3 +38,4 @@ if(!isset($educators_list) || empty($educators_list)) {
 	</div>
 	
 </div>
+<?=$pagenation;?>

@@ -184,3 +184,14 @@ table.admin td{
 	margin: 10px 0;
 }
 
+.choose-editor span{
+	font-weight: bold;
+}
+
+.choose-editor span:hover,
+.choose-editor span.active{
+	text-decoration: underline;
+}
+
+
+

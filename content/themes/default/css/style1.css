@@ -2068,3 +2068,34 @@ h3.subtitle{
 img{
 	max-width: 100%;
 }
+
+#pagenation{
+	text-align: center;
+	padding: 80px 10px 0px;
+}
+
+#pagenation li {
+    display: inline-block;
+    padding: 2px;
+}
+
+#pagenation a{
+	padding: 5px;
+	font-size: 22px;
+	font-weight: bold;
+	display: inline-block;
+	width: 40px;
+	height: 40px;
+	border-radius: 4px;
+	transition: .5s;
+	
+}
+
+#pagenation a.active-page-link{
+	background: lightgreen;
+	color: black;
+}
+
+#pagenation a:hover{
+	background: #c4ffc1;
+}

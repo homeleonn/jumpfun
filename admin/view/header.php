@@ -27,5 +27,7 @@
 			<div id="logo"><img src="<?php echo ADMIN_THEME;?>img/jump.png"></div>
 		</div>
 	</header>
-	<?php include 'dashboard.php'; ?>
+	<?php 
+		include 'dashboard.php';
+	?>
 	<div id="content">

@@ -4,6 +4,7 @@ namespace cms\controllers;
 
 use Jump\Controller;
 use Jump\helpers\Filter;
+use Jump\helpers\Pagenation;
 
 class PostController extends Controller{
 	public function actionIndex(){
@@ -25,8 +26,8 @@ class PostController extends Controller{
 		$listMark = $list['type'] . 's_list';
 		$page = 1;
 		$perPage = 1;
-		
 		if($this->filters = Filter::analisys($filters, $this->filtersRules)){
+			$fullFilters = $this->filters;
 			$page = $this->getFilter('page', true) ?: 1;
 			$viewParams['view'] = $this->getFilter('view', true) ?: 'item';
 		}
@@ -42,6 +43,8 @@ class PostController extends Controller{
 			$list[$listMark] = $this->model->getPostList($taxonomy, $value);
 		
 		$this->addBreadCrumbs($list, $taxonomy, $value, $type);
+		//var_dump($page, $this->model->getAllItemsCount(), $perPage, isset($fullFilters) ? Filter::stringFromFilters($fullFilters) : '');
+		$list['pagenation'] = (new Pagenation())->run($page, $this->model->getAllItemsCount(), $perPage, isset($fullFilters) ? Filter::stringFromFilters($fullFilters) : '');
 		
 		return $list;
 	}

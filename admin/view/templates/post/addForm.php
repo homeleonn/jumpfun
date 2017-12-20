@@ -19,7 +19,7 @@
 		
 		<div class="block1">
 			<div>Текст</div>
-			<div><textarea name="content" id="content" value="1" style="width: 100%;height: 600px;"></textarea></div>
+			<div id="editors"><textarea name="content" id="content" value="1" style="width: 100%;height: 600px; visibility:hidden;"></textarea></div>
 		</div>
 	</div>
 	

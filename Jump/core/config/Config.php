@@ -18,6 +18,7 @@ class Config{
 	public function __construct(DI $di, $routes = NULL){
 		$this->di = $di;
 		$this->db = $this->di->get('db');
+		$this->options['postType'] = NULL;
 		
 		// Загружаем обязательные настройки сайта из базы данных
 		$this->optionsLoad();
@@ -76,14 +77,13 @@ class Config{
 		$router = $this->di->get('router');
 		
 			if(ENV != 'admin'){
-				$filtersRegExp = '[a-zA-Z0-9-,=;]+[^;]';
 				
 				$router
 					->add($slug, $type . ':list')
-					->add($slug . '/(' . $filtersRegExp . ')', $type . ':list////$1')
+					->add($slug . '/(' . FILTER_PATTERN . ')', $type . ':list////$1')
 					// category + filters
-					->add('(' . $type . '-cat)/(' . URL_PATTERN . ')' . '(/(' . $filtersRegExp . '))?', $type . ':list/$1/$2/category/$4')
-					->add('(' . $type . '-tag)/(' . URL_PATTERN . ')' . '(/(' . $filtersRegExp . '))?', $type . ':list/$1/$2/tag/$4')
+					->add('(' . $type . '-cat)/(' . URL_PATTERN . ')' . '(/(' . FILTER_PATTERN . '))?', $type . ':list/$1/$2/category/$4')
+					->add('(' . $type . '-tag)/(' . URL_PATTERN . ')' . '(/(' . FILTER_PATTERN . '))?', $type . ':list/$1/$2/tag/$4')
 					->add($slug . '/(' . URL_PATTERN . ')', $type . ':single/$1');
 			}else{
 				$router

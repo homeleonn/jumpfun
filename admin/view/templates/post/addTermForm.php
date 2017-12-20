@@ -20,7 +20,7 @@ if(isset($_GET['msg']))
 		
 		<div class="block1">
 			<div>Описание</div>
-			<div><textarea name="description" id="description" value="1" style="width: 100%;height: 600px;"></textarea></div>
+			<div><textarea class="nonEditor" name="description" id="description" value="1" style="width: 100%;height: 600px;"></textarea></div>
 		</div>
 	</div>
 	<div id="sidebar-right">

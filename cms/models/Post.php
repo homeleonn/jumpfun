@@ -27,6 +27,7 @@ class Post extends Model{
 	private $limit;
 	private $page;
 	private $start;
+	private $allItemsCount;
 	private $select = 'Select * from posts where ';
 	private $relationship = 'posts p, terms t, term_taxonomy tt, term_relationships tr where t.id = tt.term_id and tt.term_taxonomy_id = tr.term_taxonomy_id and p.id = tr.object_id ';
 	
@@ -60,10 +61,9 @@ class Post extends Model{
 	
 		//var_dump($filters, $validFilters, $filtersAsString, $validFiltersAsString);
 		
-		if(strcmp($filtersAsString, $validFiltersAsString) !== 0){echo 1;exit;
+		if(strcmp($filtersAsString, $validFiltersAsString) !== 0){var_dump(1);exit;
 			$this->request->location(str_replace($filtersAsString . (!$validFiltersAsString ? '/' : ''), $validFiltersAsString, FULL_URL), 301);
 		}
-		
 		// Формируем условие из валидных фильтров
 		foreach($validFilters as $taxonomy => $slugs){
 			$sqlFilters .= " (tt.taxonomy = '{$postType}-{$taxonomy}' and t.slug IN('" . str_replace(',', "','", $slugs) . "')) OR";
@@ -137,20 +137,25 @@ class Post extends Model{
 	}
 	
 	private function checkInLimit($query, $params){
-		$countItems = (int)call_user_func_array([$this->db, 'getOne'], array_merge([str_replace('Select *', 'Select COUNT(*) as count', $query)], $params));
-			//var_dump($countItems, $this->start, Filter::clearInvalidFilter(FULL_URL, 'page=' . $this->page, ';'));exit;
-		if($countItems <= $this->start){
+		$this->allItemsCount = (int)call_user_func_array([$this->db, 'getOne'], array_merge([str_replace('Select *', 'Select COUNT(*) as count', $query)], $params));
+		
+		//var_dump($this->db->getAll($query));exit;;
+		if($this->allItemsCount && $this->allItemsCount <= $this->start){
 			$newUrl = Filter::clearInvalidFilter(FULL_URL, 'page=' . $this->page, ';');
 			if(!$this->filters)
 				$newUrl = substr($newUrl, 0, -1);
-			//var_dump($countItems, $this->start, $newUrl);exit;
+			
 			$this->request->location($newUrl);
 		}
 	}
 	
+	public function getAllItemsCount(){
+		return $this->allItemsCount;
+	}
+	
 	public function setLimit($page, $perPage){
 		$this->page = (int)$page;
-		$this->start = ($this->page - 1 ) * 1;
+		$this->start = ($this->page - 1 ) * $perPage;
 		$this->limit = ' LIMIT ' . $this->start . ',' . $perPage;
 	}
 	

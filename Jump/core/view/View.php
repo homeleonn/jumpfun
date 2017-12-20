@@ -30,9 +30,9 @@ class View
 				unset($data);
 			}
 		}else{
-			
+			$options = $this->di->get('config')->getCurrentPageOptions();
 		}
-		$options = $this->di->get('config')->getCurrentPageOptions();
+		
 		
 		//var_dump(get_defined_vars());exit;
 		$templateFile 	= $this->theme->template($template);
