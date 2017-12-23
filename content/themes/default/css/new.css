@@ -37,3 +37,23 @@
 .new .list-item{
 	margin: 10px 0;
 }
+
+.filters{
+	margin: 10px 0;
+	width: 300px;
+	max-width: 100%;
+}
+
+.filters .title{
+	background: #090;
+	border-radius: 5px 5px 0 0;
+	padding: 5px;
+	text-align: center;
+}
+
+.filters .content{
+	background: #555;
+	padding: 5px;
+	border-radius: 0 0 5px 5px;
+	clear: both;
+}

@@ -36,7 +36,7 @@ function checkData(act, data){
 	if((act != 'del' && !checkUrl(data.elements['url'])) || !validData){
 		return 'Данные введены некорректно';
 	}
-	//console.log(data);
+	
 	if(checkEmpty(data)){
 		return 'Не все поля заполнены';
 	}
@@ -249,14 +249,13 @@ $(function(){
 		localStorage.setItem("visual-editor", "2");
 	
 	$('#editors').prepend('<div class="right choose-editor"><span id="visual">Визуальный</span> | <span id="simple">Текстовый</span></div>');
-	
 	$('#editors > textarea').after('<textarea id="simple-editor" style="width:100%;height: 600px;display: none;"></textarea>');
 	
 	if(localStorage.getItem("visual-editor") == "2"){
 		setTimeout(function(){
 			$('.mce-tinymce').css('display', 'none');
 			$('#editors > textarea#simple-editor').html(text).css('display', 'block');
-		$('#editors > .choose-editor > #simple').addClass('active');
+			$('#editors > .choose-editor > #simple').addClass('active');
 		}, 500);
 	}else{
 		setTimeout(function(){
@@ -269,7 +268,6 @@ $(function(){
 	
 	$('.choose-editor').click(function(e){
 		if($(e.target).hasClass('active')) return;
-		console.log(e.target.id, e.target)
 		
 		$(this).children('span').removeClass('active');
 		$(e.target).addClass('active');

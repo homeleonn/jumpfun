@@ -1,7 +1,3 @@
-<?php 
-
-//var_dump(get_defined_vars());exit;
-?>
 <a href="<?=SITE_URL?>admin/<?=$options['slug']?>/add-term/?type=<?=$data['type']?>" class="action-tool plus" title="Добавить"><span class="icon-plus">Добавить</span></a>
 <div style="overflow-x: auto;">
 	<table class="mytable">

@@ -61,7 +61,7 @@ class Filter{
 		return substr($string, 0, -1);
 	}
 	
-	public static function clearInvalidFilter($filters, $invalidFilter, $limiter){
+	public static function clearFilter($filters, $invalidFilter, $limiter = ';'){
 		return str_replace([$invalidFilter . $limiter, $limiter . $invalidFilter, $invalidFilter], '', $filters);
 	}
 }

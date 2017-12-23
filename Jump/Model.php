@@ -23,6 +23,5 @@ abstract class Model{
 		$this->config = $this->di->get('config');
 		$this->request = $this->di->get('request');
 		Common::loadCurrentPostOptions();
-		
 	}
 }

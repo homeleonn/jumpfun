@@ -19,7 +19,8 @@ class Jump{
 	
 	public function run(){
 		if($this->router->searchController() && ($data = $this->router->run($this->di)) !== 0){	
-			$this->view->render($this->router->getController() . '/' . $this->router->getAction(), $data);
+			if(!$this->view->rendered())
+				$this->view->render($this->router->getController() . '/' . $this->router->getAction(), $data);
 		}else{
 			header('HTTP/1.1 404 Not Found');
 			exit('Page not found');

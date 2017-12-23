@@ -1,16 +1,15 @@
 <?php 
 use Jump\helpers\Common;
 ?>
-<a href="<?=SITE_URL?>admin/<?=Common::postSlug()?>/add/" class="action-tool plus" title="Добавить"><span class="icon-plus">Добавить</span></a>
+<a href="<?=SITE_URL?>admin/<?=$options['slug']?>/add/" class="action-tool plus" title="Добавить"><span class="icon-plus">Добавить</span></a>
 <div style="overflow-x: auto;">
 	<table class="mytable">
 		<tr align="center">
 			<td>title/url</td><td>Дата публикации</td><td></td><td></td>
 		</tr>
 		<?php
-		$slug = Common::postSlug();
 		foreach($data as $page):
-			$link = '<a target="_blank" href="' . ROOT_URI . $slug . '/' . $page['url'] . '/">' . $page['title'] . '</a>';
+			$link = '<a target="_blank" href="' . ROOT_URI . (Common::isPage() ? '' : $options['slug'] . '/') . $page['url'] . '/">' . $page['title'] . '</a>';
 		?>
 		<tr>
 				<td><?=$link;?></td>

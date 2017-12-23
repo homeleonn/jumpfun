@@ -7,6 +7,7 @@ use Jump\helpers\Filter;
 
 class Post extends Model{
 	use \Jump\helpers\CurrentWork;
+	use \Jump\traits\PostTrait;
 	
 	private $id;
 	private $url;
@@ -43,10 +44,10 @@ class Post extends Model{
 		return $this->db->getRow($this->select . 'url = ?s and post_type = ?s', $url, $this->options['type']);
 	}
 	
-	public function getPostsByPostType(){
+	public function getPostsByPostType($type){
 		$query = $this->select . 'post_type = ?s order by id DESC';
-		$this->checkInLimit($query, [$this->options['type']]);
-		return $this->db->getAll($query . $this->limit, $this->options['type']);
+		$this->checkInLimit($query, [$type]);
+		return $this->db->getAll($query . $this->limit, $type);
 	}
 	
 	public function getPostsByFilters($filters, $postType){
@@ -109,15 +110,41 @@ class Post extends Model{
 	
 	public function getPostList($taxonomy, $value){
 		// Проверим есть ли вообще такой термин
-		if(!$this->checkTermExists($taxonomy, $value)) 
+		if(!$termName = $this->checkTermExists($taxonomy, $value)) 
 			return 0;
 		$query = $this->select . 'id IN(Select DISTINCT p.id from ' . $this->relationship . ' and t.slug = ?s and tt.taxonomy = ?s) order by id DESC';
 		$this->checkInLimit($query, [$value, $taxonomy]);
-		return $this->db->getAll($query . $this->limit, $value, $taxonomy);
+		$post = $this->db->getAll($query . $this->limit, $value, $taxonomy);
+		$post['termName'] = $termName;
+		return $post;
 	}
 	
 	private function checkTermExists($taxonomy, $value){
-		return $this->db->getOne('Select t.id from terms as t, term_taxonomy as tt where t.id = tt.term_id and t.slug = ?s and tt.taxonomy = ?s', $value, $taxonomy);
+		return $this->db->getOne('Select t.name from terms as t, term_taxonomy as tt where t.id = tt.term_id and t.slug = ?s and tt.taxonomy = ?s', $value, $taxonomy);
+	}
+	
+	public function getTermNameByTermSlug($slug){
+		return $this->db->getOne('Select name from terms where slug = ?s LIMIT 1', $slug);
+	}
+	
+	public function getTermsByPostId($postId){
+		$terms = $this->db->getAll('Select t.*, tt.* from terms as t, term_taxonomy as tt, term_relationships as tr where t.id = tt.term_id and tt.term_taxonomy_id = tr.term_taxonomy_id and tr.object_id = ' . $postId);
+		
+		$categories = $tags = '';
+		if($terms){
+			foreach($terms as $term){
+				if($this->options['category_slug'] == $term['taxonomy'])
+					$categories .= "<a href='".SITE_URL."{$this->options['category_slug']}/{$term['slug']}/'>{$term['name']}</a>";
+				elseif($this->options['tag_slug'] == $term['taxonomy'])
+					$tags .= "<a href='".SITE_URL."{$this->options['tag_slug']}/{$term['slug']}/'>{$term['name']}</a>";
+					
+			}
+		}
+		
+		if($categories) $categories = 'Категории: ' . $categories;
+		if($tags) $tags = '<br>Теги: ' . $tags;
+		
+		return $categories . $tags;
 	}
 	
 	public function getMeta($postId){
@@ -137,11 +164,12 @@ class Post extends Model{
 	}
 	
 	private function checkInLimit($query, $params){
+		if(!$this->page || $this->page == 1) return;
 		$this->allItemsCount = (int)call_user_func_array([$this->db, 'getOne'], array_merge([str_replace('Select *', 'Select COUNT(*) as count', $query)], $params));
 		
 		//var_dump($this->db->getAll($query));exit;;
 		if($this->allItemsCount && $this->allItemsCount <= $this->start){
-			$newUrl = Filter::clearInvalidFilter(FULL_URL, 'page=' . $this->page, ';');
+			$newUrl = Filter::clearFilter(FULL_URL, 'page=' . $this->page, ';');
 			if(!$this->filters)
 				$newUrl = substr($newUrl, 0, -1);
 			
@@ -153,13 +181,23 @@ class Post extends Model{
 		return $this->allItemsCount;
 	}
 	
-	public function setLimit($page, $perPage){
-		$this->page = (int)$page;
-		$this->start = ($this->page - 1 ) * $perPage;
-		$this->limit = ' LIMIT ' . $this->start . ',' . $perPage;
+	public function getFiltersHTML($options){
+		$filters = $this->db->getAll('Select DISTINCT t.*, tt.* from terms as t, term_taxonomy as tt where t.id = tt.term_id and tt.count > 0 and (tt.taxonomy = \''.$options['category_slug'].'\' OR tt.taxonomy = \''.$options['tag_slug'].'\')');
+		$html['categories'] = $html['tags'] = $html['all'] = '';	
+		if($filters){
+			$html['all'] .= '<a href="'. SITE_URL . $options['slug'] . '/">Все</a><br>';
+			foreach($filters as $filter){
+				$html[($filter['taxonomy'] == $options['category_slug'] ? 'categories' : 'tags')] .= "<a href=\"" . SITE_URL . "{$filter['taxonomy']}/{$filter['slug']}/\">{$filter['name']}</a> ({$filter['count']})<br>";
+			}
+		}
+		
+		if($html['categories']) $html['categories'] = $this->getFiltersHTMLHelper('Категории', $html['categories']);
+		if($html['tags'])		$html['tags'] 		= $this->getFiltersHTMLHelper('Теги', $html['tags']);
+		
+		return $html['all'] . $html['categories'] . $html['tags'];
 	}
 	
-	public function setFilters($filters){
-		$this->filters = $filters;
+	public function getFiltersHTMLHelper($type, $html){
+		return '<div class="filters"><div class="title">' . $type . '</div><div class="content">' . $html . '</div></div>';
 	}
 }

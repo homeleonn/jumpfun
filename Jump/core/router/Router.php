@@ -24,21 +24,12 @@ class Router{
 	public function run(){
 		$controller = '\\' . ENV . '\controllers\\' . ucfirst($this->controller) . 'Controller';
 		$action = 'action' . ucfirst($this->action);
-
-		//var_dump($controller,$action);exit;
 		return call_user_func_array([new $controller($this->di, $this->controller), $action], $this->params);
 	}
 	
 	public function searchController(){
 		$uri = urldecode($this->request->uri());
-		
-		if(strpos($uri, 'admin/') === 0) {
-			if($uri == 'admin/') $uri = '/';
-			else{
-				$replaceCount = 1;
-				$uri = str_replace('admin/', '', $uri, $replaceCount);
-			}
-		}
+		$uri = $this->replaceUriIfAdmin($uri);
 		
 		$this->routesReverse();
 		//var_dump($this->routes);exit;
@@ -55,16 +46,13 @@ class Router{
 			if(preg_match($pattern, $uri))
 			{
 				$convertedUri = preg_replace($pattern, $replacement['controller'], $uri);
-			
 				list($this->controller, $this->action, $this->params) = $this->request->parseUri(true, $convertedUri);
-				
 				return true;
 			}
 		}
 		
 		return false;
 	}
-	
 	
 	private function fillRoutes($routes)
 	{
@@ -107,4 +95,14 @@ class Router{
 		}
 	}
 	
+	private function replaceUriIfAdmin($uri){
+		if(strpos($uri, 'admin/') === 0) {
+			if($uri == 'admin/') $uri = '/';
+			else{
+				$replaceCount = 1;
+				$uri = str_replace('admin/', '', $uri, $replaceCount);
+			}
+		}
+		return $uri;
+	}
 }

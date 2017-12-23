@@ -4,6 +4,7 @@ namespace Jump\Core\view;
 
 use Jump\DI\DI;
 use Jump\Core\view\Theme;
+use Jump\helpers\Common;
 
 class View
 {
@@ -12,6 +13,7 @@ class View
 	private $theme;
 	private $path;
 	private $template;
+	private $rendered = false;
 	
     public function __construct(DI $di, Theme $theme)
     {
@@ -48,6 +50,8 @@ class View
 		include $this->path . 'header.php';
 		include $contentFile;
 		include $this->path . 'footer.php';
+		
+		$this->rendered = true;
 	}
 	
 	public function getFile($filename){
@@ -56,5 +60,9 @@ class View
 			return;
 		}
 		return $filename;
+	}
+	
+	public function rendered(){
+		return $this->rendered;
 	}
 }

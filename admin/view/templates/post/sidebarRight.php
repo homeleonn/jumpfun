@@ -1,4 +1,7 @@
-<?php if($options['slug'] == 'pages') return ;?>
+<?php 
+use Jump\helpers\Common;
+if(Common::isPage()) return;
+?>
 <!-- Block for add post categories -->
 <div id="post-category" class="side-block">
 	<div class="block-title">Категории <?=$options['common']?></div>

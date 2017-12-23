@@ -10,6 +10,9 @@ return [
 	['', 'page:index', 'method' => 'GET'],
 	['('.URL_PATTERN.')', 'page:single/$1'],
 	
+	['('.URL_PATTERN.')-c(\d+)(/(' . FILTER_PATTERN . '))?', 'category/single/$1/$2/$4'],
+	['('.URL_PATTERN.')-p(\d+)', 'product/single/$1/$2'],
+	
 	['login', 'user/login'],
 	['login/auth', 'user/auth', 'POST'],
 	

@@ -3,6 +3,7 @@
 namespace admin\controllers;
 
 use admin\AdminController;
+use Jump\helpers\Common;
 
 class PostController extends AdminController{
 	
@@ -19,7 +20,7 @@ class PostController extends AdminController{
 	}
 	
 	public function actionAddForm(){
-		return $this->model->addForm();
+		if(!Common::isPage()) return $this->model->addForm();
 	}
 	
 	public function actionAdd($type = NULL, $value = NULL){

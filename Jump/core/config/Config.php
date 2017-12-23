@@ -38,14 +38,8 @@ class Config{
 		if(isset($this->options[$name]))
 			return $this->options[$name];
 		
-		$optionValue = $this->db->getOne('Select option_value from options where name = ?s', $name);
-		
-		if($optionValue){
-			$this->options[$name] = $optionValue;
-			return $this->options[$name];
-		}
-		
-		return NULL;
+		$this->options[$name] = $this->db->getOne('Select option_value from options where name = ?s', $name);
+		return $this->options[$name];
 	}
 	
 	public function setOption($name, $value){
@@ -57,7 +51,9 @@ class Config{
 		$options['category_slug'] = $options['type'] . '-cat';
 		$options['tag_slug'] = $options['type'] . '-tag';
 		$this->options['jump_pageTypes'][$options['type']] = $options;
-		$this->addRewrite($slug, $options['type']);
+		if(!isset($options['rewrite'])) $options['rewrite'] = true;
+		if($options['rewrite'])
+			$this->addRewrite($slug, $options['type']);
 		
 	}
 	

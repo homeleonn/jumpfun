@@ -108,7 +108,6 @@ div.sep {
     overflow: hidden;
     background: #E7EAED;
 	clear: both;
-	
 }
 
 .separ{
@@ -136,7 +135,8 @@ div.sep {
 
 .product:after,
 .product #desc:after,
-.clearfix:after {
+.clearfix:after,
+div.sep:after {
 	content: " ";
 	display: table;
 	clear: both;

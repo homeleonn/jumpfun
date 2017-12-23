@@ -89,6 +89,9 @@ class Post extends Model{
 	
 	public function editForm($id){
 		if(!$data = $this->db->getRow('Select * from posts where id = ?s', $id)) return 0;
+		if(!Common::isPage()){
+			return $data;
+		}
 		$data['selfTerms'] = $this->getTermsIdByPostId($id);
 		return array_merge($data, $this->getFormattedTermList());
 	}
