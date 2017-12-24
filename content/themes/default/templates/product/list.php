@@ -3,6 +3,7 @@
 //var_dump(get_defined_vars());
 ?>
 <div class="col-sm-9" style="float: right;">
+	<?php echo $selectedFilters;?>
 	<div class="row">
 	<?php foreach($products as $product):?>
 		

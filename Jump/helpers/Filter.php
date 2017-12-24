@@ -21,7 +21,7 @@ class Filter{
 		return $validFilters;
     }
 	
-	public static function validation($filters, $rules){
+	public static function validation($filters, $rules = []){
 		$filtersNew = [];
 		foreach($filters as $key => $value){
 			// Проверяем проходит ли валидацию по формату

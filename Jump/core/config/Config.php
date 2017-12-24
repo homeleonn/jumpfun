@@ -13,12 +13,13 @@ class Config{
 	
 	private $options;
 	
-	private $breadcrumbs = [SITE_URL => 'Главная'];
+	private $breadcrumbs = [];
+	public $breadcrumbsType = false;
 	
 	public function __construct(DI $di, $routes = NULL){
 		$this->di = $di;
 		$this->db = $this->di->get('db');
-		$this->options['postType'] = NULL;
+		$this->options['postType'] = false;
 		
 		// Загружаем обязательные настройки сайта из базы данных
 		$this->optionsLoad();
@@ -113,18 +114,27 @@ class Config{
 	public function getBreadCrumbs(){
 		$s = '';
 		$snake = '';
-		//var_dump($this->breadcrumbs);
 		$breadcrumbsLength = count($this->breadcrumbs);
 		
 		if($breadcrumbsLength == 1) return;
-		
-		$endElement = array_pop($this->breadcrumbs);
-		//var_dump($this->breadcrumbs);
-		foreach($this->breadcrumbs as $link => $name){
-			$snake .= $link;
-			$s .= '<a href="'.$snake.'">'.$name.'</a> > ';
+		if($this->breadcrumbsType){
+			$this->breadcrumbs = array_reverse($this->breadcrumbs);
 		}
+		$this->breadcrumbs = array_merge(['' => 'Главная'], $this->breadcrumbs);
+		$endElement = array_pop($this->breadcrumbs);
 		
-		return $breadcrumbsLength > 1 ? $s . $endElement : substr($s, 0, -3);
+			
+		
+			foreach($this->breadcrumbs as $link => $name){
+				if(!$this->breadcrumbsType){
+					$snake .= $link;
+					$s .= '<a href="'.$snake.'">'.$name.'</a> > ';
+				}else{
+					$s .= '<a href="'.SITE_URL.$link.'">'.$name.'</a> > ';
+				}
+			}
+			$breadcrumbs = $breadcrumbsLength > 1 ? $s . $endElement : substr($s, 0, -3);
+		
+		return '<div id="breadcrumbs">' . $breadcrumbs . '</div>';
 	}
 }

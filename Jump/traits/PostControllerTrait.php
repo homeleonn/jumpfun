@@ -10,6 +10,7 @@ trait PostControllerTrait{
 		'view' => '/^list$/',
 	];
 	
+	
 	private function filtersProcessed($filters){
 		global $viewParams;
 		$this->filters = $filters;

@@ -13,7 +13,8 @@ class View
 	private $theme;
 	private $path;
 	private $template;
-	private $rendered = false;
+	public $rendered = false;
+	public $cache = false;
 	
     public function __construct(DI $di, Theme $theme)
     {
@@ -35,20 +36,18 @@ class View
 			$options = $this->di->get('config')->getCurrentPageOptions();
 		}
 		
-		
-		//var_dump(get_defined_vars());exit;
 		$templateFile 	= $this->theme->template($template);
-		$this->template = explode('/', $template)[0] . '/';
-		$this->path = $this->theme->path();
+		$this->path = $this->getPath($template);
 		$contentFile = $this->path . 'templates/' . $templateFile . '.php';
-		//var_dump($templateFile, $template, $this->template);exit;
 		if(!is_file($contentFile)){
 			//var_dump('File ' . $contentFile . ' not exists!');
 			$contentFile = $this->path . 'index.php';
 		}
 		
 		include $this->path . 'header.php';
+		//$this->cacheStart();
 		include $contentFile;
+		//$this->cacheStop();
 		include $this->path . 'footer.php';
 		
 		$this->rendered = true;
@@ -65,4 +64,19 @@ class View
 	public function rendered(){
 		return $this->rendered;
 	}
+	
+	public function getPath($template){
+		$this->template = explode('/', $template)[0] . '/';
+		return $this->theme->path();
+	}
+	
+	private function cacheStart(){
+		if($this->cache) ob_start();
+	}
+	
+	private function cacheStop(){
+		if($this->cache) $this->cache = ob_get_clean();
+	}
+	
+	
 }
