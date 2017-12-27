@@ -33,7 +33,7 @@ function getMsg(data){
 
 
 function checkData(act, data){
-	if((act != 'del' && !checkUrl(data.elements['url'])) || !validData){
+	if(act != 'del' && !validData){
 		return 'Данные введены некорректно';
 	}
 	
@@ -46,14 +46,15 @@ function checkData(act, data){
 
 
 function checkEmpty(data){
-	var elInvalid = true;
+	var elInvalid = false;
 	data.check.forEach(function(i){//console.log(data.elements, data.elements[i]);
+	console.log(i, data.elements[i].value);
 		if(data.elements[i].value == '') {
-			elInvalid = false;
+			elInvalid = true;
 			return false;
 		}
 	});
-	return !elInvalid;
+	return elInvalid;
 }
 
 function checkUrl(url){
@@ -112,12 +113,6 @@ function item(act, data){
 	if(typeof(tinymce) != "undefined" && data.elements['content']/*data.type != 'page' && data.type != 'news'*/&& $('textarea#simple-editor')) 
 		data.elements['content'].value = $('#editors span.active').attr('id') == 'visual' ? tinymce.get('content').getContent() : $('textarea#simple-editor').val();
 	
-	/*try{
-		if(data.type == 'news') 
-			data.elements['content'].value = tinymce.get('content').getContent();
-	}catch(e){}*/
-	
-	
 	if((valid = checkData(act, data)) !== true){
 		getMsg({text:valid, eType:'err', el:self, delay: 5});
 		return false;
@@ -143,7 +138,6 @@ function delItem(el, slug, id, type){
 }
 
 function checkElemets(type, act){
-	console.log(type);
 	var checkElemets = {
 		categories:{
 			add:['name','url', 'uploadimgname', 'parent'],
@@ -205,7 +199,16 @@ function issetTerm(existingTerms, newTerm){
 }
 //----------------------------	
 	
-
+function initTinymce(){
+	tinymceInit = true;
+	tinymce.init({ 
+		selector:'textarea.visual',
+		plugins : "image imagetools fullscreen hr anchor autoresize autolink autosave link lists table",
+		relative_urls: false,
+		remove_script_host: false,
+		height : "600px"
+	});
+}
 
 var validData = true;
 var filesUpload = [];
@@ -225,18 +228,6 @@ $(function(){
 	
 	
 	/*common checking inputs*/
-	
-	$('#title').on('keyup', function(e){
-		validData = translate1(this.id, 'url');
-		$('#url').val($('#url').val().replace(/\(|\)/ig, ''));
-		$('#url').val($('#url').val().replace(/[^-a-z0-9]+/ig, '-'));
-	});
-	
-	$('#title').on('blur', function(e){
-		$('#url').val($('#url').val().replace(/\(|\)/ig, ''));
-		$('#url').val($('#url').val().replace(/[^-a-z0-9]+/ig, '-'));
-	});
-	
 	$('#price').on('blur', function(){
 		validData = $.isNumeric($(this).val());
 		$(this).css('background',validData ? 'lightgreen' : 'red');
@@ -252,12 +243,11 @@ $(function(){
 	$('#editors > textarea').after('<textarea id="simple-editor" style="width:100%;height: 600px;display: none;"></textarea>');
 	
 	if(localStorage.getItem("visual-editor") == "2"){
-		setTimeout(function(){
-			$('.mce-tinymce').css('display', 'none');
-			$('#editors > textarea#simple-editor').html(text).css('display', 'block');
-			$('#editors > .choose-editor > #simple').addClass('active');
-		}, 500);
+		$('textarea.visual, .mce-tinymce').css('display', 'none');
+		$('#editors > textarea#simple-editor').html(text).css('display', 'block');
+		$('#editors > .choose-editor > #simple').addClass('active');
 	}else{
+		initTinymce();
 		setTimeout(function(){
 			tinymce.get('content').setContent(text);
 			$('.mce-tinymce').css({'visibility': 'visible', 'display': 'block'});
@@ -273,17 +263,95 @@ $(function(){
 		$(e.target).addClass('active');
 		
 		if(e.target.id == 'visual'){
-			localStorage.setItem("visual-editor", "1");
-			$('.mce-tinymce').css('display', 'block');
-			tinymce.get('content').setContent(content = $('textarea#simple-editor').css('display', 'none').val());
+			if(!tinymceInit){
+				initTinymce();
+				setTimeout(function(){getVisual()}, 1000);
+			}else{
+				getVisual();
+			}
+			
 		}else{
 			localStorage.setItem("visual-editor", "2");
-			$('.mce-tinymce').css('display', 'none');
+			$('textarea.visual, .mce-tinymce').css('display', 'none');
 			$('textarea#simple-editor').css('display', 'block').val(content = tinymce.get('content').getContent());
 		}
 	});
 	
 	
+	// Edit url
+	
+	
 	
 	
 });
+
+if($('#edit-url-init').length)
+	var editUrl = new EditUrl();
+
+
+function EditUrl(){
+	this.urlEl = $('a#url');
+	this.achorEl = $('a#url > span.editing-part');
+	this.fullUrl = this.anchorUrl = '';
+	
+	this.editUrlInit = function(){
+		this.setUrl();
+		this.drawInput();
+	}
+	
+	this.setUrl = function(){
+		this.fullUrl = this.urlEl.text();
+		this.anchorUrl = this.achorEl.text();
+	}
+	
+	this.drawInput = function(){
+		$(this.urlEl).addClass('none');
+		$('#edit-url-ok, #edit-url-cancel').addClass('inline');
+		$('<span id="edit-url-draft">'+this.urlEl.html()+'</span>').insertAfter(this.urlEl);
+		$('#edit-url-draft > span.editing-part').html('<input type="text" value="'+this.anchorUrl+'" id="new-editing-part-url">');
+		this.draftUrlEl = $('#edit-url-draft');
+		this.draftAchorEl = $('#edit-url-draft > span.editing-part > input');
+	}
+	
+	this.setNewUrl = function(cancel){
+		var newUrlValue = this.draftAchorEl.val();
+		var newUrl = !cancel ? (newUrlValue && urlPattern.test(newUrlValue) ? newUrlValue : this.anchorUrl) : this.anchorUrl;
+		this.achorEl.text(newUrl);
+		$('input[name="url"]').val(newUrl);
+		this.urlEl.attr('href', this.urlEl.text());
+		$(this.urlEl).toggleClass('none');
+		$('#edit-url-init').toggleClass('none');
+		this.draftUrlEl.addClass('none');
+		$('#edit-url-ok, #edit-url-cancel').toggleClass('inline');
+	}
+	
+	
+	
+	$(function(){
+		$('#edit-url-init').click(function(){
+			editUrl.editUrlInit(this);
+			$(this).addClass('none');
+		});
+		
+		$('#edit-url-ok').click(function(){
+			editUrl.setNewUrl();
+		});
+		
+		$('#edit-url-cancel').click(function(){
+			editUrl.setNewUrl(true);
+		});
+	});
+}
+
+function getShortMsg(text, afterEl){
+	$(' <span class="short-msg"> ' + text + '</span>').insertAfter(afterEl);
+	setTimeout(function(){
+		$('.short-msg').animate({'opacity':0}, 3000, function(){$('.short-msg').remove()});
+	}, 2000);
+}
+
+function getVisual(){
+	localStorage.setItem("visual-editor", "1");
+	$('.mce-tinymce').css('display', 'block');
+	tinymce.get('content').setContent(content = $('textarea#simple-editor').css('display', 'none').val());
+}

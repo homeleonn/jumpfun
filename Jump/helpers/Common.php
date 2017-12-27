@@ -31,7 +31,4 @@ class Common{
 		return helperDI::get('config')->postType == 'page';
 	}
 	
-	public static function time(){
-		return $_SERVER['REQUEST_TIME_FLOAT'];
-	}
 }

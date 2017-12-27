@@ -6,6 +6,7 @@ use Jump\Model;
 use Jump\helpers\Msg;
 use Jump\helpers\MyDate;
 use Jump\helpers\Common;
+use Jump\helpers\Transliteration;
 
 class Post extends Model{
 	
@@ -14,7 +15,10 @@ class Post extends Model{
 	];
 	
 	public function postList(){
-		return $this->db->getAll('Select * from posts where post_type = ?s', $this->options['type']);
+		return $this->hierarchy($this->getPossibleParents(NULL, NULL, true)[0], 0, 0, 'table');
+		
+		//return $this->db->getAll('Select * from posts where post_type = ?s', $this->options['type']);
+		//var_dump($this->getPossibleParents(NULL, NULL, true));exit;
 	}
 	
 	public function termList($type){
@@ -24,7 +28,74 @@ class Post extends Model{
 	// ADD
 	
 	public function addForm(){
-		return $this->getFormattedTermList($this->options['category_slug'], $this->options['tag_slug']);
+		if(!Common::isPage()) 
+			$data = $this->getFormattedTermList($this->options['category_slug'], $this->options['tag_slug']);
+		
+		$data['listForParents'] = $this->getPossibleParents();
+		return $data;
+	}
+	
+	private function getPossibleParents($selfId = NULL, $parent = NULL, $getPosts = false){
+		$addSql = $selfId ? ' AND id != ' . $selfId : '';
+		$posts = $this->db->getAll('Select * from posts where post_type IN(\'page\')'.$addSql.' order by parent');
+		$postsToParents = [];
+		foreach($posts as $post){
+			$postsToParents[$post['parent']][] = $post;
+		}
+		
+		$postsToParents = array_reverse($postsToParents, true);
+		foreach($postsToParents as &$posts){
+			foreach($posts as &$post){
+				if(isset($postsToParents[$post['id']])){
+					$post['children'] = $postsToParents[$post['id']];
+					unset($postsToParents[$post['id']]);
+				}
+			}
+		}
+		
+		if($getPosts)
+			return $postsToParents;
+		return '<select name="parent"><option value="0">(нет родительской)</option>' . $this->hierarchy($postsToParents[0], 0, $parent) . '</select>';
+	}
+	
+	private function hierarchy($posts, $level, $parent, $type = 'select', $urlHierarchy = ''){
+		$html = '';
+		foreach($posts as $post){
+			if($type == 'select'){
+				$html .= '<option '.($post['id'] == $parent ? 'selected' : '').' value="' . $post['id'] . '">' . str_repeat('&nbsp;', $level * 3) . ($level ? '&#8735;'  : '') . (mb_strlen($post['title']) > 46 ? mb_substr($post['title'], 0, 45) . '...' : $post['title']) . '</option>';
+			}elseif($type = 'table'){
+				$html .= $this->hierarchyListHtml($post, $level, $urlHierarchy);
+			}
+			
+			if(isset($post['children'])){
+				$urlHierarchy .= $post['url'] . '/';
+				$html .= $this->hierarchy($post['children'], $level + 1, $parent, $type, $urlHierarchy);
+			}
+			$urlHierarchy = '';
+		}
+		return $html;
+	}
+	
+	private function hierarchyListHtml($page, $level, $urlHierarchy){//var_dump($page);
+		$link = '<a target="_blank" href="' . ROOT_URI . $urlHierarchy .(Common::isPage() ? '' : $this->options['slug'] . '/') . $page['url'] . '/">' . $page['title'] . '</a>';
+		ob_start();
+		?>
+		<tr>
+			<td><?=str_repeat('&mdash;', $level)?> <?=$link;?></td>
+			<td><?=$page['created'];?></td>
+			<td>
+				<a title="<?=$this->options['edit']?>"  target="blank" href="<?=SITE_URL?>admin/<?=$this->options['slug']?>/edit/<?=$page['id'];?>/">
+					<span class="icon-pencil block"></span>
+				</a>
+			</td>
+			<td>
+				<a href="javascript:void(0);" title="<?=$this->options['delete']?>" onclick="if(confirm('Подтвердите удаление')) delItem(this,'<?=$this->options['slug']?>',<?=$page['id'];?> );">
+					<span class="icon-cancel red block"></span>
+				</a>
+			</td>
+		</tr>
+		<?php
+		return ob_get_clean();
 	}
 	
 	public function addTermForm($type){
@@ -38,11 +109,12 @@ class Post extends Model{
 	}
 	
 	public function add(){
-		if($this->request->post['title'] == '' || $this->request->post['url'] == '') exit;
-		if($this->checkUrlExists($this->request->post['url'])) Msg::json('Введенный адрес уже существует!', 0);
+		if($this->request->post['title'] == '') exit;
 		
+		$url = Transliteration::run($this->request->post['title']);
+		$url = $this->checkUrl($url);
 				
-		$this->db->query('INSERT INTO posts (title, url, content, post_type) VALUES (?s, ?s, ?s, ?s)', $this->request->post['title'], $this->request->post['url'], $this->request->post['content'], $this->options['type']);
+		$this->db->query('INSERT INTO posts (title, url, content, parent, post_type) VALUES (?s, ?s, ?s, ?i, ?s)', $this->request->post['title'], $url, $this->request->post['content'], $this->request->post['parent'], $this->options['type']);
 		
 		$postId = $this->db->insertId();
 		
@@ -55,6 +127,15 @@ class Post extends Model{
 		
 		Msg::json(array('id' => $postId), 10);
 	}
+	
+	private function checkUrl($url, $adder = 0){
+		$newUrl = $url . ($adder ? '-' . $adder : '');
+		if($this->checkUrlExists($newUrl)){
+			$newUrl = $this->checkUrl($url, $adder + 1);
+		}
+		return $newUrl;
+	}
+	
 	
 	
 	public function addTermHelper($name, $type, $whisper = false, $slug = '', $description = ''){
@@ -88,12 +169,13 @@ class Post extends Model{
 	// EDIT
 	
 	public function editForm($id){
-		if(!$data = $this->db->getRow('Select * from posts where id = ?s', $id)) return 0;
-		if(!Common::isPage()){
-			return $data;
+		if(!$post = $this->db->getRow('Select * from posts where id = ?s', $id)) return 0;
+		$post['listForParents'] = $this->getPossibleParents($post['id'], $post['parent']);
+		if(Common::isPage()){
+			return $post;
 		}
-		$data['selfTerms'] = $this->getTermsIdByPostId($id);
-		return array_merge($data, $this->getFormattedTermList());
+		$post['selfTerms'] = $this->getTermsIdByPostId($id);
+		return array_merge($post, $this->getFormattedTermList());
 	}
 	
 	public function editTermForm($id){
@@ -105,7 +187,7 @@ class Post extends Model{
 		if($this->checkUrlExists($this->request->post['url'], $this->request->post['id'])) Msg::json('Введенный адрес уже существует!', 0);
 		
 		// Обновлям запись
-		$this->db->query('UPDATE posts SET title = ?s, url = ?s, content = ?s, modified = ?s where id = ?i', $this->request->post['title'], $this->request->post['url'], $this->request->post['content'], MyDate::getDateTime(), $this->request->post['id']);
+		$this->db->query('UPDATE posts SET title = ?s, url = ?s, content = ?s, parent = ?i, modified = ?s where id = ?i', $this->request->post['title'], $this->request->post['url'], $this->request->post['content'], $this->request->post['parent'], MyDate::getDateTime(), $this->request->post['id']);
 		
 		
 		// Добавляем новые термины или удаляем ненужные
@@ -124,6 +206,7 @@ class Post extends Model{
 		// -Безопасность- Проверим пришедшие термины на валидность. Невалидные отбросим.
 		// Сформируем пришедшие
 		$comeTerms = array_merge($comeCategories, $comeTags);
+		if(!empty($comeTerms)) return;
 		$comeTerms = $this->checkTermExists($comeTerms);
 		
 		
@@ -269,16 +352,6 @@ class Post extends Model{
 	
 	public function getFormattedTermList(){
 		$data['terms'] = $this->getTermList($this->options['category_slug'], $this->options['tag_slug']);
-		return $data;
-		
-		$terms = $this->getTermList($this->options['category_slug'], $this->options['tag_slug']);
-
-		$data = NULL;
-		foreach($terms as $term){
-			//$data[(($term['taxonomy'] == $this->options['category_slug']) ? '_category' : '_tag')][$term['slug']] = $term['name'];
-			$data[(($term['taxonomy'] == $this->options['category_slug']) ? '_category' : '_tag')][$term['id']] = $term;
-		}//var_dump($data);exit;
-		
 		return $data;
 	}
 	

@@ -11,15 +11,9 @@
 			<div>Заголовок</div>
 			<div><input class="w100" type="text" name="title" id="title" placeholder=""></div>
 		</div>
-		
-		<div class="block1">
-			<div>URL</div>
-			<div><input class="w100" type="text" name="url" id="url" placeholder=""></div>
-		</div>
-		
 		<div class="block1">
 			<div>Текст</div>
-			<div id="editors"><textarea name="content" id="content" value="1" style="width: 100%;height: 600px; visibility:hidden;"></textarea></div>
+			<div id="editors"><textarea class="visual" name="content" id="content" value="1" style="width: 100%;height: 600px; visibility:hidden;"></textarea></div>
 		</div>
 	</div>
 	
@@ -29,9 +23,9 @@
 		<input type="button" id="item-factory" value="Добавить">
 		<input type="submit" id="" value="Добавить">
 
-		<?php include $this->getFile('sidebarRight');?>
+		<?php include $this->getFile('sidebar/categoriesAndTags');?>
+		<?php include $this->getFile('sidebar/listForParents');?>
 	</div>
 	
 	<div class="sep"></div>
-	
 </form>

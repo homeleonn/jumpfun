@@ -1,5 +1,7 @@
 <?php
-
+ini_set('xdebug.var_display_max_depth', 50);
+ini_set('xdebug.var_display_max_children', 256);
+ini_set('xdebug.var_display_max_data', 1024);
 define('DS', DIRECTORY_SEPARATOR);
 
 define('ROOT_URI', str_replace($_SERVER['DOCUMENT_ROOT'], '', str_replace('\\', '/', ROOT)) ?: '/');
@@ -14,6 +16,7 @@ define('URI', explode('?', FULL_URI)[0]);
 
 define('SITE_URL', $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . ROOT_URI);
 define('FULL_URL', SITE_URL . FULL_URI);
+define('FULL_URL_WITHOUT_PARAMS', SITE_URL . URI);
 
 
 define('THEME', SITE_URL . 'content/themes/default/');
@@ -25,4 +28,4 @@ define('URL_PATTERN', '[а-яА-ЯЁa-zA-Z0-9-]+');
 define('FILTER_PATTERN', '[^;\-,=][a-zA-Z0-9-,=;]+[^;,=]');
 
 
-//var_dump(ROOT_URI, FULL_URI, URI, SITE_URL, FULL_URL);exit;
+//var_dump(ROOT_URI, FULL_URI, URI, SITE_URL, FULL_URL_WITHOUT_PARAMS, FULL_URL);exit;

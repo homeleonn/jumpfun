@@ -4,6 +4,7 @@ namespace cms\controllers;
 
 use Jump\Controller;
 use Jump\helpers\Filter;
+use Jump\helpers\Common;
 use Jump\helpers\Pagenation;
 
 class PostController extends Controller{
@@ -13,11 +14,85 @@ class PostController extends Controller{
 	}
 	
 	public function actionSingle($url, $id = NULL){
-		if(!$post 		= $this->model->single($url, $id)) return 0;
-		$post['meta']  	= $this->model->getMeta($post['id']);
-		$post['terms'] 	= $this->model->getTermsByPostId($post['id']);
+		$hierarchy =  func_get_args();
+		
+		if($url && count($hierarchy) > 1){
+			foreach($hierarchy as $url){
+				if(!preg_match('~^'.URL_PATTERN.'$~u', $url)){
+					$this->request->location(NULL, 404);
+				}
+			}
+			$id = NULL;
+		}
+		
+		$url = array_pop($hierarchy);
+		if(!$post = $this->model->single($url, $id)) return 0;
+		
+		$this->checkHierarchy($post['url'], $post['parent'], $hierarchy);
+		//var_dump($url, $hierarchy, $id);exit;
+		//$post['meta']  	= $this->model->getMeta($post['id']);
+		if(!Common::isPage())
+			$post['terms'] 	= $this->model->getTermsByPostId($post['id']);
 		$this->addBreadCrumbs($post);
 		return $post;
+	}
+	
+	private function checkHierarchy($url, $parent, $hierarchy){
+		if(!$parent){
+			if($hierarchy)
+				$this->request->location(NULL, 404);
+			return false;
+		}else{
+			if(!$hierarchy){
+				// взять все страницы, создать иерархию и перенаправить
+				$this->request->location(SITE_URL . $this->getParentHierarchy($parent) . '/' . $url . '/', 301);
+			}else{
+				$parents = $this->db->getAll('Select id, url, parent from posts where url IN(\''.implode("','", $hierarchy).'\') order by parent DESC');
+				if(count($parents) < count($hierarchy)){
+					$this->request->location(NULL, 404);
+				}else{
+					$h = array_reverse($hierarchy);
+					$tempParent = $parent;
+					$i = 0;
+					foreach($parents as $parent){
+						if($parent['id'] != $tempParent || $parent['url'] != $h[$i++]){
+							$this->request->location(NULL, 404);
+						}
+						$tempParent = $parent['parent'];
+					}
+				}
+			}
+		}
+	}
+	
+	private function getParentHierarchy($parentId){
+		$posts = $this->db->getAll('Select id, url, parent from posts where post_type = \'page\'');
+		foreach($posts as $post){
+			$postsOnId[$post['id']] = $post;
+		}
+		
+		// $parents[] = $postsOnId[$parentId];
+		// $hierarchy = $postsOnId[$parentId]['url'] . '|';
+		// $i = 0;
+		// while($parents[$i]){
+			// if(!$parents[$i]['parent']) break;
+			// if(isset($postsOnId[$parents[$i]['parent']])){
+				// $parents[] = $postsOnId[$parents[$i]['parent']];
+				// $hierarchy .= $postsOnId[$parents[$i]['parent']]['url'] . '|';
+			// }
+			// $i++;
+		// }
+		
+		$hierarchy = $this->setHierarchy($postsOnId, $parentId);
+		$hierarchy = implode('/', array_reverse(explode('|', substr($hierarchy, 0, -1))));
+		return $hierarchy;
+	}
+	
+	private function setHierarchy($posts, $parentId){
+		$hierarchy = $posts[$parentId]['url'] . '|';
+		if(isset($posts[$parentId]['parent']) && $posts[$parentId]['parent']) 
+			$hierarchy .= $this->setHierarchy($posts, $posts[$parentId]['parent']);
+		return $hierarchy;
 	}
 	
 	public function actionList($taxonomy = null, $value = null, $type = null, $filters = null){

@@ -87,14 +87,6 @@ class Category extends Model{
 		$filters = $this->db->getAll('SELECT fg.*, f.* from categories as c, filters as f, filter_group as fg where c.id = fg.cat_id and f.group_id = fg.group_id and c.id = '.$category['id'].' order by fg.group_order DESC, f.filter_order DESC');
 		$html = '';
 		if($filters){
-			
-			$pIds = [];
-			$productCount = count($products);
-			foreach($products as $p){
-				$pIds[] = $p['id'];
-			}
-			$possibleRelations = $pIds ? $this->db->getAll('Select * from relationships where product_id IN('.implode(',', $pIds).')') : false;
-			
 			$title = [];
 			foreach($filters as $filter){
 				$filterGroupsBySlug[$filter['group_slug']][] = $filter;
@@ -106,14 +98,6 @@ class Category extends Model{
 				$groupSelected = $this->checkGroupOnSelected($filtersGroupSlug);
 				$html .= '<div class="filters"><div class="title">' . $filters[0]['group_name'] . '</div><div class="content">';
 				foreach($filters as $filter){
-					// count possible products in this group with this filter value
-					$cpp = 0;
-					if($possibleRelations)
-						foreach($possibleRelations as $relation){
-							if($relation['relation_group_id'] == $filter['group_id'] && $relation['filter_id'] == $filter['id'])
-								$cpp++;
-						}
-					//var_dump($cpp . ' - ' . $filter['count']);
 					$currentFilter = $filter['group_slug'] . '=' . $filter['slug'];
 					if($this->filters){
 						list($url, $filters2) = $this->urlFromFilter($filterGroupsBySlug, $filtersGroupSlug, $filter['slug']);
@@ -128,62 +112,47 @@ class Category extends Model{
 						$groupSelected = true;
 					}else{
 						$count = $filter['count'];
-						/*if(!$possibleRelations)
-							$count = 0;
-						else{
-							if($cpp == $productCount || $cpp == 0){
-								$count = $filter['count'];
-							}else{
-								$count = $cpp;
+						if($filters2){
+							$filters1 = [];
+							foreach(explode(';', $filters2) as $filter3){
+								list($group, $values) = explode('=', $filter3);
+								$filters1[$group] = $filtersGroupSlug != $group ? $values : $filter['slug'];
 							}
-							//$count = $cpp;
 						}
-						if(!$groupSelected){
-							if($count > $productCount)
-								$count = $cpp;
-						}else{
-							$count = '+' . $count;
-						}*/
 						
-						// if($possibleRelations && ($cpp == $productCount || $cpp == 0))
-							// $count = $filter['count'];
-						// else{
-							if($filters2){
-								$filters1 = [];
-								foreach(explode(';', $filters2) as $filter3){
-									list($group, $values) = explode('=', $filter3);
-									$filters1[$group] = $filtersGroupSlug != $group ? $values : $filter['slug'];
-								}
-							}
+						if(($count = $this->getCache($cacheFileName = $this->setCacheFileName($category['id'], $filters1), false)) === false){
 							$count = $this->getProductsByFilters1($filters1, true)[0]['count'];
-							//var_dump($count);exit;
-						//}
+							$this->setCache($cacheFileName, $count?:'0');
+						}
+						
 						$c = $count;
 						if($groupSelected && $count)
 							$count = '+' . $count;
 						
-						
-						//var_dump();
 						if(!$c)
 							$html .= "<input type='checkbox' disabled> <span style='cursor: default;color: #ccc;'>{$filter['name']} ({$count})</span><br>";
 						else
 							$html .= "<a href=\"{$url}\"><input type='checkbox'> {$filter['name']}</a> ({$count})<br>";
 					}
 				}
-				// preg_match('/\(%(\d+)\|(\d+)\)/', $html, $matches);
-				// if($replacement =)
-				// if($groupSelected){
-					// $replacement =
-				// }
 				$html .= '</div></div>';
 			}//exit;
 			$this->selectedFilters[] = '<a style="border: 1px red solid; padding: 3px 6px; margin: 3px; border-radius: 20px;" href="'. SITE_URL . "{$category['url']}-c{$category['id']}" . '/">Сбросить</a>';
-			//var_dump($this->selectedFilters);
-			//echo($html);var_dump($this->di->get('db')->getStats());exit;
 			$category['title'] = $this->setCategoryTitleFromSelectedFilters($title) . $category['title'];
 			
 		}
 		return $html;
+	}
+	
+	private function setCacheFileName($catId, $filters){
+		$cacheFilename = ROOT . 'content/uploads/cache/shop/counting-c' . $catId . '-z-';
+		$groups = '';
+		foreach($filters as $filterGroup => $values){
+			$groups .= $filterGroup . '-';
+			$cacheFilename .= $filterGroup . $values;
+		}
+		$cacheFilename .= '--' . $groups;
+		return $cacheFilename . '.php';
 	}
 	
 	private function urlFromFilter($allGroups, $currentGroup, $value){//var_dump($currentGroup, $value);
@@ -230,29 +199,7 @@ class Category extends Model{
 		return [$url, $newFiltersString];
 	}
 	
-	private function checkExistsFilterInString($string, $filter){
-		list($currentFilterGroup, $currentFilterValue) = explode('=', $filter);
-		
-		if(!isset($this->filters[$currentFilterGroup]))
-			return false;
-		
-		$existingFilterValues = explode(',', $this->filters[$currentFilterGroup]);
-		return in_array($currentFilterValue, $existingFilterValues);
-		
-		
-		
-		
-		var_dump($string, $currentFilterGroup, $this->checkExistsFilterGroup($string, $currentFilterGroup, $currentFilterValue));
-		return strpos($string, ';' . $filter) !== false || strpos($string, $filter . ';') !== false || strpos($string . '/', $filter . '/') !== false;
-	}
 	
-	private function checkExistsFilterGroup($string, $group){
-		return strpos($string, $group . '=') !== false;
-	}
-	
-	private function checkExistsFilterValue($string, $group, $value){
-		return strpos($string, $filterGroup . '=') !== false;
-	}
 	
 	private function filterProcessed($string, $filter){
 		list($currentFilterGroup, $currentFilterValue) = explode('=', $filter);
@@ -260,19 +207,8 @@ class Category extends Model{
 		
 		if(!$groupIsset)
 			$this->addFilter($currentFilterGroup, $currentFilterValue, $groupIsset);
-		
-		
-		
 		$existingFilterValues = explode(',', $this->filters[$currentFilterGroup]);
 		return in_array($currentFilterValue, $existingFilterValues);
-	}
-	
-	private function getFilterGroup($string, $group){
-		var_dump($this->filters);
-	}
-	
-	private function getFilterValues($values){
-		return explode(',', $values);
 	}
 	
 	public function getSelectedFiltersHTML(){
@@ -291,6 +227,26 @@ class Category extends Model{
 	
 	private function checkGroupOnSelected($filterGroup){
 		return $this->filters  ? strpos(Filter::stringFromFilters($this->filters), $filterGroup . '=') !== false : false;
+	}
+	
+	private function getCache($cacheFileName, $outNow = true, $delayHours = 24){
+		if(file_exists($cacheFileName) && filemtime($cacheFileName) > time() - $delayHours * 3600){
+			$data = file_get_contents($cacheFileName);
+			if($data === false) return false;
+			if($outNow){
+				echo $data;
+			}
+			else return $data;
+			return true;
+		}
+		ob_start();
+		return false;
+	}
+
+	private function setCache($cacheFileName, $data = false){
+		if($data === false) $data = ob_get_clean();
+		file_put_contents($cacheFileName, (string)$data, LOCK_EX);
+		return $data;
 	}
 	
 }

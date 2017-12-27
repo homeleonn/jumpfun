@@ -7,17 +7,17 @@
 	<link rel="stylesheet" type="text/css" href="<?=THEME?>css/bootstrap.css" />
 	<link rel="stylesheet" type="text/css" href="<?=THEME?>css/style1.css" />
 	<link rel="stylesheet" type="text/css" href="<?=THEME?>css/new.css" />
-	<link href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,700italic,400,800,700,600" rel="stylesheet" type="text/css">
+	<!--<link href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,700italic,400,800,700,600" rel="stylesheet" type="text/css">-->
 	<link rel="shortcut icon" href="http://localhost/wordpress/favicon1.ico" type="image/x-icon">
 </head>
 <body>
 	<!--HEADER(+-)-->
-	<header style="height: 400px;">
-		<div id="head">
+	<header style="height: 250px;">
+		<!--<div id="head">
 			<div class="head-bg1 active"></div>
 			<div class="head-bg2 "></div>
 			<div class="head-bg4 "></div>
-		</div>
+		</div>-->
 		<div id="header-feature"></div>
 		<div id="top">
 			<div id="contacts">

@@ -1,4 +1,5 @@
 <?php
+$start = microtime(true);
 define('ROOT', __DIR__ . '/');
 
 if(!defined('ENV'))

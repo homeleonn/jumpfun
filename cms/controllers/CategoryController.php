@@ -8,12 +8,7 @@ use Jump\helpers\Common;
 class CategoryController extends Controller{
 	use \Jump\traits\PostControllerTrait;
 	public function actionSingle($url, $id, $filters = NULL){
-		if($filters){
-			$filename = md5(FULL_URL) . '--' . implode('-', $this->getFilterGroups($filters));
-			$cacheFileName = ROOT . 'content/uploads/cache/shop/' . $filename . '.php';
-			//var_dump($cacheFileName);exit;
-			if($this->getCache($cacheFileName, 1)) return true;
-		}
+		if($this->goCache($filters)) return true;
 		
 		$this->filtersProcessed($filters);
 		if(!$category = $this->model->getSingleCategory($id, $url)) return 0;
@@ -47,10 +42,6 @@ class CategoryController extends Controller{
 			}
 		}
 		
-		if(isset($cacheFileName)){
-			echo $this->setCache($cacheFileName);
-		}
-		
 		return $data ?: true;
 	}
 	
@@ -65,35 +56,49 @@ class CategoryController extends Controller{
 	}
 	
 	private function getFilterGroups($filters){
+		if(strpos($filters, '=') === false) return 'groups---all';
 		$groups = [];
 		foreach(explode(';', $filters) as $filter){
 			$groups[] = explode('=', $filter)[0];
 		}
-		return $groups;
+		return implode('-', $groups);
 	}
 	
-	private function getCache($cacheFileName, $delayHours = 24, $template = 'product/list', $outNow = true){
+	private function getCache($cacheFileName, $outNow = true, $delayHours = 24, $template = 'product/list'){
 		if(file_exists($cacheFileName) && filemtime($cacheFileName) > time() - $delayHours * 3600){
-			if(!$data = file_get_contents($cacheFileName)) return false;
-			$this->view->rendered = true;
+			$data = file_get_contents($cacheFileName);
+			if($data === false) return false;
 			if($outNow){
-				//$path = $this->view->getPath($template);
-				//include $path . 'header.php';
+				$path = $this->view->getPath($template);
+				extract($this->getCacheMeta($data));
+				include $path . 'header.php';
 				echo $data;
-				//include $path . 'footer.php';
+				include $path . 'footer.php';
+				$this->view->rendered = true;
 			}
-			else 	  return $data;
+			else return $data;
 			return true;
 		}
-		ob_start();
-		$this->view->cache = true;
+		//ob_start();
+		$this->view->cacheOn($cacheFileName);
 		return false;
 	}
 
 	private function setCache($cacheFileName, $data = false){
-		if(!$data) $data = ob_get_clean();
-		//if(!$data) $data = $this->view->cache;
-		file_put_contents($cacheFileName, $data, LOCK_EX);
+		if($data === false) $data = ob_get_clean();
+		file_put_contents($cacheFileName, (string)$data, LOCK_EX);
 		return $data;
+	}
+	
+	private function getCacheMeta($data){
+		preg_match('/var postData = ({.*})/', $data, $matches);
+		return (array)json_decode($matches[1]);
+	}
+	
+	private function goCache($filters, $delayHours = 24){
+		if($this->view->cache) return false;
+		$filename = md5(FULL_URL_WITHOUT_PARAMS) . '--' . $this->getFilterGroups($filters);
+		$cacheFileName = ROOT . 'content/uploads/cache/shop/' . $filename . '.php';
+		return $this->getCache($cacheFileName, true, $delayHours) ? true : false;
 	}
 }

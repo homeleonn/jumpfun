@@ -15,6 +15,7 @@ class View
 	private $template;
 	public $rendered = false;
 	public $cache = false;
+	public $cacheFileName = false;
 	
     public function __construct(DI $di, Theme $theme)
     {
@@ -45,20 +46,11 @@ class View
 		}
 		
 		include $this->path . 'header.php';
-		//$this->cacheStart();
+		$this->cacheStart();
 		include $contentFile;
-		//$this->cacheStop();
+		$this->cacheStop();
 		include $this->path . 'footer.php';
-		
 		$this->rendered = true;
-	}
-	
-	public function getFile($filename){
-		if(!is_file($filename = $this->path . 'templates/' . $this->template . $filename . '.php')){
-			var_dump('File :' . $filename . ' not exists!');
-			return;
-		}
-		return $filename;
 	}
 	
 	public function rendered(){
@@ -70,13 +62,38 @@ class View
 		return $this->theme->path();
 	}
 	
+	public function getFile($filename){
+ 		if(!is_file($filename = $this->path . 'templates/' . $this->template . $filename . '.php')){
+ 			var_dump('File :' . $filename . ' not exists!');
+ 			return;
+ 		}
+ 		return $filename;
+ 	}
+	
+	
 	private function cacheStart(){
-		if($this->cache) ob_start();
+		if($this->cache){ 
+			ob_start();
+		}
 	}
 	
 	private function cacheStop(){
-		if($this->cache) $this->cache = ob_get_clean();
+		if($this->cache){
+			$this->setMetaForCache();
+			$data = ob_get_clean();
+			file_put_contents($this->cacheFileName, (string)($this->di->get('config')->getBreadCrumbs() . $data), LOCK_EX);
+			echo $data;
+			$this->rendered = true;
+		}
 	}
 	
+	public function cacheOn($cacheFileName){
+		$this->cache = true;
+		$this->cacheFileName = $cacheFileName;
+	}
 	
+	private function setMetaForCache(){
+		if($this->cache)
+			echo "<script>var postData = {\"title\":\"{$this->theme->data['title']}\"}</script>";
+	}
 }

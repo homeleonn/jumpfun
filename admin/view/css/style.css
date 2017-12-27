@@ -97,6 +97,10 @@
 	display: none;
 }
 
+.inline{
+	display: inline !important;
+}
+
 .rel{
 	position: relative;
 }
@@ -198,6 +202,12 @@ div.sep:after {
 
 .help:hover{
 	cursor: help;
+}
+
+input[type="button"]:active{
+	position: relative;
+	top: 1px;
+	left: 1px;
 }
 
 

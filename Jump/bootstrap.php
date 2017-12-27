@@ -1,7 +1,4 @@
 <?php
-ini_set('xdebug.var_display_max_depth', 50);
-ini_set('xdebug.var_display_max_children', 256);
-ini_set('xdebug.var_display_max_data', 1024);
 define('JUMP', __DIR__);
 
 require_once JUMP . '/config/constants.php';
@@ -24,13 +21,10 @@ try{
 	
 	require_once THEME_DIR . 'functions.php';
 	
-	
 	$di->set('models', []);
 	
 	$jump = new Jump($di);
 	$jump->run();
-	
-	
-} catch(Exception $e){	
+}catch(Exception $e){	
 	Common::exceptionMessage($e);
 }

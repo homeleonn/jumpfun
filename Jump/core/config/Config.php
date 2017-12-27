@@ -4,6 +4,7 @@ namespace Jump\core\config;
 
 use Jump\core\request\Request;
 use Jump\DI\DI;
+use Jump\helpers\Common;
 
 class Config{
 	
@@ -22,10 +23,14 @@ class Config{
 		$this->options['postType'] = false;
 		
 		// Загружаем обязательные настройки сайта из базы данных
-		$this->optionsLoad();
+		$this->optionsLoad(true);
 	}
 	
-	public function optionsLoad(){
+	public function optionsLoad($fromFile = false){
+		if($fromFile){
+			$this->options = array_merge($this->options, Common::getConfig('options'));
+			return;
+		}
 		$options = $this->db->getAll('Select name, option_value from options where autoload = \'yes\'');
 		
 		if($options){
@@ -38,7 +43,6 @@ class Config{
 	public function getOption($name){
 		if(isset($this->options[$name]))
 			return $this->options[$name];
-		
 		$this->options[$name] = $this->db->getOne('Select option_value from options where name = ?s', $name);
 		return $this->options[$name];
 	}
@@ -72,31 +76,29 @@ class Config{
 	private function addRewrite($slug, $type){
 		//var_dump(1);
 		$router = $this->di->get('router');
-		
-			if(ENV != 'admin'){
-				
-				$router
-					->add($slug, $type . ':list')
-					->add($slug . '/(' . FILTER_PATTERN . ')', $type . ':list////$1')
-					// category + filters
-					->add('(' . $type . '-cat)/(' . URL_PATTERN . ')' . '(/(' . FILTER_PATTERN . '))?', $type . ':list/$1/$2/category/$4')
-					->add('(' . $type . '-tag)/(' . URL_PATTERN . ')' . '(/(' . FILTER_PATTERN . '))?', $type . ':list/$1/$2/tag/$4')
-					->add($slug . '/(' . URL_PATTERN . ')', $type . ':single/$1');
-			}else{
-				$router
-					->add($slug . '/terms', $type . ':termList', 'GET')
-					->add($slug . '/add', $type . ':addForm', 'GET')
-					->add($slug . '/add', $type . ':add', 'POST')
-					->add($slug . '/add-term', $type . ':addTermForm', 'GET')
-					->add($slug . '/add-term', $type . ':addTerm', 'POST')
-					->add($slug . '/edit/(\d+)', $type . ':editForm/$1', 'GET')
-					->add($slug . '/edit', $type . ':edit', 'POST')
-					->add($slug . '/edit-term/(\d+)', $type . ':editTermForm/$1', 'GET')
-					->add($slug . '/edit-term/(\d+)', $type . ':editTerm', 'POST')
-					->add($slug . '/del/(post|category|tag)/(\d+)', $type . ':del/$2/$1', 'POST')
-					->add($slug, $type . ':list', 'GET');
-			}
+		if(ENV != 'admin'){
+			$router
+				->add($slug, $type . ':list')
+				->add($slug . '/(' . FILTER_PATTERN . ')', $type . ':list////$1')
+				// category + filters
+				->add('(' . $type . '-cat)/(' . URL_PATTERN . ')' . '(/(' . FILTER_PATTERN . '))?', $type . ':list/$1/$2/category/$4')
+				->add('(' . $type . '-tag)/(' . URL_PATTERN . ')' . '(/(' . FILTER_PATTERN . '))?', $type . ':list/$1/$2/tag/$4')
+				->add($slug . '/(' . URL_PATTERN . ')', $type . ':single/$1');
+		}else{
+			$router
+				->add($slug . '/terms', $type . ':termList', 'GET')
+				->add($slug . '/add', $type . ':addForm', 'GET')
+				->add($slug . '/add', $type . ':add', 'POST')
+				->add($slug . '/add-term', $type . ':addTermForm', 'GET')
+				->add($slug . '/add-term', $type . ':addTerm', 'POST')
+				->add($slug . '/edit/(\d+)', $type . ':editForm/$1', 'GET')
+				->add($slug . '/edit', $type . ':edit', 'POST')
+				->add($slug . '/edit-term/(\d+)', $type . ':editTermForm/$1', 'GET')
+				->add($slug . '/edit-term/(\d+)', $type . ':editTerm', 'POST')
+				->add($slug . '/del/(post|category|tag)/(\d+)', $type . ':del/$2/$1', 'POST')
+				->add($slug, $type . ':list', 'GET');
 		}
+	}
 		
 	
 	
@@ -112,11 +114,12 @@ class Config{
 	}
 	
 	public function getBreadCrumbs(){
+		if(is_string($this->breadcrumbs)) return $this->breadcrumbs;
 		$s = '';
 		$snake = '';
 		$breadcrumbsLength = count($this->breadcrumbs);
-		
-		if($breadcrumbsLength == 1) return;
+		//echo $breadcrumbsLength;
+		//if($breadcrumbsLength == 1) return;
 		if($this->breadcrumbsType){
 			$this->breadcrumbs = array_reverse($this->breadcrumbs);
 		}
@@ -124,17 +127,20 @@ class Config{
 		$endElement = array_pop($this->breadcrumbs);
 		
 			
-		
-			foreach($this->breadcrumbs as $link => $name){
-				if(!$this->breadcrumbsType){
-					$snake .= $link;
-					$s .= '<a href="'.$snake.'">'.$name.'</a> > ';
-				}else{
-					$s .= '<a href="'.SITE_URL.$link.'">'.$name.'</a> > ';
-				}
+		$i = 0;
+		foreach($this->breadcrumbs as $link => $name){
+			if(!$this->breadcrumbsType){
+				$snake .= (!$i ? SITE_URL : '') . $link;
+				$s .= '<a href="'.$snake.'">'.$name.'</a> > ';
+			}else{
+				$s .= '<a href="'.SITE_URL.$link.'">'.$name.'</a> > ';
 			}
-			$breadcrumbs = $breadcrumbsLength > 1 ? $s . $endElement : substr($s, 0, -3);
+			$i++;
+		}
 		
-		return '<div id="breadcrumbs">' . $breadcrumbs . '</div>';
+		//$breadcrumbs = $breadcrumbsLength > 1 ? $s . $endElement : substr($s, 0, -3);
+		$breadcrumbs = $s . $endElement;
+		$this->breadcrumbs = '<div id="breadcrumbs">' . $breadcrumbs . '</div>';
+		return $this->breadcrumbs;
 	}
 }

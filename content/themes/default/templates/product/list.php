@@ -1,5 +1,4 @@
 <?php
-
 //var_dump(get_defined_vars());
 ?>
 <div class="col-sm-9" style="float: right;">

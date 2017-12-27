@@ -20,7 +20,7 @@ class PostController extends AdminController{
 	}
 	
 	public function actionAddForm(){
-		if(!Common::isPage()) return $this->model->addForm();
+		return $this->model->addForm();
 	}
 	
 	public function actionAdd($type = NULL, $value = NULL){

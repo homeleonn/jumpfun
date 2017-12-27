@@ -15,8 +15,8 @@ var root = '<?=ROOT_URI?>',
 ajaxUrl = root + "admin/ajax/",
 postSlug = '<?=$options['slug'];?>',
 contents = ['content', 'description'],
-text,
-editor;
+text, editor, tinymceInit = false,
+urlPattern = /^<?=URL_PATTERN?>$/;
 
 contents.forEach(function(item){
 	var item = 'textarea#' + item;
@@ -27,13 +27,7 @@ contents.forEach(function(item){
 	}
 });
 
-tinymce.init({ 
-	selector:'textarea:not(.nonEditor)',
-	plugins : "image imagetools fullscreen hr anchor autoresize autolink autosave link lists table",
-	relative_urls: false,
-	remove_script_host: false,
-	height : "600px"
-});
+
 
 </script>
 
