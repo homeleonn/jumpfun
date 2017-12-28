@@ -11,6 +11,8 @@ class View
     public $di;
     public $request;
 	private $theme;
+	private $children = NULL;
+	private $senderModel;
 	private $path;
 	private $template;
 	public $rendered = false;
@@ -26,6 +28,7 @@ class View
 
     public function render($template, $data = [])
     {//var_dump($data);exit;
+		$contentFile = '';
 		if(ENV != 'admin'){
 			$this->theme->data = $data;
 		
@@ -33,14 +36,27 @@ class View
 				extract($data);
 				unset($data);
 			}
+			if(isset($___list)){
+				$this->children = $___list;
+				unset($___list);
+			}
+			if(isset($___model)){
+				$this->senderModel = $___model;
+				unset($___model);
+			}
+			$contentFile = $this->path . 'page-' . $title . '.php';	
 		}else{
+			
 			$options = $this->di->get('config')->getCurrentPageOptions();
 		}
 		
-		$templateFile 	= $this->theme->template($template);
 		$this->path = $this->getPath($template);
-		$contentFile = $this->path . 'templates/' . $templateFile . '.php';
-		if(!is_file($contentFile)){
+		if(!file_exists($contentFile)){
+			$templateFile 	= $this->theme->template($template);
+			$contentFile = $this->path . 'templates/' . $templateFile . '.php';
+		}
+		
+		if(!file_exists($contentFile)){
 			//var_dump('File ' . $contentFile . ' not exists!');
 			$contentFile = $this->path . 'index.php';
 		}
@@ -95,5 +111,19 @@ class View
 	private function setMetaForCache(){
 		if($this->cache)
 			echo "<script>var postData = {\"title\":\"{$this->theme->data['title']}\"}</script>";
+	}
+	
+	private function haveChild($id){
+		if(is_null($this->children)){
+			$this->children = $this->senderModel->getChildrens($id);
+			if(!$this->children) $this->children = false;
+		}
+		return $this->children;
+	}
+	
+	private function theChild(){
+		if(!$this->children || !($child = current($this->children))) return false;
+		next($this->children);
+		return $child;
 	}
 }

@@ -6,7 +6,6 @@ use Jump\Model;
 use Jump\helpers\Msg;
 use Jump\helpers\MyDate;
 use Jump\helpers\Common;
-use Jump\helpers\Transliteration;
 
 class Post extends Model{
 	
@@ -71,7 +70,9 @@ class Post extends Model{
 				$urlHierarchy .= $post['url'] . '/';
 				$html .= $this->hierarchy($post['children'], $level + 1, $parent, $type, $urlHierarchy);
 			}
-			$urlHierarchy = '';
+			
+			if(!$post['parent'])
+				$urlHierarchy = '';
 		}
 		return $html;
 	}
@@ -108,13 +109,8 @@ class Post extends Model{
 		return $this->addTermHelper($name, $type, $whisper, $slug, $description);
 	}
 	
-	public function add(){
-		if($this->request->post['title'] == '') exit;
-		
-		$url = Transliteration::run($this->request->post['title']);
-		$url = $this->checkUrl($url);
-				
-		$this->db->query('INSERT INTO posts (title, url, content, parent, post_type) VALUES (?s, ?s, ?s, ?i, ?s)', $this->request->post['title'], $url, $this->request->post['content'], $this->request->post['parent'], $this->options['type']);
+	public function add($title, $url, $content, $parent, $posType){
+		$this->db->query('INSERT INTO posts (title, url, content, parent, post_type) VALUES (?s, ?s, ?s, ?i, ?s)', $title, $url, $content, $parent, $posType);
 		
 		$postId = $this->db->insertId();
 		
@@ -128,7 +124,9 @@ class Post extends Model{
 		Msg::json(array('id' => $postId), 10);
 	}
 	
-	private function checkUrl($url, $adder = 0){
+	
+	
+	public function checkUrl($url, $adder = 0){
 		$newUrl = $url . ($adder ? '-' . $adder : '');
 		if($this->checkUrlExists($newUrl)){
 			$newUrl = $this->checkUrl($url, $adder + 1);
@@ -182,13 +180,9 @@ class Post extends Model{
 		return $this->db->getRow('Select t.*, tt.* from terms as t, term_taxonomy as tt where t.id = tt.term_id and t.id = ?i', $id);
 	}
 	
-	public function edit(){//var_dump($_POST);exit;
-		if($this->request->post['title'] == '' || $this->request->post['url'] == '') return;
-		if($this->checkUrlExists($this->request->post['url'], $this->request->post['id'])) Msg::json('Введенный адрес уже существует!', 0);
-		
+	public function edit($title, $url, $content, $parent, $modified, $id){//var_dump($_POST);exit;
 		// Обновлям запись
-		$this->db->query('UPDATE posts SET title = ?s, url = ?s, content = ?s, parent = ?i, modified = ?s where id = ?i', $this->request->post['title'], $this->request->post['url'], $this->request->post['content'], $this->request->post['parent'], MyDate::getDateTime(), $this->request->post['id']);
-		
+		$this->db->query('UPDATE posts SET title = ?s, url = ?s, content = ?s, parent = ?i, modified = ?s where id = ?i', $title, $url, $content, $parent, $modified, $id);
 		
 		// Добавляем новые термины или удаляем ненужные
 		$this->editTerms(
@@ -196,7 +190,6 @@ class Post extends Model{
 			isset($this->request->post['_categories']) ? $this->request->post['_categories'] : [], 
 			isset($this->request->post['_tags']) ? $this->request->post['_tags'] : []
 		);
-		
 		
 		Msg::json(array('link' => ROOT_URI . ($this->options['slug'] != 'pages' ? $this->options['slug'] . '/' : '') . $this->request->post['url'] . '/'));
 	}
@@ -356,7 +349,7 @@ class Post extends Model{
 	}
 	
 	
-	private function checkUrlExists($url, $id = ''){
+	public function checkUrlExists($url, $id = ''){
 		if(is_numeric($id)) $id = ' and id != ' . $id;
 		return $this->db->getOne('Select id from posts where url = ?s and post_type = ?s' . $id, $url, $this->options['type']) ? true : false;
 	}

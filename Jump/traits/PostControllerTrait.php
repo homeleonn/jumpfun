@@ -41,4 +41,21 @@ trait PostControllerTrait{
 		
 		return $filterNecessary;
 	}
+	
+	private function textSanitize($content, $type = 'content'){
+		$types = [
+			'content' => [
+				'from' 	=> [],
+				'to' 	=> []
+			],
+			'title' => [
+				'from' 	=> ['\'', '"'],
+				'to' 	=> ['’', '»']
+			],
+		];
+		if(!isset($types[$type])) $type = 'content';
+		$content = str_replace($types[$type]['from'], $types[$type]['to'], $content);
+		$content = htmlspecialchars($content);
+		return $content;
+	}
 }

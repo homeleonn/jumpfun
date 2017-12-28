@@ -18,26 +18,30 @@ class PostController extends Controller{
 		
 		if($url && count($hierarchy) > 1){
 			foreach($hierarchy as $url){
-				if(!preg_match('~^'.URL_PATTERN.'$~u', $url)){
+				if(!preg_match('~^'.URL_PATTERN.'$~u', $url)){echo 1;
 					$this->request->location(NULL, 404);
 				}
 			}
 			$id = NULL;
 		}
-		
 		$url = array_pop($hierarchy);
+		
 		if(!$post = $this->model->single($url, $id)) return 0;
+		$post['___model'] = $this->model;
+		if($post['id'] == $this->config->front_page) return $post;
 		
 		$this->checkHierarchy($post['url'], $post['parent'], $hierarchy);
-		//var_dump($url, $hierarchy, $id);exit;
-		//$post['meta']  	= $this->model->getMeta($post['id']);
+		
 		if(!Common::isPage())
 			$post['terms'] 	= $this->model->getTermsByPostId($post['id']);
+		
 		$this->addBreadCrumbs($post);
+		
 		return $post;
 	}
 	
 	private function checkHierarchy($url, $parent, $hierarchy){
+		
 		if(!$parent){
 			if($hierarchy)
 				$this->request->location(NULL, 404);
@@ -47,19 +51,26 @@ class PostController extends Controller{
 				// взять все страницы, создать иерархию и перенаправить
 				$this->request->location(SITE_URL . $this->getParentHierarchy($parent) . '/' . $url . '/', 301);
 			}else{
-				$parents = $this->db->getAll('Select id, url, parent from posts where url IN(\''.implode("','", $hierarchy).'\') order by parent DESC');
+				$parents = $this->db->getAll('Select id, title, url, parent from posts where url IN(\''.implode("','", $hierarchy).'\') order by parent DESC');
 				if(count($parents) < count($hierarchy)){
 					$this->request->location(NULL, 404);
 				}else{
 					$h = array_reverse($hierarchy);
 					$tempParent = $parent;
 					$i = 0;
+					$addBreadCrumbs = [];
 					foreach($parents as $parent){
-						if($parent['id'] != $tempParent || $parent['url'] != $h[$i++]){
+						if($parent['id'] != $tempParent || $parent['url'] != $h[$i]){
 							$this->request->location(NULL, 404);
 						}
 						$tempParent = $parent['parent'];
+						$addBreadCrumbs[$h[$i]] = $parent['title'];
+						$i++;
 					}
+					foreach(array_reverse($addBreadCrumbs) as $link => $title){
+						$this->config->addBreadCrumbs($link, $title);
+					}
+					
 				}
 			}
 		}

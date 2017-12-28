@@ -3,10 +3,14 @@
 namespace admin\controllers;
 
 use admin\AdminController;
+use Jump\traits\PostControllerTrait;
 use Jump\helpers\Common;
+use Jump\helpers\Msg;
+use Jump\helpers\MyDate;
+use Jump\helpers\Transliteration;
 
 class PostController extends AdminController{
-	
+	use PostControllerTrait;
 	private $validTerms = ['category', 'tag'];
 		
 	
@@ -24,7 +28,19 @@ class PostController extends AdminController{
 	}
 	
 	public function actionAdd($type = NULL, $value = NULL){
-		return !$type ? $this->model->add() : $this->model->addTermHelper($value, $type);
+		if(!$type){
+			if($this->request->post['title'] == '') exit;
+			$title 		= $this->textSanitize($this->request->post['title'], 'title');
+			$url 		= Transliteration::run($this->request->post['title']);
+			$url 		= $this->model->checkUrl($url);
+			$content  	= $this->request->post['content'];
+			$parent  	= (int)$this->request->post['parent'];
+			$posType	= $this->options['type'];
+			$data = $this->model->add($title, $url, $content, $parent, $posType);
+		}else{
+			$data = $this->model->addTermHelper($value, $type);
+		}
+		return $data;
 	}	
 	
 	public function actionEditForm($id){
@@ -32,7 +48,15 @@ class PostController extends AdminController{
 	}
 	
 	public function actionEdit(){
-		return $this->model->edit();
+		if($this->request->post['title'] == '' || $this->request->post['url'] == '') return;
+		if($this->model->checkUrlExists($this->request->post['url'], $this->request->post['id'])) Msg::json('Введенный адрес уже существует!', 0);
+		$id 		= (int)$this->request->post['id'];
+		$title 		= $this->textSanitize($this->request->post['title'], 'title'); 
+		$url 		= Transliteration::run($this->request->post['title']);
+		$content 	= $this->request->post['content']; 
+		$parent 	= (int)$this->request->post['parent'];
+		$modified 	= MyDate::getDateTime();
+		return $this->model->edit($title, $url, $content, $parent, $modified, $id);
 	}
 	
 	public function actionDel($id, $type){

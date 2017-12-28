@@ -44,6 +44,10 @@ class Post extends Model{
 		return $this->db->getRow($this->select . 'url = ?s and post_type = ?s', $url, $this->options['type']);
 	}
 	
+	public function getChildrens($parentId){
+		return $this->db->getAll($this->select . 'parent = ?i', (int)$parentId);
+	}
+	
 	public function getPostsByPostType($type){
 		$query = $this->select . 'post_type = ?s order by id DESC';
 		$this->checkInLimit($query, [$type]);

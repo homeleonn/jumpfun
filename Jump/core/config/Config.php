@@ -123,7 +123,8 @@ class Config{
 		if($this->breadcrumbsType){
 			$this->breadcrumbs = array_reverse($this->breadcrumbs);
 		}
-		$this->breadcrumbs = array_merge(['' => 'Главная'], $this->breadcrumbs);
+		if($breadcrumbsLength)
+			$this->breadcrumbs = array_merge(['' => 'Главная'], $this->breadcrumbs);
 		$endElement = array_pop($this->breadcrumbs);
 		
 			

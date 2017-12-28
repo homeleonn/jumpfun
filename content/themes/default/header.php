@@ -55,4 +55,5 @@
 		<div id="main-logo"><img alt="Транспортная компания Дива в Одессе. Лимузины, седаны, микроавтобусы" src="<?=THEME?>img/logo2.png"></div>
 		<div id="sec-logo"><img src="<?=THEME?>img/second-logo.jpg"></div>
 	</header>
+	<div class="container-fluid">
 	<?=$this->di->get('config')->getBreadCrumbs();?>

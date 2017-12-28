@@ -1,3 +1,4 @@
+</div>
 <!--FOOTER(+-)-->
 	<footer>
 		<div style="max-width: 960px; margin: 10px auto;" class="bl1">
