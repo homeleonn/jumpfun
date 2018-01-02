@@ -62,7 +62,13 @@ class Request{
 		$result[] = array_slice($params, 2); // args
 		//var_dump($result);exit;
 		return $result;
-	} 
+	}
+	
+	public function alternateParseUrl($string, $matches){
+		eval('$urlString = "'.$string.'";');
+		parse_str(parse_url($urlString, PHP_URL_QUERY), $params);
+		return ['post', 'router', $params];
+	}
 	
 	public function siteInRoot(){
 		if($this->siteInRoot == NULL){

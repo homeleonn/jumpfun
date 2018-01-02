@@ -12,8 +12,18 @@ $(function(){
 		
 	});
 	
+	
+	
 	// select active menu element
-	var $active = $('#menu a[href="'+document.URL+'"]');
+	var activeTemp = document.URL;
+	var $active = document.URL;
+	if(!($active = menuSelector(activeTemp)).length){
+		var i = 3;
+		while(i--){
+			if(($active = menuSelector(activeTemp = activeTemp.replace(/(.*)\/.*\/$/gi, '$1/'))).length)
+				break;
+		}
+	}
 	$active.closest('li.top').find('div > a').click();
 	if(!$active.parent('li').length){
 		$active.closest('li.top').addClass('active');
@@ -21,6 +31,10 @@ $(function(){
 		$active.parent().addClass('active').closest('li.top').addClass('active')
 	}
 });
+
+function menuSelector(href){
+	return $('#menu a[href="'+href+'"]');
+}
 
 function getCookie(name) {
   var matches = document.cookie.match(new RegExp(

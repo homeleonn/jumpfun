@@ -50,7 +50,7 @@ class Post extends Model{
 		
 		if($getPosts)
 			return $postsToParents;
-		return '<select name="parent"><option value="0">(нет родительской)</option>' . $this->hierarchy($postsToParents[0], 0, $parent) . '</select>';
+		return '<select style="max-width: 100%;"name="parent"><option value="0">(нет родительской)</option>' . $this->hierarchy($postsToParents[0], 0, $parent) . '</select>';
 	}
 	
 	private function hierarchy($posts, $level, $parent, $type = 'select', $urlHierarchy = ''){
@@ -130,10 +130,10 @@ class Post extends Model{
 	
 	
 	
-	public function checkUrl($url, $adder = 0){
+	public function checkUrl($url, $parent, $adder = 0){
 		$newUrl = $url . ($adder ? '-' . $adder : '');
-		if($this->checkUrlExists($newUrl)){
-			$newUrl = $this->checkUrl($url, $adder + 1);
+		if($this->checkUrlExists($newUrl, $parent)){
+			$newUrl = $this->checkUrl($url, $parent, $adder + 1);
 		}
 		return $newUrl;
 	}
@@ -374,9 +374,9 @@ class Post extends Model{
 	}
 	
 	
-	public function checkUrlExists($url, $id = ''){
+	public function checkUrlExists($url, $parent, $id = ''){
 		if(is_numeric($id)) $id = ' and id != ' . $id;
-		return $this->db->getOne('Select id from posts where url = ?s and post_type = ?s' . $id, $url, $this->options['type']) ? true : false;
+		return $this->db->getOne('Select id from posts where url = ?s and parent = ?i and post_type = ?s' . $id, $url, $parent, $this->options['type']) ? true : false;
 	}
 	
 	public function getAllPosts($postType = 'page'){

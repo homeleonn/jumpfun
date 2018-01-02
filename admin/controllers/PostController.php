@@ -31,7 +31,7 @@ class PostController extends AdminController{
 		if(!$type){
 			if($this->request->post['title'] == '') exit;
 			list($title, $url, $content, $parent, $modified) = $this->postProcessing($this->request->post['title']);
-			$url 		= $this->model->checkUrl($url);
+			$url 		= $this->model->checkUrl($url, $parent);
 			$posType	= $this->options['type'];
 			$data = $this->model->add($title, $url, $content, $parent, $posType);
 		}else{
@@ -46,10 +46,10 @@ class PostController extends AdminController{
 	
 	public function actionEdit(){
 		if($this->request->post['title'] == '') exit;
-		if($this->model->checkUrlExists($this->request->post['url'], $this->request->post['id'])) Msg::json('Введенный адрес уже существует!', 0);
-		
 		$id = (int)$this->request->post['id'];
 		list($title, $url, $content, $parent, $modified) = $this->postProcessing($this->request->post['url']);
+		if($this->model->checkUrlExists($url, $parent, $id)) Msg::json('Введенный адрес уже существует!', 0);
+		
 		return $this->model->edit($title, $url, $content, $parent, $modified, $id);
 	}
 	

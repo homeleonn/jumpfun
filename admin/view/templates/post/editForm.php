@@ -6,6 +6,7 @@
 $anchor = SITE_URL;
 $url = $anchor . $data['urlHierarchy'] . $data['url'] . '/';
 ?>
+<a href="<?=SITE_URL?>admin/<?=$options['slug']?>/add/" class="action-tool plus" title="Добавить"><span class="icon-plus">Добавить новую</span></a>
 <h2><?=$options['edit']?></h2>
 <form method="POST" id="edit-<?=$options['slug']?>" class="post-from-admin" name="" autocomplete="off">
 	<div id="center">

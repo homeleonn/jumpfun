@@ -79,10 +79,10 @@ class Config{
 		if(ENV != 'admin'){
 			$router
 				->add($slug, $type . ':list')
-				->add($slug . '/(' . FILTER_PATTERN . ')', $type . ':list////$1')
 				// category + filters
-				->add('(' . $type . '-cat)/(' . URL_PATTERN . ')' . '(/(' . FILTER_PATTERN . '))?', $type . ':list/$1/$2/category/$4')
-				->add('(' . $type . '-tag)/(' . URL_PATTERN . ')' . '(/(' . FILTER_PATTERN . '))?', $type . ':list/$1/$2/tag/$4')
+				->add('(' . $type . '-cat)/(' . URL_PATTERN . ')', $type . ':list/$1/$2/category/$4')
+				->add('(' . $type . '-tag)/(' . URL_PATTERN . ')', $type . ':list/$1/$2/tag/$4')
+				->add($slug . '/style/(' . URL_PATTERN . ')', '*?post_type=' . $type. '&category_name=$matches[1]')
 				->add($slug . '/(' . URL_PATTERN . ')', $type . ':single/$1');
 		}else{
 			$router

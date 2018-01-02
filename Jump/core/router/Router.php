@@ -14,6 +14,7 @@ class Router{
 	private $controller;
 	private $action;
 	private $params = [];
+	private $alternate = false;
 	
 	public function __construct(DI $di, $routes = NULL){
 		$this->di = $di;
@@ -24,7 +25,10 @@ class Router{
 	public function run(){
 		$controller = '\\' . ENV . '\controllers\\' . ucfirst($this->controller) . 'Controller';
 		$action = 'action' . ucfirst($this->action);
-		return call_user_func_array([new $controller($this->di, $this->controller), $action], $this->params);
+		if(!$this->alternate)
+			return call_user_func_array([new $controller($this->di, $this->controller), $action], $this->params);
+		else
+			return call_user_func([new $controller($this->di, $this->controller), $action], $this->params);
 	}
 	
 	public function searchController(){
@@ -43,8 +47,14 @@ class Router{
 			
 			//var_dump($pattern . ' - ' . $uri . ' - ' . preg_match($pattern, $uri));
 			
-			if(preg_match($pattern, $uri))
+			if(preg_match($pattern, $uri, $matches))
 			{
+				if(strpos($replacement['controller'], '*') === 0){
+					list($this->controller, $this->action, $this->params) = $this->request->alternateParseUrl($replacement['controller'], $matches);
+					$this->alternate = true;
+					return true;
+				}
+					
 				$convertedUri = preg_replace($pattern, $replacement['controller'], $uri);
 				list($this->controller, $this->action, $this->params) = $this->request->parseUri(true, $convertedUri);
 				return true;

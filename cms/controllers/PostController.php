@@ -113,6 +113,10 @@ class PostController extends Controller{
 		return $hierarchy;
 	}
 	
+	public function actionRouter($params){
+		var_dump($params);exit;
+	}
+	
 	public function actionList($taxonomy = null, $value = null, $type = null, $filters = null){
 		$list = $this->options;
 		$listMark = $list['type'] . 's_list';
