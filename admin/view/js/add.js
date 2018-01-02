@@ -201,7 +201,7 @@ function issetTerm(existingTerms, newTerm){
 	
 function initTinymce(){
 	tinymceInit = true;
-	tinymce.init({ 
+	tinyMCE.init({ 
 		selector:'textarea.visual',
 		plugins : "image imagetools fullscreen hr anchor autoresize autolink autosave link lists table",
 		relative_urls: false,
@@ -243,13 +243,12 @@ $(function(){
 	$('#editors > textarea').after('<textarea id="simple-editor" style="width:100%;height: 600px;display: none;"></textarea>');
 	
 	if(localStorage.getItem("visual-editor") == "2"){
-		$('textarea.visual, .mce-tinymce').css('display', 'none');
-		$('#editors > textarea#simple-editor').html(text).css('display', 'block');
+		$('#editors > textarea#simple-editor').text(text).css('display', 'block');
 		$('#editors > .choose-editor > #simple').addClass('active');
 	}else{
 		initTinymce();
 		setTimeout(function(){
-			tinymce.get('content').setContent(text);
+			tinyMCE.get('content').setContent(text);
 			$('.mce-tinymce').css({'visibility': 'visible', 'display': 'block'});
 			$('#editors > .choose-editor > #visual').addClass('active');
 		}, 1000);
@@ -273,7 +272,7 @@ $(function(){
 		}else{
 			localStorage.setItem("visual-editor", "2");
 			$('textarea.visual, .mce-tinymce').css('display', 'none');
-			$('textarea#simple-editor').css('display', 'block').val(content = tinymce.get('content').getContent());
+			$('textarea#simple-editor').css('display', 'block').val(content = tinyMCE.get('content').getContent());
 		}
 	});
 	

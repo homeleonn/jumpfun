@@ -9,6 +9,8 @@ use Jump\helpers\Common;
 
 class Post extends Model{
 	
+	private $allPosts;
+	
 	private $answers = [
 		'not_found' => 'Произошла ошибка: Возможно данной записи не существует'
 	];
@@ -35,13 +37,7 @@ class Post extends Model{
 	}
 	
 	private function getPossibleParents($selfId = NULL, $parent = NULL, $getPosts = false){
-		$addSql = $selfId ? ' AND id != ' . $selfId : '';
-		$posts = $this->db->getAll('Select * from posts where post_type IN(\'page\')'.$addSql.' order by parent');
-		$postsToParents = [];
-		foreach($posts as $post){
-			$postsToParents[$post['parent']][] = $post;
-		}
-		
+		$postsToParents = $this->postKeysToParents($this->getAllPosts(), $selfId);
 		$postsToParents = array_reverse($postsToParents, true);
 		foreach($postsToParents as &$posts){
 			foreach($posts as &$post){
@@ -78,25 +74,33 @@ class Post extends Model{
 	}
 	
 	private function hierarchyListHtml($page, $level, $urlHierarchy){//var_dump($page);
-		$link = '<a target="_blank" href="' . ROOT_URI . $urlHierarchy .(Common::isPage() ? '' : $this->options['slug'] . '/') . $page['url'] . '/">' . $page['title'] . '</a>';
+		$link = '<a target="_blank" href="' . ROOT_URI . $urlHierarchy .(Common::isPage() ? '' : $this->options['slug'] . '/') . $page['url'] . '/">перейти</a>';
+		$edit = '<a target="blank" href="' . SITE_URL . 'admin/' . $this->options['slug'] . '/edit/' . $page['id'] . '/">%s</a>';
 		ob_start();
 		?>
 		<tr>
-			<td><?=str_repeat('&mdash;', $level)?> <?=$link;?></td>
+			<td class="admin-page-list">
+				<?=str_repeat('&mdash;', $level) . ' ' . sprintf($edit, $page['title']);?>
+				<div style="position: absolute;">
+					[<?=$link;?>]
+					[<a href="#">свойства</a>]
+					[<?=sprintf($edit, 'изменить');?>]
+					[<a style="color: red;" href="javascript:void(0);" title="<?=$this->options['delete']?>" onclick="if(confirm('Подтвердите удаление')) delItem(this,'<?=$this->options['slug']?>',<?=$page['id'];?> );">удалить</span></a>]
+				</div>
+			</td>
 			<td><?=$page['created'];?></td>
-			<td>
-				<a title="<?=$this->options['edit']?>"  target="blank" href="<?=SITE_URL?>admin/<?=$this->options['slug']?>/edit/<?=$page['id'];?>/">
-					<span class="icon-pencil block"></span>
-				</a>
-			</td>
-			<td>
-				<a href="javascript:void(0);" title="<?=$this->options['delete']?>" onclick="if(confirm('Подтвердите удаление')) delItem(this,'<?=$this->options['slug']?>',<?=$page['id'];?> );">
-					<span class="icon-cancel red block"></span>
-				</a>
-			</td>
 		</tr>
 		<?php
 		return ob_get_clean();
+	}
+	
+	
+	private function postKeysToParents($posts, $excludePostId = NULL){
+		foreach($posts as $post){
+			if($post['id'] == $excludePostId) continue;
+			$postsToParents[$post['parent']][] = $post;
+		}
+		return $postsToParents;
 	}
 	
 	public function addTermForm($type){
@@ -168,12 +172,32 @@ class Post extends Model{
 	
 	public function editForm($id){
 		if(!$post = $this->db->getRow('Select * from posts where id = ?s', $id)) return 0;
+		$post['urlHierarchy'] = $this->getUrlHierarchy($post['id']);
 		$post['listForParents'] = $this->getPossibleParents($post['id'], $post['parent']);
 		if(Common::isPage()){
 			return $post;
 		}
 		$post['selfTerms'] = $this->getTermsIdByPostId($id);
 		return array_merge($post, $this->getFormattedTermList());
+	}
+	
+	public function getUrlHierarchy($childId){
+		$posts = $this->getAllPosts();
+		foreach($posts as $post){
+			$postsKeysId[$post['id']] = $post;
+		}
+		$hierarchyUrl = '';
+		if(isset($postsKeysId[$postsKeysId[$childId]['parent']]))
+			$parent[] = $postsKeysId[$postsKeysId[$childId]['parent']];
+		$i = 0;
+		while(isset($parent[$i])){
+			$hierarchyUrl .= '/' . $parent[$i]['url'];
+			if($parent[$i]['parent']){
+				$parent[] = $postsKeysId[$parent[$i]['parent']];
+			}
+			$i++;
+		}
+		return implode('/', array_reverse(explode('/', $hierarchyUrl)));
 	}
 	
 	public function editTermForm($id){
@@ -285,7 +309,7 @@ class Post extends Model{
 	}
 	
 	private function delPost($id){
-		$id = $this->db->getOne('Select id from posts where id = ?i', $id);
+		$id = $this->db->getOne('Select id, parent from posts where id = ?i', $id);
 		
 		if(!$id)
 			exit($this->answers['not_found']);
@@ -294,6 +318,7 @@ class Post extends Model{
 		
 		$this->db->query('Delete from posts where id = ' . $id);
 		$this->db->query('Delete from postmeta where post_id = ' . $id);
+		$this->db->query('Update posts SET parent = 0 where parent = ' . $id);
 		$this->db->query('Update term_taxonomy SET count = count - 1 where term_taxonomy_id IN(Select term_taxonomy_id from term_relationships where object_id = ?i)', $id);
 		$this->db->query('Delete from term_relationships where object_id = ' . $id);
 		Msg::success();
@@ -354,5 +379,17 @@ class Post extends Model{
 		return $this->db->getOne('Select id from posts where url = ?s and post_type = ?s' . $id, $url, $this->options['type']) ? true : false;
 	}
 	
+	public function getAllPosts($postType = 'page'){
+		$postType = isset($this->options['type']) ? $this->options['type'] : $postType;
+		if(!isset($this->allPosts[$postType])){
+			$this->allPosts[$postType] = $this->db->getAll('Select * from posts where post_type = ?s order by id', $postType);
+		}
+		
+		return $this->allPosts[$postType];
+	}
 	
+	public function checkExistsPostById($postId){
+		if($postId === 0) return true;
+		return $this->db->getOne('Select id from posts where id = ?i', $postId);
+	}
 }

@@ -10,19 +10,20 @@ trait PostControllerTrait{
 		'view' => '/^list$/',
 	];
 	
+	private $page = 1;
+	private $perPage = 10;
+	
 	
 	private function filtersProcessed($filters){
 		global $viewParams;
 		$this->filters = $filters;
-		$page = 1;
-		$perPage = 10;
 		if($this->filters = Filter::analisys($filters, $this->filtersRules)){
 			$fullFilters = $this->filters;
-			$page = $this->getFilter('page', true) ?: 1;
+			$this->page = $this->getFilter('page', true) ?: 1;
 			$viewParams['view'] = $this->getFilter('view', true) ?: 'item';
 		}
 		
-		$this->model->setLimit($page, $perPage);
+		$this->model->setLimit($this->page, $this->perPage);
 		$this->model->setFilters($this->filters, $filters);
 		
 		return isset($fullFilters) ? $fullFilters : [];
@@ -42,8 +43,12 @@ trait PostControllerTrait{
 		return $filterNecessary;
 	}
 	
-	private function textSanitize($content, $type = 'content'){
+	private function textSanitize($content, $type = 'content', $tagsOn = false){
 		$types = [
+			'all' => [
+				'from' 	=> ['<?', '<?php', '<%'],
+				'to' 	=> ['']
+			],
 			'content' => [
 				'from' 	=> [],
 				'to' 	=> []
@@ -54,8 +59,12 @@ trait PostControllerTrait{
 			],
 		];
 		if(!isset($types[$type])) $type = 'content';
-		$content = str_replace($types[$type]['from'], $types[$type]['to'], $content);
-		$content = htmlspecialchars($content);
+		$content = str_replace($types[$type]['from'], $types[$type]['to'], str_replace($types['all']['from'], $types['all']['to'], $content));
+		if(!$tagsOn)
+			$content = htmlspecialchars($content);
+		if($type == 'content')
+			$content = html_entity_decode($content);
+		
 		return $content;
 	}
 }

@@ -29,6 +29,7 @@ class View
     public function render($template, $data = [])
     {//var_dump($data);exit;
 		$contentFile = '';
+		$this->path = $this->getPath($template);
 		if(ENV != 'admin'){
 			$this->theme->data = $data;
 		
@@ -50,7 +51,6 @@ class View
 			$options = $this->di->get('config')->getCurrentPageOptions();
 		}
 		
-		$this->path = $this->getPath($template);
 		if(!file_exists($contentFile)){
 			$templateFile 	= $this->theme->template($template);
 			$contentFile = $this->path . 'templates/' . $templateFile . '.php';

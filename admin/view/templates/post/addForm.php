@@ -13,7 +13,7 @@
 		</div>
 		<div class="block1">
 			<div>Текст</div>
-			<div id="editors"><textarea class="visual" name="content" id="content" value="1" style="width: 100%;height: 600px; visibility:hidden;"></textarea></div>
+			<div id="editors"><textarea class="visual" name="content" id="content" value="1" style="width: 100%;height: 600px;display: none; visibility:hidden;"></textarea></div>
 		</div>
 	</div>
 	

@@ -6,7 +6,7 @@ use Jump\helpers\Common;
 <div style="overflow-x: auto;">
 	<table class="mytable">
 		<tr align="center">
-			<td>title/url</td><td>Дата публикации</td><td></td><td></td>
+			<td>title/url</td><td>Дата публикации</td>
 		</tr>
 		<?php
 		echo $data;

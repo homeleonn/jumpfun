@@ -30,11 +30,8 @@ class PostController extends AdminController{
 	public function actionAdd($type = NULL, $value = NULL){
 		if(!$type){
 			if($this->request->post['title'] == '') exit;
-			$title 		= $this->textSanitize($this->request->post['title'], 'title');
-			$url 		= Transliteration::run($this->request->post['title']);
+			list($title, $url, $content, $parent, $modified) = $this->postProcessing($this->request->post['title']);
 			$url 		= $this->model->checkUrl($url);
-			$content  	= $this->request->post['content'];
-			$parent  	= (int)$this->request->post['parent'];
 			$posType	= $this->options['type'];
 			$data = $this->model->add($title, $url, $content, $parent, $posType);
 		}else{
@@ -48,15 +45,24 @@ class PostController extends AdminController{
 	}
 	
 	public function actionEdit(){
-		if($this->request->post['title'] == '' || $this->request->post['url'] == '') return;
+		if($this->request->post['title'] == '') exit;
 		if($this->model->checkUrlExists($this->request->post['url'], $this->request->post['id'])) Msg::json('Введенный адрес уже существует!', 0);
-		$id 		= (int)$this->request->post['id'];
-		$title 		= $this->textSanitize($this->request->post['title'], 'title'); 
-		$url 		= Transliteration::run($this->request->post['title']);
-		$content 	= $this->request->post['content']; 
-		$parent 	= (int)$this->request->post['parent'];
-		$modified 	= MyDate::getDateTime();
+		
+		$id = (int)$this->request->post['id'];
+		list($title, $url, $content, $parent, $modified) = $this->postProcessing($this->request->post['url']);
 		return $this->model->edit($title, $url, $content, $parent, $modified, $id);
+	}
+	
+	private function postProcessing($transitString){
+		$parent 	= (int)$this->request->post['parent'];
+		if(!$this->model->checkExistsPostById($parent))
+			Msg::json('Данного родителя не существует', 0);
+		
+		$title 		= $this->textSanitize($this->request->post['title'], 'title'); 
+		$url 		= Transliteration::run($transitString);
+		$content 	= $this->textSanitize($this->request->post['content']); 
+		$modified 	= MyDate::getDateTime();
+		return [$title, $url, $content, $parent, $modified];
 	}
 	
 	public function actionDel($id, $type){

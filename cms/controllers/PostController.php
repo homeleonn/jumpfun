@@ -29,7 +29,6 @@ class PostController extends Controller{
 		if(!$post = $this->model->single($url, $id)) return 0;
 		$post['___model'] = $this->model;
 		if($post['id'] == $this->config->front_page) return $post;
-		
 		$this->checkHierarchy($post['url'], $post['parent'], $hierarchy);
 		
 		if(!Common::isPage())
@@ -38,6 +37,14 @@ class PostController extends Controller{
 		$this->addBreadCrumbs($post);
 		
 		return $post;
+	}
+	
+	public function actionCategory(){
+		$funcParams = func_get_args();
+		$category = array_pop($funcParams);
+		$hierarchy = $funcParams;
+		var_dump($this->model->getTermsByPostId(39), $category, $hierarchy);exit;
+		
 	}
 	
 	private function checkHierarchy($url, $parent, $hierarchy){
@@ -123,7 +130,7 @@ class PostController extends Controller{
 			unset($list[$listMark]['termName']);
 		}
 		$this->addBreadCrumbs($list, $taxonomy, $value, $type);
-		$list['pagenation'] = (new Pagenation())->run($page, $this->model->getAllItemsCount(), $perPage, isset($fullFilters) ? Filter::stringFromFilters($fullFilters) : '');
+		$list['pagenation'] = (new Pagenation())->run($this->page, $this->model->getAllItemsCount(), $this->perPage, isset($fullFilters) ? Filter::stringFromFilters($fullFilters) : '');
 		$list['filters'] = $this->model->getFiltersHTML($this->options);
 		
 		return $list;
