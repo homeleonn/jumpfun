@@ -10,7 +10,7 @@ use Jump\DI\DI;
 
 try{
 	// Dependency injection
-    $di = new DI();
+    $di = DI::getInstance();
 	
 	// requiring services by a providers
     $services = require JUMP . '/config/services.php';

@@ -3,6 +3,6 @@ $start = microtime(true);
 define('ROOT', __DIR__ . '/');
 
 if(!defined('ENV'))
-	define('ENV', 'cms');
+	define('ENV', 'frontend');
 
-require_once ROOT . 'jump/bootstrap.php';
+require_once ROOT . 'Jump/bootstrap.php';

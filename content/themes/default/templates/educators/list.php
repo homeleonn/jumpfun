@@ -1,15 +1,13 @@
 <?php
-//var_dump(get_defined_vars());exit;
-if(!isset($educators_list) || empty($educators_list)) {
+if(!$this->haveChild()){
 	echo 'Педагогов нет!';
 	return;
 }
-
+	
 ?>
-
 <div class="list-wrapper container-fluid">
 	<div class="col-sm-9" style="float: right;">
-		<?php foreach($educators_list as $educator):?>
+		<?php while($educator = $this->theChild()):?>
 
 		<div class="col-sm-3 list-item">
 			<div>
@@ -20,7 +18,7 @@ if(!isset($educators_list) || empty($educators_list)) {
 			</div>
 		</div>
 
-		<?php endforeach;?>
+		<?php endwhile;?>
 	</div>
 	<div class="col-sm-3">
 		<?=$filters?>

@@ -1,8 +1,4 @@
 <?php  
-//var_dump($data);
-
-//$data['content'] = str_replace('</textarea>', '</textare>', $data['content']);
-//$d = htmlspecialchars($data['content']);
 $anchor = SITE_URL;
 $url = $anchor . $data['urlHierarchy'] . $data['url'] . '/';
 ?>

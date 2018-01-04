@@ -1,6 +1,6 @@
 <?php
 
-namespace cms\controllers;
+namespace frontend\controllers;
 
 use Jump\Controller;
 

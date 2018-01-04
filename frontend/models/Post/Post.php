@@ -1,9 +1,12 @@
 <?php
 
-namespace cms\models;
+namespace frontend\models\Post;
 
 use Jump\Model;
 use Jump\helpers\Filter;
+use Jump\helpers\Common;
+use Jump\DI\DI;
+use frontend\models\Post\Taxonomy;
 
 class Post extends Model{
 	use \Jump\helpers\CurrentWork;
@@ -24,6 +27,7 @@ class Post extends Model{
 	private $created;
 	private $modified;
 	
+	private $options;
 	private $filters;
 	private $limit;
 	private $page;
@@ -31,6 +35,16 @@ class Post extends Model{
 	private $allItemsCount;
 	private $select = 'Select * from posts where ';
 	private $relationship = 'posts p, terms t, term_taxonomy tt, term_relationships tr where t.id = tt.term_id and tt.term_taxonomy_id = tr.term_taxonomy_id and p.id = tr.object_id ';
+	
+	public function __construct(DI $di, Taxonomy $taxonomy){
+		parent::__construct($di);
+		$this->taxonomy = $taxonomy;
+	}
+	
+	public function setOptions($options){
+		$this->options = $options;
+		Common::loadCurrentPostOptions();
+	}
 	
 	public function single($url, $id = NULL){
 		return $id ? $this->getPostById($id) : $this->getPostByUrl($url);
@@ -83,6 +97,7 @@ class Post extends Model{
 	
 	// Поиск валидных фильтров и их значений из присланных
 	private function taxonomyValidation($filters, $postType){
+		var_dump($postType);
 		$type = $this->options['type'] . '-';
 		$taxonomies = '';
 		
@@ -117,8 +132,7 @@ class Post extends Model{
 		if(!$termName = $this->checkTermExists($taxonomy, $value)) 
 			return 0;
 		$query = $this->select . 'id IN(Select DISTINCT p.id from ' . $this->relationship . ' and t.slug = ?s and tt.taxonomy = ?s) order by id DESC';
-		$this->checkInLimit($query, [$value, $taxonomy]);
-		$post = $this->db->getAll($query . $this->limit, $value, $taxonomy);
+		$post = $this->getAll($query, [$value, $taxonomy]);
 		$post['termName'] = $termName;
 		return $post;
 	}
@@ -179,6 +193,11 @@ class Post extends Model{
 			
 			$this->request->location($newUrl);
 		}
+	}
+	
+	private function getAll($query, $params){
+		$this->checkInLimit($query, $params);
+		return call_user_func_array([$this->db, 'getAll'], array_merge([$query . $this->limit], $params));
 	}
 	
 	public function getAllItemsCount(){

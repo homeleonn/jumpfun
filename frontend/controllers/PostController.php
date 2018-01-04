@@ -1,24 +1,50 @@
 <?php
 
-namespace cms\controllers;
+namespace frontend\controllers;
 
 use Jump\Controller;
+use frontend\models\Post\Taxonomy;
 use Jump\helpers\Filter;
 use Jump\helpers\Common;
 use Jump\helpers\Pagenation;
 
 class PostController extends Controller{
 	use \Jump\traits\PostControllerTrait;
-	public function actionIndex(){
-		return $this->actionSingle(NULL, $this->config->front_page);
+	
+	private $taxonomyModel;
+	
+	/**
+	 *  @param $di dependency injection container
+	 *  @param object $model base model for this controller
+	 */
+	public function __construct($di, $model){
+		parent::__construct($di, $model);
+		$this->options = $this->config->getCurrentPageOptions();
+		$this->model->setOptions($this->options);
+		$this->taxonomyModel = new Taxonomy($di->get('db'));
 	}
 	
+	/**
+	 *  
+	 *  @return
+	 */
+	public function actionIndex(){
+		$a = $this->actionSingle(NULL, $this->config->front_page);
+		return $a;
+	}
+	
+	/**
+	 *  @param string $url
+	 *  @param int $id
+	 *  
+	 *  @return array post
+	 */
 	public function actionSingle($url, $id = NULL){
 		$hierarchy =  func_get_args();
 		
 		if($url && count($hierarchy) > 1){
 			foreach($hierarchy as $url){
-				if(!preg_match('~^'.URL_PATTERN.'$~u', $url)){echo 1;
+				if(!preg_match('~^'.URL_PATTERN.'$~u', $url)){
 					$this->request->location(NULL, 404);
 				}
 			}
@@ -27,7 +53,7 @@ class PostController extends Controller{
 		$url = array_pop($hierarchy);
 		
 		if(!$post = $this->model->single($url, $id)) return 0;
-		$post['___model'] = $this->model;
+		$post['__model'] = $this->model;
 		if($post['id'] == $this->config->front_page) return $post;
 		$this->checkHierarchy($post['url'], $post['parent'], $hierarchy);
 		
@@ -117,24 +143,23 @@ class PostController extends Controller{
 		var_dump($params);exit;
 	}
 	
-	public function actionList($taxonomy = null, $value = null, $type = null, $filters = null){
+	public function actionList($taxonomy = null, $taxonomySlug = null, $type = null, $filters = null){
 		$list = $this->options;
-		$listMark = $list['type'] . 's_list';
-		$this->filtersProcessed($filters);
+		$listMark = '__list';
 		
-		if($this->filters){
-			$list[$listMark] = $this->model->getPostsByFilters($this->filters, $this->options['type']);
-		}elseif(!$taxonomy){
+		if(!$taxonomy){
 			$list[$listMark] = $this->model->getPostsByPostType($this->options['type']);
 		}else
-			$list[$listMark] = $this->model->getPostList($taxonomy, $value);
-		//var_dump(get_defined_vars());exit;
-		if($value && isset($list[$listMark]['termName'])){
-			$value = $list[$listMark]['termName'];
+			$list[$listMark] = $this->model->getPostList($taxonomy, $taxonomySlug);
+		// Узнаем имя таксономии по метке для хлебных крошек
+		$taxonomyName = $taxonomySlug;
+		if($taxonomySlug && isset($list[$listMark]['termName'])){
+			$taxonomyName = $list[$listMark]['termName'];
 			unset($list[$listMark]['termName']);
 		}
-		$this->addBreadCrumbs($list, $taxonomy, $value, $type);
-		$list['pagenation'] = (new Pagenation())->run($this->page, $this->model->getAllItemsCount(), $this->perPage, isset($fullFilters) ? Filter::stringFromFilters($fullFilters) : '');
+		$this->addBreadCrumbs($list, $taxonomy, $taxonomyName, $type);
+		
+		$list['pagenation'] = (new Pagenation())->run($this->page, $this->model->getAllItemsCount(), $this->perPage, '');
 		$list['filters'] = $this->model->getFiltersHTML($this->options);
 		
 		return $list;

@@ -1,9 +1,9 @@
 <?php
 
-namespace cms\controllers;
+namespace frontend\controllers;
 
 use Jump\Controller;
-use cms\models\Login;
+use frontend\models\Login;
 
 class UserController extends Controller{
 	public function actionAuth(){
@@ -11,6 +11,7 @@ class UserController extends Controller{
 	}
 	
 	public function actionLogin(){
-		return true;
+		$data['title'] = 'Авторизация';
+		return $data;
 	}
 }

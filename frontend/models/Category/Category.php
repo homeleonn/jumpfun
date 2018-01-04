@@ -1,6 +1,6 @@
 <?php
 
-namespace cms\models;
+namespace frontend\models\category;
 
 use Jump\Model;
 use Jump\helpers\Filter;
@@ -14,8 +14,8 @@ class Category extends Model{
 		return $this->db->getRow('Select * from categories where id = ?i and url = ?s', $id, $url);
 	}
 	
-	public function getParentCategory($parentId){
-		return $this->db->getRow('Select id, url, title, parent from categories where id = ?i', $parentId);
+	public function getCategoryById($id){
+		return $this->db->getRow('Select * from categories where id = ?i', $id);
 	}
 	
 	public function getCategoriesByParent($parentId){

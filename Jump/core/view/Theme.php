@@ -16,7 +16,7 @@ class Theme
 	}
 	
 	public function path(){
-		return ROOT . (ENV == 'cms' ? 'content/themes/default/' : 'admin/view/'); 
+		return ROOT . (ENV == 'frontend' ? 'content/themes/default/' : 'admin/view/'); 
 	}
 	
 	public function template($template){

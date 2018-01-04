@@ -38,7 +38,7 @@ class Router{
 		$this->routesReverse();
 		//var_dump($this->routes);exit;
 		
-		foreach($this->routes[$this->request->server['REQUEST_METHOD']] as $pattern => $replacement)
+		foreach($this->routes[$_SERVER['REQUEST_METHOD']] as $pattern => $replacement)
 		{
 			if(isset($replacement['method']) && !$this->request->checkRequestMethod($replacement['method']))
 				continue;

@@ -37,17 +37,16 @@ class View
 				extract($data);
 				unset($data);
 			}
-			if(isset($___list)){
-				$this->children = $___list;
-				unset($___list);
+			if(isset($__list)){
+				$this->children = $__list;
+				unset($__list);
 			}
-			if(isset($___model)){
-				$this->senderModel = $___model;
-				unset($___model);
+			if(isset($__model)){
+				$this->senderModel = $__model;
+				unset($__model);
 			}
 			$contentFile = $this->path . 'page-' . $title . '.php';	
 		}else{
-			
 			$options = $this->di->get('config')->getCurrentPageOptions();
 		}
 		
@@ -113,7 +112,7 @@ class View
 			echo "<script>var postData = {\"title\":\"{$this->theme->data['title']}\"}</script>";
 	}
 	
-	private function haveChild($id){
+	private function haveChild($id = 0){
 		if(is_null($this->children)){
 			$this->children = $this->senderModel->getChildrens($id);
 			if(!$this->children) $this->children = false;

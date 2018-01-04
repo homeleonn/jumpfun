@@ -2,24 +2,20 @@
 
 namespace Jump\core\config;
 
-use Jump\core\request\Request;
-use Jump\DI\DI;
 use Jump\helpers\Common;
+use Jump\helpers\HelperDI;
 
 class Config{
 	
 	private $db;
-	
-	private $di;
-	
+	private $router;
 	private $options;
 	
 	private $breadcrumbs = [];
 	public $breadcrumbsType = false;
 	
-	public function __construct(DI $di, $routes = NULL){
-		$this->di = $di;
-		$this->db = $this->di->get('db');
+	public function __construct($db, $routes = NULL){
+		$this->db 		= $db;
 		$this->options['postType'] = false;
 		
 		// Загружаем обязательные настройки сайта из базы данных
@@ -74,14 +70,13 @@ class Config{
 	}
 	
 	private function addRewrite($slug, $type){
-		//var_dump(1);
-		$router = $this->di->get('router');
+		$router = HelperDI::get('router');
 		if(ENV != 'admin'){
 			$router
 				->add($slug, $type . ':list')
 				// category + filters
-				->add('(' . $type . '-cat)/(' . URL_PATTERN . ')', $type . ':list/$1/$2/category/$4')
-				->add('(' . $type . '-tag)/(' . URL_PATTERN . ')', $type . ':list/$1/$2/tag/$4')
+				->add('(' . $type . '-cat)/(' . URL_PATTERN . ')', $type . ':list/$1/$2/category')
+				->add('(' . $type . '-tag)/(' . URL_PATTERN . ')', $type . ':list/$1/$2/tag')
 				->add($slug . '/style/(' . URL_PATTERN . ')', '*?post_type=' . $type. '&category_name=$matches[1]')
 				->add($slug . '/(' . URL_PATTERN . ')', $type . ':single/$1');
 		}else{

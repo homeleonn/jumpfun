@@ -1,6 +1,6 @@
 <?php
 
-namespace cms\models;
+namespace frontend\models\product;
 
 use Jump\Model;
 

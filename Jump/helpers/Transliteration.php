@@ -11,7 +11,6 @@ class Transliteration{
 		$ru = ['щ','ш','ч','ц','ю','я','ё','ж','ъ','ы','э','а','б','в','г','д','е','з','и','й','к','л','м','н','о','п','р','с','т','у','ф','х','ь', ' '];
 		$en = ['shh','sh','ch','cz','yu','ya','yo','zh','yi','ui','e','a','b','v','g','d','e','z','i','j','k','l','m','n','o','p','r','s','t','u','f','x','','-'];
 		$from = mb_strtolower($from);
-		//var_dump($from);
 		
 		foreach($ru as $key => $symbol){
 			$from = str_replace($symbol, $en[$key], $from);
@@ -32,7 +31,6 @@ class Transliteration{
 		}
 		$newUrl = $newUrl ? $newUrl : $from;
 		$newUrl = preg_replace('/-+/', '-', $newUrl);
-		//var_dump(mb_detect_encoding($from), $from, mb_convert_encoding($newUrl, 'UTF-8'), $newUrl);exit;
 		return $newUrl ? $newUrl : $from;
 	}
 }

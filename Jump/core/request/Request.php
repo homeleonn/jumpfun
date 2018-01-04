@@ -43,7 +43,7 @@ class Request{
 	}
 	
 	public function parseUri($needController = NULL, $uri = NULL){
-		$uri = $uri ?: $this->uri;//var_dump($uri, explode(':', 'aa/a'));
+		$uri = $uri ?: URI;//var_dump($uri, explode(':', 'aa/a'));
 		$result = array();
 		
 		// Определим есть ли тип поста
@@ -95,7 +95,7 @@ class Request{
 	}
 	
 	public function checkRequestMethod($permissibleMethod){
-		return $permissibleMethod == $this->server['REQUEST_METHOD'];
+		return $permissibleMethod == $_SERVER['REQUEST_METHOD'];
 	}
 	
 	public function location($url = NULL, $code = NULL){

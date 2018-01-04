@@ -20,7 +20,7 @@ class Common{
 	
 	public static function loadCurrentPostOptions(){
 		if(!self::$currentPageOptions)
-			self::$currentPageOptions = helperDI::get('config')->getCurrentPageOptions();
+			self::$currentPageOptions = HelperDI::get('config')->getCurrentPageOptions();
 	}
 	
 	public static function getConfig($filename){

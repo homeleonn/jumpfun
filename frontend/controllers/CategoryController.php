@@ -1,6 +1,6 @@
 <?php
 
-namespace cms\controllers;
+namespace frontend\controllers;
 
 use Jump\Controller;
 use Jump\helpers\Common;
@@ -8,23 +8,15 @@ use Jump\helpers\Common;
 class CategoryController extends Controller{
 	use \Jump\traits\PostControllerTrait;
 	public function actionSingle($url, $id, $filters = NULL){
-		if($this->goCache($filters)) return true;
-		
+		if($this->goCache($filters, 0.001)) return true;
+		// Обрабатываем пришедшие фильтры(анализ, валидация)
 		$this->filtersProcessed($filters);
+		
 		if(!$category = $this->model->getSingleCategory($id, $url)) return 0;
-		$this->config->addBreadCrumbs("{$category['url']}-c{$category['id']}" , $category['title']);
-		if($category['parent']){
-			$parent = $this->model->getParentCategory($category['parent']);
-			$this->config->addBreadCrumbs("{$parent['url']}-c{$parent['id']}" , $parent['title']);
-			if($parent['parent']){
-				$parent = $this->model->getParentCategory($parent['parent']);
-				$this->config->addBreadCrumbs("{$parent['url']}-c{$parent['id']}" , $parent['title']);
-			}
-		}
-		$this->config->breadcrumbsType = true;
+		
+		$this->breadcrumbs($category['url'], $category['id'], $category['title'], $category['parent']);
 		
 		if($this->filters){
-			
 			$products = $this->model->getProductsByFilters($this->filters, $category['id']);
 			$filters = $this->model->getFiltersHTML($category, $products);
 			$selectedFilters = $this->model->getSelectedFiltersHTML();
@@ -100,5 +92,16 @@ class CategoryController extends Controller{
 		$filename = md5(FULL_URL_WITHOUT_PARAMS) . '--' . $this->getFilterGroups($filters);
 		$cacheFileName = ROOT . 'content/uploads/cache/shop/' . $filename . '.php';
 		return $this->getCache($cacheFileName, true, $delayHours) ? true : false;
+	}
+	
+	private function breadcrumbs($url, $id, $title, $parent){
+		$this->config->addBreadCrumbs("{$url}-c{$id}" , $title);
+		if($parent){
+			do{
+				$child = $this->model->getCategoryById($parent);
+				$this->config->addBreadCrumbs("{$child['url']}-c{$child['id']}" , $child['title']);
+			}while($parent = $child['parent']);
+		}
+		$this->config->breadcrumbsType = true;
 	}
 }
