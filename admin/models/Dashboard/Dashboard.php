@@ -1,6 +1,6 @@
 <?php
 
-namespace admin\models;
+namespace admin\models\Dashboard;
 
 use Jump\Model;
 

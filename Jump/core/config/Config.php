@@ -47,15 +47,38 @@ class Config{
 		$this->options[$name] = $value;
 	}
 	
-	public function addPageType($slug, $options){//var_dump(debug_backtrace());
-		$options['slug'] = $slug;
-		$options['category_slug'] = $options['type'] . '-cat';
-		$options['tag_slug'] = $options['type'] . '-tag';
+	public function addPageType($options){
 		$this->options['jump_pageTypes'][$options['type']] = $options;
 		if(!isset($options['rewrite'])) $options['rewrite'] = true;
-		if($options['rewrite'])
-			$this->addRewrite($slug, $options['type']);
-		
+		if($options['rewrite']){
+			$slug = $options['slug'];
+			$type = $options['type'];
+			$taxonomy = isset($options['taxonomy']) ? $options['taxonomy'] : [];
+			$router = HelperDI::get('router');
+			if(ENV != 'admin'){
+				$router
+					->add($slug, $type . ':list')
+					->add($slug . '/(' . URL_PATTERN . ')', $type . ':single/$1');
+					//->add($slug . '/style/(' . URL_PATTERN . ')', '*?post_type=' . $type. '&category_name=$matches[1]')
+				if(!empty($taxonomy)){
+					foreach($taxonomy as $t)
+						$router->add("{$slug}/{$t}/(" . URL_PATTERN . ')', $type . ":list/{$t}/$1");
+				}
+			}else{
+				$router
+					->add($slug . '/terms', $type . ':termList', 'GET')
+					->add($slug . '/add', $type . ':addForm', 'GET')
+					->add($slug . '/add', $type . ':add', 'POST')
+					->add($slug . '/add-term', $type . ':addTermForm', 'GET')
+					->add($slug . '/add-term', $type . ':addTerm', 'POST')
+					->add($slug . '/edit/(\d+)', $type . ':editForm/$1', 'GET')
+					->add($slug . '/edit', $type . ':edit', 'POST')
+					->add($slug . '/edit-term/(\d+)', $type . ':editTermForm/$1', 'GET')
+					->add($slug . '/edit-term/(\d+)', $type . ':editTerm', 'POST')
+					->add($slug . '/del/(post|category|tag)/(\d+)', $type . ':del/$2/$1', 'POST')
+					->add($slug, $type . ':list', 'GET');
+			}
+		}
 	}
 	
 	public function getCurrentPageOptions(){
@@ -68,40 +91,10 @@ class Config{
 		
 		return $option;
 	}
-	
-	private function addRewrite($slug, $type){
-		$router = HelperDI::get('router');
-		if(ENV != 'admin'){
-			$router
-				->add($slug, $type . ':list')
-				// category + filters
-				->add('(' . $type . '-cat)/(' . URL_PATTERN . ')', $type . ':list/$1/$2/category')
-				->add('(' . $type . '-tag)/(' . URL_PATTERN . ')', $type . ':list/$1/$2/tag')
-				->add($slug . '/style/(' . URL_PATTERN . ')', '*?post_type=' . $type. '&category_name=$matches[1]')
-				->add($slug . '/(' . URL_PATTERN . ')', $type . ':single/$1');
-		}else{
-			$router
-				->add($slug . '/terms', $type . ':termList', 'GET')
-				->add($slug . '/add', $type . ':addForm', 'GET')
-				->add($slug . '/add', $type . ':add', 'POST')
-				->add($slug . '/add-term', $type . ':addTermForm', 'GET')
-				->add($slug . '/add-term', $type . ':addTerm', 'POST')
-				->add($slug . '/edit/(\d+)', $type . ':editForm/$1', 'GET')
-				->add($slug . '/edit', $type . ':edit', 'POST')
-				->add($slug . '/edit-term/(\d+)', $type . ':editTermForm/$1', 'GET')
-				->add($slug . '/edit-term/(\d+)', $type . ':editTerm', 'POST')
-				->add($slug . '/del/(post|category|tag)/(\d+)', $type . ':del/$2/$1', 'POST')
-				->add($slug, $type . ':list', 'GET');
-		}
-	}
 		
-	
-	
 	public function __get($option){//var_dump($option, $this->getOption($option));
 		return $this->getOption($option);
 	}
-	
-	
 	
 	public function addBreadCrumbs($link, $name){
 		//var_dump($link, $name);exit;

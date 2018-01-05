@@ -8,7 +8,7 @@ use Jump\helpers\Common;
 class CategoryController extends Controller{
 	use \Jump\traits\PostControllerTrait;
 	public function actionSingle($url, $id, $filters = NULL){
-		if($this->goCache($filters, 0.001)) return true;
+		if($this->goCache($filters)) return true;
 		// Обрабатываем пришедшие фильтры(анализ, валидация)
 		$this->filtersProcessed($filters);
 		

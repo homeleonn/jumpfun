@@ -9,7 +9,7 @@ class ConfigProvider extends AbstractProvider{
 	
 	public function init(){
 		$config  = new Config($this->di->get('db'));
-		$config->setOption('frontend_deps', include ROOT . 'frontend/dependencies.php');
+		$config->setOption('frontend_deps', include ROOT . ENV . '/dependencies.php');
 		
 		$this->di->set($this->serviceName, $config);
 	}

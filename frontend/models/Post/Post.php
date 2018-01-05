@@ -43,7 +43,6 @@ class Post extends Model{
 	
 	public function setOptions($options){
 		$this->options = $options;
-		Common::loadCurrentPostOptions();
 	}
 	
 	public function single($url, $id = NULL){
@@ -145,25 +144,6 @@ class Post extends Model{
 		return $this->db->getOne('Select name from terms where slug = ?s LIMIT 1', $slug);
 	}
 	
-	public function getTermsByPostId($postId){
-		$terms = $this->db->getAll('Select t.*, tt.* from terms as t, term_taxonomy as tt, term_relationships as tr where t.id = tt.term_id and tt.term_taxonomy_id = tr.term_taxonomy_id and tr.object_id = ' . $postId);
-		
-		$categories = $tags = '';
-		if($terms){
-			foreach($terms as $term){
-				if($this->options['category_slug'] == $term['taxonomy'])
-					$categories .= "<a href='".SITE_URL."{$this->options['category_slug']}/{$term['slug']}/'>{$term['name']}</a>";
-				elseif($this->options['tag_slug'] == $term['taxonomy'])
-					$tags .= "<a href='".SITE_URL."{$this->options['tag_slug']}/{$term['slug']}/'>{$term['name']}</a>";
-					
-			}
-		}
-		
-		if($categories) $categories = 'Категории: ' . $categories;
-		if($tags) $tags = '<br>Теги: ' . $tags;
-		
-		return $categories . $tags;
-	}
 	
 	public function getMeta($postId){
 		return $this->metaProcessing($this->db->getAll('Select meta_key, meta_value from postmeta where post_id = ?i', $postId));
@@ -171,13 +151,9 @@ class Post extends Model{
 	
 	private function metaProcessing($meta){
 		if(!$meta) return false;
-		
 		$metaNew = [];
-		
-		foreach($meta as $m){
+		foreach($meta as $m)
 			$metaNew[$m['meta_key']] = $m['meta_value'];
-		}
-		
 		return $metaNew;
 	}
 	
@@ -185,7 +161,6 @@ class Post extends Model{
 		if(!$this->page || $this->page == 1) return;
 		$this->allItemsCount = (int)call_user_func_array([$this->db, 'getOne'], array_merge([str_replace('Select *', 'Select COUNT(*) as count', $query)], $params));
 		
-		//var_dump($this->db->getAll($query));exit;;
 		if($this->allItemsCount && $this->allItemsCount <= $this->start){
 			$newUrl = Filter::clearFilter(FULL_URL, 'page=' . $this->page, ';');
 			if(!$this->filters)
@@ -204,23 +179,50 @@ class Post extends Model{
 		return $this->allItemsCount;
 	}
 	
-	public function getFiltersHTML($options){
-		$filters = $this->db->getAll('Select DISTINCT t.*, tt.* from terms as t, term_taxonomy as tt where t.id = tt.term_id and tt.count > 0 and (tt.taxonomy = \''.$options['category_slug'].'\' OR tt.taxonomy = \''.$options['tag_slug'].'\')');
-		$html['categories'] = $html['tags'] = $html['all'] = '';	
-		if($filters){
-			$html['all'] .= '<a href="'. SITE_URL . $options['slug'] . '/">Все</a><br>';
-			foreach($filters as $filter){
-				$html[($filter['taxonomy'] == $options['category_slug'] ? 'categories' : 'tags')] .= "<a href=\"" . SITE_URL . "{$filter['taxonomy']}/{$filter['slug']}/\">{$filter['name']}</a> ({$filter['count']})<br>";
-			}
-		}
+	public function getFiltersHTML($taxonomies, $postType, $postSlug){
+		if(!isset($taxonomies)) return false;
+		if(!$terms = $this->db->getAll('Select DISTINCT t.*, tt.* from ' . $this->relationship . ' and p.post_type = \''.$postType.'\' and tt.taxonomy IN(\'' . implode("','", $taxonomies) . '\')')) return false;
 		
-		if($html['categories']) $html['categories'] = $this->getFiltersHTMLHelper('Категории', $html['categories']);
-		if($html['tags'])		$html['tags'] 		= $this->getFiltersHTMLHelper('Теги', $html['tags']);
-		
-		return $html['all'] . $html['categories'] . $html['tags'];
+		return $this->getFiltersHTMLForList($terms, $postSlug);
 	}
 	
-	public function getFiltersHTMLHelper($type, $html){
-		return '<div class="filters"><div class="title">' . $type . '</div><div class="content">' . $html . '</div></div>';
+	private function getFiltersHTMLForList($terms, $postSlug){
+		$html['all']= '<a href="'. SITE_URL . $postSlug . '/">Все</a><br>';
+		$tmpTaxonomy = $terms[0]['taxonomy'];
+		foreach($terms as $key => $term){
+			if(!isset($html[$term['taxonomy']])){
+				$html[$term['taxonomy']] = '<div class="filters"><div class="title">' . $term['taxonomy'] . '</div><div class="content">';
+				if($term['taxonomy'] != $tmpTaxonomy) $html[$tmpTaxonomy] .= '</div></div>';
+			}
+			$html[$term['taxonomy']] .= "<a href=\"" . SITE_URL . "{$postSlug}/{$term['taxonomy']}/{$term['slug']}/\">{$term['name']}</a> ({$term['count']})";
+			$tmpTaxonomy = $term['taxonomy'];
+		}
+		$html[$tmpTaxonomy] .= '</div></div>';
+		
+		return implode('', $html);
+	}
+	
+	public function getTermsByPostId($postId, $taxonomies){
+		$terms = $this->db->getAll('Select t.*, tt.* from terms as t, term_taxonomy as tt, term_relationships as tr where t.id = tt.term_id and tt.term_taxonomy_id = tr.term_taxonomy_id and tr.object_id = ' . $postId . ' and tt.taxonomy IN(\'' . implode("','", $this->options['taxonomy']) . '\')');
+		if(!$terms) return false;
+		$html = [];
+		if($terms){
+			foreach($terms as $key => $term){
+				if(!isset($html[$term['taxonomy']])) $html[$term['taxonomy']] = ($key ? '<br>' : '') . $term['taxonomy'] . ': ';
+				$html[$term['taxonomy']] .= "<a href='" . SITE_URL . "{$this->options['slug']}/{$term['taxonomy']}/{$term['slug']}/'>{$term['name']}</a><br>";
+			}
+		}
+		return implode('', $html);
+	}
+	
+	
+	public function getTermsListByTaxonomy($taxonomy, $postType){
+		if(!$terms = $this->db->getAll('Select DISTINCT t.*, tt.* from ' . $this->relationship . ' and p.post_type = \''.$postType.'\' and tt.taxonomy = \''.$taxonomy.'\'')) return false;
+		
+		foreach($terms as $t){
+			$html[] = "<a href='" . SITE_URL . "{$this->options['slug']}/{$t['taxonomy']}/{$t['slug']}/'>{$t['name']}</a>";
+		}
+		
+		return $html;
 	}
 }

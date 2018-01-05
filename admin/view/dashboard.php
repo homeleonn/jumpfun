@@ -9,14 +9,12 @@ $sections = array(
 	'Педагоги||' => [
 		'Все педагоги' => 'educators',
 		'Добавить новую' => 'educators/add',
-		'Категории' => 'educators/terms/?type=category',
-		'Теги' => 'educators/terms/?type=tag',
+		'Стили' => 'educators/terms/?term=style',
+		'Возраст' => 'educators/terms/?term=age',
 	],
 	'Новости||' => [
 		'Все новости' => 'news',
 		'Добавить новую' => 'news/add',
-		'Категории' => 'news/terms/?type=category',
-		'Теги' => 'news/terms/?type=tag',
 	],
 	'Настройки||cog' => [
 		'Меню' => 'menu',

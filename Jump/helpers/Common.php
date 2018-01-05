@@ -14,10 +14,6 @@ class Common{
 		}
 	}
 	
-	public static function postSlug(){
-		return self::$currentPageOptions['slug'];
-	}
-	
 	public static function loadCurrentPostOptions(){
 		if(!self::$currentPageOptions)
 			self::$currentPageOptions = HelperDI::get('config')->getCurrentPageOptions();

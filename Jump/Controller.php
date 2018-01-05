@@ -25,7 +25,7 @@ class Controller{
 		// create model dependencies
 		$modelArguments = $this->createModelArguments($di, $model, $modelDependencies);
 		// create model with created dependencies
-		$this->model = (new \ReflectionClass($model))->newInstanceArgs($modelArguments);
+		$this->model = (new \ReflectionClass($model))->newInstanceArgs(array_merge([$di], $modelArguments));
 	}
 	
 	private function initVars($di){
@@ -48,24 +48,26 @@ class Controller{
 		return $model;
 	}
 	
-	private function createModel($model){
-		$reflect  = new ReflectionClass($class);
-		$instance = $reflect->newInstanceArgs($args);
-	}
-	
-	// create model dependencies
+	/**
+	 *  create model dependencies
+	 *  
+	 *  @param mixed $di
+	 *  @param array $modelDependencies
+	 *  
+	 *  @return $arguments model dependencies
+	 */
 	private function createModelArguments($di, $model, $modelDependencies){
 		$arguments = [];
-		foreach($modelDependencies as $key => $dependency){
+		foreach($modelDependencies as $model => $dependency){
 			if($dependency == 'di'){
 				$arguments[] = $di;
-			}elseif($key == 'di'){
+			}elseif($model == 'di'){
 				foreach($dependency as $d){
 					$arguments[] = $di->get($d);
 				}
 			}else{
-				$dep = new \ReflectionClass($key);
-				$arguments[] = $dep->newInstanceArgs($this->createModelArguments($di, $key, $dependency));
+				$dep = new \ReflectionClass($model);
+				$arguments[] = $dep->newInstanceArgs($this->createModelArguments($di, $model, $dependency));
 			}
 		}
 		return $arguments;

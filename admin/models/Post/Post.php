@@ -1,6 +1,6 @@
 <?php
 
-namespace admin\models;
+namespace admin\models\Post;
 
 use Jump\Model;
 use Jump\helpers\Msg;
@@ -8,12 +8,17 @@ use Jump\helpers\MyDate;
 use Jump\helpers\Common;
 
 class Post extends Model{
-	
 	private $allPosts;
-	
 	private $answers = [
 		'not_found' => 'Произошла ошибка: Возможно данной записи не существует'
 	];
+	private $select = 'Select * from posts where ';
+	private $relationship = 'posts p, terms t, term_taxonomy tt, term_relationships tr where t.id = tt.term_id and tt.term_taxonomy_id = tr.term_taxonomy_id and p.id = tr.object_id ';
+	
+	
+	public function setOptions($options){
+		$this->options = $options;
+	}
 	
 	public function postList(){
 		return $this->hierarchy($this->getPossibleParents(NULL, NULL, true)[0], 0, 0, 'table');
@@ -22,20 +27,29 @@ class Post extends Model{
 		//var_dump($this->getPossibleParents(NULL, NULL, true));exit;
 	}
 	
-	public function termList($type){
-		return $type == 'tag' ? $this->getTagList() : $this->getCategoryList();
+	public function termList($term){
+		return $this->getTermList($term);
+		//return $type == 'tag' ? $this->getTagList() : $this->getCategoryList();
 	}
 	
 	// ADD
 	
 	public function addForm(){
-		if(!Common::isPage()) 
-			$data = $this->getFormattedTermList($this->options['category_slug'], $this->options['tag_slug']);
-		
-		$data['listForParents'] = $this->getPossibleParents();
+		$data = [];
+		if(!Common::isPage()) 				$data['terms'] = $this->getTermList($this->options['taxonomy']);
+		if($this->options['hierarchical']) 	$data['listForParents'] = $this->getPossibleParents();
 		return $data;
 	}
 	
+	/**
+	 *  Return of possible parents for a post
+	 *  
+	 *  @param int $selfId post id for which returns parents
+	 *  @param int $parent post parent
+	 *  @param bool $getPosts return post without html
+	 *  
+	 *  @return
+	 */
 	private function getPossibleParents($selfId = NULL, $parent = NULL, $getPosts = false){
 		$postsToParents = $this->postKeysToParents($this->getAllPosts(), $selfId);
 		$postsToParents = array_reverse($postsToParents, true);
@@ -351,9 +365,9 @@ class Post extends Model{
 		return $this->getTermList($this->options['tag_slug']);
 	}
 	
-	public function getTermList($taxonomy, $alternateTax = null){
-		$alternateTax = $alternateTax ? ' OR tt.taxonomy = \''.$alternateTax.'\'' : '';
-		return $this->db->getAll('Select t.id, t.slug, t.name, tt.taxonomy, tt.term_taxonomy_id, tt.count from terms t, term_taxonomy tt where t.id = tt.term_id and (tt.taxonomy = \''.$taxonomy.'\''.$alternateTax.') order by t.id ASC');
+	public function getTermList($taxonomy){
+		$terms =  $this->db->getAll('Select DISTINCT t.*, tt.* from terms t, term_taxonomy tt where t.id = tt.term_id and tt.taxonomy IN(\'' . implode("','", (array)$taxonomy) . '\') order by t.id ASC');
+		return $terms;
 	}
 	
 	public function getTermsIdByPostId($postId){

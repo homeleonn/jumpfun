@@ -3,7 +3,6 @@
 namespace frontend\controllers;
 
 use Jump\Controller;
-use frontend\models\Post\Taxonomy;
 use Jump\helpers\Filter;
 use Jump\helpers\Common;
 use Jump\helpers\Pagenation;
@@ -21,13 +20,8 @@ class PostController extends Controller{
 		parent::__construct($di, $model);
 		$this->options = $this->config->getCurrentPageOptions();
 		$this->model->setOptions($this->options);
-		$this->taxonomyModel = new Taxonomy($di->get('db'));
 	}
 	
-	/**
-	 *  
-	 *  @return
-	 */
 	public function actionIndex(){
 		$a = $this->actionSingle(NULL, $this->config->front_page);
 		return $a;
@@ -58,7 +52,7 @@ class PostController extends Controller{
 		$this->checkHierarchy($post['url'], $post['parent'], $hierarchy);
 		
 		if(!Common::isPage())
-			$post['terms'] 	= $this->model->getTermsByPostId($post['id']);
+			$post['terms'] 	= $this->model->getTermsByPostId($post['id'], $this->options['taxonomy']);
 		
 		$this->addBreadCrumbs($post);
 		
@@ -115,18 +109,6 @@ class PostController extends Controller{
 			$postsOnId[$post['id']] = $post;
 		}
 		
-		// $parents[] = $postsOnId[$parentId];
-		// $hierarchy = $postsOnId[$parentId]['url'] . '|';
-		// $i = 0;
-		// while($parents[$i]){
-			// if(!$parents[$i]['parent']) break;
-			// if(isset($postsOnId[$parents[$i]['parent']])){
-				// $parents[] = $postsOnId[$parents[$i]['parent']];
-				// $hierarchy .= $postsOnId[$parents[$i]['parent']]['url'] . '|';
-			// }
-			// $i++;
-		// }
-		
 		$hierarchy = $this->setHierarchy($postsOnId, $parentId);
 		$hierarchy = implode('/', array_reverse(explode('|', substr($hierarchy, 0, -1))));
 		return $hierarchy;
@@ -143,7 +125,7 @@ class PostController extends Controller{
 		var_dump($params);exit;
 	}
 	
-	public function actionList($taxonomy = null, $taxonomySlug = null, $type = null, $filters = null){
+	public function actionList($taxonomy = null, $taxonomySlug = null, $type = null, $filters = null){//var_dump(func_get_args());exit;
 		$list = $this->options;
 		$listMark = '__list';
 		
@@ -157,10 +139,11 @@ class PostController extends Controller{
 			$taxonomyName = $list[$listMark]['termName'];
 			unset($list[$listMark]['termName']);
 		}
-		$this->addBreadCrumbs($list, $taxonomy, $taxonomyName, $type);
+		$this->addBreadCrumbs($list, $taxonomy, $taxonomyName, $taxonomyName);
 		
 		$list['pagenation'] = (new Pagenation())->run($this->page, $this->model->getAllItemsCount(), $this->perPage, '');
-		$list['filters'] = $this->model->getFiltersHTML($this->options);
+		$list['filters'] = $this->model->getFiltersHTML($this->options['taxonomy'], $this->options['type'], $this->options['slug']);
+		$list['__model'] = $this->model;
 		
 		return $list;
 	}
@@ -176,7 +159,7 @@ class PostController extends Controller{
 		
 		
 		if($type){
-			$this->addBreadCrumbsHelper($taxonomy, $value, ($type == 'category' ? 'категория' : 'метка'), $post['title']);
+			$this->addBreadCrumbsHelper($taxonomy, $value, $taxonomy, $post['title']);
 		}elseif(isset($post['id']) && $this->config->front_page != $post['id']){
 			$this->config->addBreadCrumbs($post['url'], $post['title']);
 			if(isset($this->options['slug']))

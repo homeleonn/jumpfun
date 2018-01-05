@@ -11,7 +11,12 @@ use Jump\helpers\Transliteration;
 
 class PostController extends AdminController{
 	use PostControllerTrait;
-	private $validTerms = ['category', 'tag'];
+	
+	public function __construct($di, $model){
+		parent::__construct($di, $model);
+		$this->options = $this->config->getCurrentPageOptions();
+		$this->model->setOptions($this->options);
+	}
 		
 	
 	public function actionList(){
@@ -19,8 +24,9 @@ class PostController extends AdminController{
 	}
 	
 	public function actionTermList(){
-		$data['type'] = $this->checkGettingTermType();
-		return array_merge($data, ['terms' => $this->model->termList($data['type'])]);
+		$data['term'] = $_GET['term'];
+		if(!isset($this->options['taxonomy']) || !in_array($data['term'], $this->options['taxonomy'])) return false;
+		return array_merge($data, ['terms' => $this->model->termList($data['term'])]);
 	}
 	
 	public function actionAddForm(){
@@ -122,10 +128,10 @@ class PostController extends AdminController{
 	
 	
 	private function checkGettingTermType(){
-		if(!isset($this->request->get['type']) || !$this->checkValidTerms($this->request->get['type'])){
+		if(!isset($this->request->get['term']) || !$this->checkValidTerms($this->request->get['term'])){
 			$this->goToPostTypePage();
 		}
-		return $this->request->get['type'];
+		return $this->request->get['term'];
 	}
 	
 	
@@ -134,7 +140,7 @@ class PostController extends AdminController{
 	}
 	
 	private function checkValidTerms($term){
-		return in_array($term, $this->validTerms);
+		return isset($this->options['taxonomy']) ? in_array($term, $this->options['taxonomy']) : false;
 	}
 	
 	

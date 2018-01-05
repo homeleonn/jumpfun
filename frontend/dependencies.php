@@ -6,7 +6,6 @@ return [
 	],
 	'models' => [
 		'\frontend\models\Post\Post' => [
-			'di',
 			'\frontend\models\Post\Taxonomy' => [
 				'di' => [
 					'db'
@@ -14,7 +13,6 @@ return [
 			]
 		],
 		'\frontend\models\Category\Category' => [
-			'di'
 		],
 	],
 ];
