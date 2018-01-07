@@ -21,22 +21,21 @@ class Post extends Model{
 	}
 	
 	public function postList(){
-		return $this->hierarchy($this->getPossibleParents(NULL, NULL, true)[0], 0, 0, 'table');
-		
+		$postsTable = $this->hierarchy($this->getPossibleParents(NULL, NULL, true)[0], 0, 0, 'table');
+		return !$postsTable ? '' : '<table class="mytable"><tr align="center"><td>title/url</td>'.($this->options['taxonomy'] ? '<td width="10%">Метки</td>' : '').'<td width="1%">Дата публикации</td></tr>' . $postsTable . '</table>';
 		//return $this->db->getAll('Select * from posts where post_type = ?s', $this->options['type']);
 		//var_dump($this->getPossibleParents(NULL, NULL, true));exit;
 	}
 	
 	public function termList($term){
 		return $this->getTermList($term);
-		//return $type == 'tag' ? $this->getTagList() : $this->getCategoryList();
 	}
 	
 	// ADD
 	
 	public function addForm(){
 		$data = [];
-		if(!Common::isPage()) 				$data['terms'] = $this->getTermList($this->options['taxonomy']);
+		if(!Common::isPage()) 				$data['terms'] = $this->getTermList(array_keys($this->options['taxonomy']));
 		if($this->options['hierarchical']) 	$data['listForParents'] = $this->getPossibleParents();
 		return $data;
 	}
@@ -51,22 +50,51 @@ class Post extends Model{
 	 *  @return
 	 */
 	private function getPossibleParents($selfId = NULL, $parent = NULL, $getPosts = false){
-		$postsToParents = $this->postKeysToParents($this->getAllPosts(), $selfId);
+		$allPosts = $this->getAllPosts();
+		foreach($allPosts as $post)
+			$ids[] = $post['id'];
+		$postsTerms = $this->getTermsByPostsId($ids);
+		foreach($allPosts as $post){
+			if($post['id'] == $selfId) continue;
+			$post['_terms'] = $postsTerms[$post['id']];
+			$postsToParents[$post['parent']][] = $post;
+		}
+		//var_dump($postsToParents);exit;
 		$postsToParents = array_reverse($postsToParents, true);
-		foreach($postsToParents as &$posts){
-			foreach($posts as &$post){
-				if(isset($postsToParents[$post['id']])){
-					$post['children'] = $postsToParents[$post['id']];
-					unset($postsToParents[$post['id']]);
+		if($this->options['hierarchical'])
+			foreach($postsToParents as &$posts){
+				foreach($posts as &$post){
+					if(isset($postsToParents[$post['id']])){
+						$post['children'] = $postsToParents[$post['id']];
+						unset($postsToParents[$post['id']]);
+					}
 				}
 			}
-		}
 		
 		if($getPosts)
 			return $postsToParents;
 		return '<select style="max-width: 100%;"name="parent"><option value="0">(нет родительской)</option>' . $this->hierarchy($postsToParents[0], 0, $parent) . '</select>';
 	}
 	
+	private function getTermsByPostsId($ids){
+		if(!$terms = $this->db->getAll('Select t.*, tt.*, tr.object_id from terms t, term_taxonomy tt, term_relationships tr where t.id = tt.term_id and tr.term_taxonomy_id = tt.term_taxonomy_id and object_id IN('.implode(',', $ids).') order by t.id ASC')) return false;
+		foreach($terms as $t){
+			$termsByObject[$t['object_id']][] = $t;
+		}
+		return $termsByObject;
+	}
+	
+	/**
+	 *  form html post list like hierarchy
+	 *  
+	 *  @param array $posts 		array of posts
+	 *  @param int $level 			hierarchy level
+	 *  @param int $parent 			current post parent
+	 *  @param string $type 		how output html
+	 *  @param string $urlHierarchy built url hierarchy for link at each hierarchy level
+	 *  
+	 *  @return html code
+	 */
 	private function hierarchy($posts, $level, $parent, $type = 'select', $urlHierarchy = ''){
 		$html = '';
 		foreach($posts as $post){
@@ -87,23 +115,35 @@ class Post extends Model{
 		return $html;
 	}
 	
-	private function hierarchyListHtml($page, $level, $urlHierarchy){//var_dump($page);
+	private function hierarchyListHtml($page, $level, $urlHierarchy){//var_dump($page);exit;
 		$link = '<a target="_blank" href="' . ROOT_URI . $urlHierarchy .(Common::isPage() ? '' : $this->options['slug'] . '/') . $page['url'] . '/">перейти</a>';
 		$edit = '<a target="blank" href="' . SITE_URL . 'admin/' . $this->options['slug'] . '/edit/' . $page['id'] . '/">%s</a>';
 		ob_start();
 		?>
-		<tr>
-			<td class="admin-page-list">
-				<?=str_repeat('&mdash;', $level) . ' ' . sprintf($edit, $page['title']);?>
-				<div style="position: absolute;">
-					[<?=$link;?>]
-					[<a href="#">свойства</a>]
-					[<?=sprintf($edit, 'изменить');?>]
-					[<a style="color: red;" href="javascript:void(0);" title="<?=$this->options['delete']?>" onclick="if(confirm('Подтвердите удаление')) delItem(this,'<?=$this->options['slug']?>',<?=$page['id'];?> );">удалить</span></a>]
-				</div>
-			</td>
-			<td><?=$page['created'];?></td>
-		</tr>
+			<tr>
+				<td class="admin-page-list">
+					<?=str_repeat('&mdash;', $level) . ' ' . sprintf($edit, $page['title']);?>
+					<div style="position: absolute;">
+						[<?=$link;?>]
+						[<a href="#">свойства</a>]
+						[<?=sprintf($edit, 'изменить');?>]
+						[<a style="color: red;" href="javascript:void(0);" title="<?=$this->options['delete']?>" onclick="if(confirm('Подтвердите удаление')) delItem(this,'<?=$this->options['slug']?>',<?=$page['id'];?> );">удалить</span></a>]
+					</div>
+				</td>
+				<?php 
+					if($this->options['taxonomy'] && isset($page['_terms'])){
+						echo '<td>';
+						ob_start();
+						foreach($page['_terms'] as $term){
+							echo '<a href="'. SITE_URL . $this->options['slug'] . '/' . $term['taxonomy'] . '/' . $term['slug'] . '/">'.$term['name'].'</a>, ';
+						}
+						echo substr(ob_get_clean(), 0, -2);
+						echo '</td>';
+						
+					}
+				?>
+				<td><?=$page['created'];?></td>
+			</tr>
 		<?php
 		return ob_get_clean();
 	}
@@ -117,27 +157,22 @@ class Post extends Model{
 		return $postsToParents;
 	}
 	
-	public function addTermForm($type){
-		$data['type'] = $type;
-		$data['add']  = $type == 'tag' ? 'тег' : 'категорию';
+	public function addTermForm($term){
+		$data['term'] = $data['add'] = $term;
 		return $data;
 	}
 	
-	public function addTerm($name, $type, $whisper = false, $slug = '', $description = ''){
-		return $this->addTermHelper($name, $type, $whisper, $slug, $description);
+	public function addTerm($name, $term, $whisper = false, $slug = '', $description = ''){
+		return $this->addTermHelper($name, $term, $whisper, $slug, $description);
 	}
 	
-	public function add($title, $url, $content, $parent, $posType){
+	public function add($title, $url, $content, $parent, $posType, $terms){
 		$this->db->query('INSERT INTO posts (title, url, content, parent, post_type) VALUES (?s, ?s, ?s, ?i, ?s)', $title, $url, $content, $parent, $posType);
 		
 		$postId = $this->db->insertId();
 		
 		// Добавляем новые термины
-		$this->editTerms(
-			$postId, 
-			isset($this->request->post['_categories']) ? $this->request->post['_categories'] : [], 
-			isset($this->request->post['_tags']) ? $this->request->post['_tags'] : []
-		);
+		$this->editTerms($postId, $terms);
 		
 		Msg::json(array('id' => $postId), 10);
 	}
@@ -154,30 +189,22 @@ class Post extends Model{
 	
 	
 	
-	public function addTermHelper($name, $type, $whisper = false, $slug = '', $description = ''){
-		$termSlug = $type . '_slug';
+	public function addTermHelper($name, $term, $whisper = false, $slug = '', $description = ''){
 		// Checking on duplicate term for this taxonomy
-		$duplicate = $this->db->getOne('Select t.id from terms t, term_taxonomy tt where t.id = tt.term_id and t.slug = ?s and tt.taxonomy = \'' . $this->options[$termSlug] .'\'', $name);
+		$duplicate = $this->db->getOne('Select t.id from terms t, term_taxonomy tt where t.id = tt.term_id and t.slug = ?s and tt.taxonomy = \'' . $term .'\'', $name);
 		
 		if($duplicate){
-			if($whisper)
-				return false;
+			if($whisper) return false;
 			exit;
 		}
 		
-		// Add new term
-		$result = $this->db->query('INSERT INTO terms (name, slug) VALUES (?s, ?s)', $name, $slug ?: $name);
-		
-		if($result){
-			$result = $this->db->query('INSERT INTO term_taxonomy (term_id, taxonomy, description) VALUES (?s, ?s, ?s)', $this->db->insertId(), $this->options[$termSlug], $description);
+		// Add new term and taxonomy
+		if($result = $this->db->query('INSERT INTO terms (name, slug) VALUES (?s, ?s)', $name, $slug ?: $name)){
+			$result = $this->db->query('INSERT INTO term_taxonomy (term_id, taxonomy, description) VALUES (?s, ?s, ?s)', $this->db->insertId(), $term, $description);
 		}
 		
-		if($whisper)
-			return $result;
-			
-		if($result)
-			echo 1;
-		
+		if($whisper) return $result;
+		if($result)  echo 1;
 		exit;
 	}
 	
@@ -186,8 +213,12 @@ class Post extends Model{
 	
 	public function editForm($id){
 		if(!$post = $this->db->getRow('Select * from posts where id = ?s', $id)) return 0;
-		$post['urlHierarchy'] = $this->getUrlHierarchy($post['id']);
-		$post['listForParents'] = $this->getPossibleParents($post['id'], $post['parent']);
+		if($this->options['hierarchical']){
+			$post['urlHierarchy'] = $this->getUrlHierarchy($post['id']);
+			$post['listForParents'] = $this->getPossibleParents($post['id'], $post['parent']);
+		}else{
+			$post['urlHierarchy'] = $this->options['slug'] . '/';
+		}
 		if(Common::isPage()){
 			return $post;
 		}
@@ -221,27 +252,18 @@ class Post extends Model{
 	public function edit($title, $url, $content, $parent, $modified, $id){//var_dump($_POST);exit;
 		// Обновлям запись
 		$this->db->query('UPDATE posts SET title = ?s, url = ?s, content = ?s, parent = ?i, modified = ?s where id = ?i', $title, $url, $content, $parent, $modified, $id);
-		
-		// Добавляем новые термины или удаляем ненужные
-		$this->editTerms(
-			$this->request->post['id'], 
-			isset($this->request->post['_categories']) ? $this->request->post['_categories'] : [], 
-			isset($this->request->post['_tags']) ? $this->request->post['_tags'] : []
-		);
+		$this->editTerms($this->request->post['id'], isset($this->request->post['terms']) ? $this->request->post['terms'] : []);
 		
 		Msg::json(array('link' => ROOT_URI . ($this->options['slug'] != 'pages' ? $this->options['slug'] . '/' : '') . $this->request->post['url'] . '/'));
 	}
 	
 	// Добавляем новые термины или удаляем ненужные
-	private function editTerms($postId, $comeCategories, $comeTags){
+	public function editTerms($postId, $terms){
 		// -Безопасность- Проверим пришедшие термины на валидность. Невалидные отбросим.
-		// Сформируем пришедшие
-		$comeTerms = array_merge($comeCategories, $comeTags);
-		if(!empty($comeTerms)) return;
-		$comeTerms = $this->checkTermExists($comeTerms);
+		if(empty($terms)) return;
+		$terms = $this->checkTermExists($terms);
 		
-		
-		// Проверяем пришедшие категории и теги и пишем или удаляем
+		// Проверяем термины и пишем или удаляем
 		// Берем старые термины
 		$oldTerms = $this->db->getAll('Select term_taxonomy_id from term_relationships where object_id = ?i', $postId);
 		$del = [];
@@ -249,11 +271,12 @@ class Post extends Model{
 		if($oldTerms){
 			foreach($oldTerms as $old){
 				$find = false;
-				foreach($comeTerms as $key => $come){
+				foreach($terms as $key => $come){
 					// Если в пришедших есть старый, значит с ним ничего делать не надо, исключаем
 					if($old['term_taxonomy_id'] == $come){
-						unset($comeTerms[$key]);
+						unset($terms[$key]);
 						$find = true;
+						break;
 					}
 				}
 				
@@ -263,9 +286,9 @@ class Post extends Model{
 				}
 			}
 		}
-			
+		//var_dump($oldTerms, $new);exit;
 		// Все пришедшие за исключением старых - новые
-		$new = $comeTerms;
+		$new = $terms;
 		if(!empty($new)){
 			$this->db->query('INSERT INTO term_relationships (object_id, term_taxonomy_id) VALUES (' . $postId . ',' . implode('),(' . $postId . ',', $new) . ')');
 			$this->changeTermTaxonomyCount($new, true);
@@ -283,25 +306,34 @@ class Post extends Model{
 		$this->request->location(SITE_URL . URI . '?msg=успешно');
 	}
 	
-	// Проверяет пришедшие термины на валидность
-	// Принимает пришедшие термины
-	// Возвращает идентификаторы валидных терминов
+	/**
+	 *  Validation come terms
+	 *  
+	 *  @param array $comeTerms
+	 *  
+	 *  @return array valid terms id
+	 */
 	public function checkTermExists($comeTerms){
 		$termsId = [];
 		if(!empty($comeTerms)){
 			// Возьмем все возможные термины(категории и теги) для данного типа поста
-			$termsExists = $this->getTermList($this->options['category_slug'], $this->options['tag_slug']);
+			$termsExists = $this->getTermList(array_keys($this->options['taxonomy']));
 			
+			// merge come terms
+			$mergedComeTerms = [];
+			foreach($comeTerms as $t){
+				$mergedComeTerms = array_merge($mergedComeTerms, $t);
+			}
 			
 			// Проходим по валидным категориям и смотрим есть ли они в пришедших
 			// Оставляем лишь валидные
-			
 			foreach($termsExists as $term){
-				if(in_array($term['id'], $comeTerms)){
+				if(in_array($term['id'], $mergedComeTerms)){
 					$termsId[] = $term['id'];
 				}
 			}
 		}
+		//var_dump($termsId);exit;
 		return $termsId;
 	}
 	
@@ -315,20 +347,14 @@ class Post extends Model{
 	// DELETE
 	
 	public function del($id, $type){
-		if($type == 'post')
-			$this->delPost($id);
-		else
-			$this->delTerm($id);
+		if($type == 'post') $this->delPost($id);
+		else $this->delTerm($id);
 		
 	}
 	
 	private function delPost($id){
-		$id = $this->db->getOne('Select id, parent from posts where id = ?i', $id);
-		
-		if(!$id)
+		if(!$id = $this->db->getOne('Select id, parent from posts where id = ?i', $id))
 			exit($this->answers['not_found']);
-		
-		
 		
 		$this->db->query('Delete from posts where id = ' . $id);
 		$this->db->query('Delete from postmeta where post_id = ' . $id);
@@ -340,9 +366,7 @@ class Post extends Model{
 	}
 	
 	private function delTerm($id){
-		$term_taxonomy_id = $this->db->getOne('Select term_taxonomy_id from term_taxonomy as tt, terms as t where tt.term_id = t.id and t.id = ?i',  $id);
-		
-		if(!$term_taxonomy_id)
+		if(!$term_taxonomy_id = $this->db->getOne('Select term_taxonomy_id from term_taxonomy as tt, terms as t where tt.term_id = t.id and t.id = ?i',  $id))
 			exit($this->answers['not_found']);
 		
 		$this->db->query('Delete from terms where id = ?i', $id);
@@ -378,12 +402,12 @@ class Post extends Model{
 			foreach($terms as $term){
 				$data[] = $term['term_id'];
 			}
-		
+		//var_dump($terms);exit;
 		return $data;
 	}
 	
 	public function getFormattedTermList(){
-		$data['terms'] = $this->getTermList($this->options['category_slug'], $this->options['tag_slug']);
+		$data['terms'] = $this->getTermList(array_keys($this->options['taxonomy']));
 		return $data;
 	}
 	

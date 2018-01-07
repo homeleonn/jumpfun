@@ -17,7 +17,7 @@
 					</a>
 				</td>
 				<td>
-					<a href="javascript:void(0);" title="Удалить категорию" onclick="if(confirm('Подтвердите удаление')) delItem(this, '<?=$options['slug']?>', <?=$term['id'];?>, '<?=$data['term']?>' );">
+					<a href="javascript:void(0);" title="Удалить категорию" onclick="if(confirm('Подтвердите удаление')) delItem(this, '<?=$options['slug']?>', <?=$term['id'];?>, 'term' );">
 						<span class="icon-cancel red block"></span>
 					</a>
 				</td>

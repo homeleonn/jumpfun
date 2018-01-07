@@ -50,9 +50,8 @@ class PostController extends Controller{
 		$post['__model'] = $this->model;
 		if($post['id'] == $this->config->front_page) return $post;
 		$this->checkHierarchy($post['url'], $post['parent'], $hierarchy);
-		
 		if(!Common::isPage())
-			$post['terms'] 	= $this->model->getTermsByPostId($post['id'], $this->options['taxonomy']);
+			$post['terms'] 	= $this->model->getTermsByPostId($post['id'], array_keys($this->options['taxonomy']));
 		
 		$this->addBreadCrumbs($post);
 		
@@ -125,7 +124,8 @@ class PostController extends Controller{
 		var_dump($params);exit;
 	}
 	
-	public function actionList($taxonomy = null, $taxonomySlug = null, $type = null, $filters = null){//var_dump(func_get_args());exit;
+	public function actionList($taxonomy = null, $taxonomySlug = null, $page = 1){//var_dump(func_get_args());exit;
+		$this->model->setLimit($this->page = $page, $this->perPage);
 		$list = $this->options;
 		$listMark = '__list';
 		
@@ -133,6 +133,7 @@ class PostController extends Controller{
 			$list[$listMark] = $this->model->getPostsByPostType($this->options['type']);
 		}else
 			$list[$listMark] = $this->model->getPostList($taxonomy, $taxonomySlug);
+		if(!$list[$listMark]) return 0;
 		// Узнаем имя таксономии по метке для хлебных крошек
 		$taxonomyName = $taxonomySlug;
 		if($taxonomySlug && isset($list[$listMark]['termName'])){
@@ -140,9 +141,8 @@ class PostController extends Controller{
 			unset($list[$listMark]['termName']);
 		}
 		$this->addBreadCrumbs($list, $taxonomy, $taxonomyName, $taxonomyName);
-		
-		$list['pagenation'] = (new Pagenation())->run($this->page, $this->model->getAllItemsCount(), $this->perPage, '');
-		$list['filters'] = $this->model->getFiltersHTML($this->options['taxonomy'], $this->options['type'], $this->options['slug']);
+		$list['pagenation'] = (new Pagenation())->run($this->page, $this->model->getAllItemsCount(), $this->perPage);
+		$list['filters'] = $this->model->getFiltersHTML(array_keys($this->options['taxonomy']), $this->options['type'], $this->options['slug']);
 		$list['__model'] = $this->model;
 		
 		return $list;

@@ -11,7 +11,7 @@ trait PostControllerTrait{
 	];
 	
 	private $page = 1;
-	private $perPage = 10;
+	private $perPage = 20;
 	
 	
 	private function filtersProcessed($filters){

@@ -1,19 +1,9 @@
-<?php
-if(!$this->haveChild()){
-	echo 'Педагогов нет!';
-	return;
-}	
-?>
-<div class="list-wrapper container">
-	<div class="col-sm-12" style="float: right;">
-		
-		<?php if($styles = $this->senderModel->getTermsListByTaxonomy('style', $type)):?>
-		<div class="row">
-			<div style="border: 2px lightblue solid; border-radius: 10px; padding: 10px; margin: 10px;">Стили: <?=implode(' | ', $styles)?></div>
-		</div>
-		<?php endif;?>
-		
-		<?php while($educator = $this->theChild()):?>
+<div class="list-wrapper container-fluid">
+	<div class="col-sm-9" style="float: right;">
+		<?php 
+		if($this->haveChild()):
+			while($educator = $this->theChild()):
+		?>
 		<div class="col-sm-3 list-item">
 			<div>
 				<a href="<?=SITE_URL . $slug . '/' . $educator['url']?>/">
@@ -22,12 +12,29 @@ if(!$this->haveChild()){
 				</a>
 			</div>
 		</div>
-		<?php endwhile;?>
+		<?php 
+			endwhile;
+		else:
+			echo 'Педагогов нет!';
+		endif;
+		?>
 		
 	</div>
-	<!--<div class="col-sm-3">
+	<div class="col-sm-3">
 		<?=$filters;?>
-	</div>-->
+	</div>
 	
 </div>
 <?=$pagenation;?>
+
+
+<!--
+<div class="row">
+	<div style="border: 2px lightblue solid; border-radius: 10px; padding: 10px; margin: 10px;">
+	<?php //if($styles = $this->senderModel->getTermsListByTaxonomy('style')):?>
+		Стили: <?//=implode(' | ', $styles) . '<hr>'?>
+	<?php //endif;?>
+	
+	<?//=$this->senderModel->getTermsListByTaxonomy('age', ' || ');?>
+	</div>
+</div>-->

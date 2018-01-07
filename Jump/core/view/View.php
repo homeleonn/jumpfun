@@ -26,8 +26,7 @@ class View
         $this->theme = $theme;
     }
 
-    public function render($template, $data = [])
-    {//var_dump($data);exit;
+    public function render($template, $data = []){
 		$contentFile = '';
 		$this->path = $this->getPath($template);
 		if(ENV != 'admin'){
@@ -59,7 +58,6 @@ class View
 			//var_dump('File ' . $contentFile . ' not exists!');
 			$contentFile = $this->path . 'index.php';
 		}
-		
 		include $this->path . 'header.php';
 		$this->cacheStart();
 		include $contentFile;
@@ -124,5 +122,10 @@ class View
 		if(!$this->children || !($child = current($this->children))) return false;
 		next($this->children);
 		return $child;
+	}
+	
+	public function __get($property){
+		if($property == 'date')
+			return \Jump\helpers\MyDate::class;
 	}
 }

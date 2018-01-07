@@ -4,12 +4,12 @@ use Jump\helpers\Common;
 ?>
 <a href="<?=SITE_URL?>admin/<?=$options['slug']?>/add/" class="action-tool plus" title="Добавить"><span class="icon-plus">Добавить</span></a>
 <div style="overflow-x: auto;">
-	<table class="mytable">
+	<!--<table class="mytable">
 		<tr align="center">
 			<td>title/url</td><td>Дата публикации</td>
 		</tr>
 		<?php
-		echo $data;
+		
 		// foreach($data as $page):
 			// $link = '<a target="_blank" href="' . ROOT_URI . (Common::isPage() ? '' : $options['slug'] . '/') . $page['url'] . '/">' . $page['title'] . '</a>';
 		/* 
@@ -29,5 +29,6 @@ use Jump\helpers\Common;
 		</tr> */
 		//endforeach; 
 		?>
-	</table>
+	</table>-->
+	<?=$data;?>
 </div>

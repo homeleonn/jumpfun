@@ -2,9 +2,8 @@
 //var_dump(get_defined_vars());exit;
 if(isset($_GET['msg']))
 	echo "<h3 style='padding: 10px;background: lightgreen;'>{$_GET['msg']}</h3>";
-$data['type'] = $data['taxonomy'] == $options['category_slug'] ? 'category' : 'tag';
 ?>
-<h2><?=$options['edit']?>(<?=$data['type']?>)</h2>
+<h2>Редактировать (<?=$data['taxonomy']?>)</h2>
 <form method="POST" id="edit-term-<?=$options['slug']?>" class="post-from-admin" name="" autocomplete="off">
 	<div id="center">
 		<input type="hidden" name="id" value="<?=$data['id']?>">

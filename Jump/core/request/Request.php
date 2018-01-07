@@ -56,7 +56,6 @@ class Request{
 		}
 			
 		$params = explode('/', trim($uri, '/'));
-		
 		if($needController) $result[] = $params[0] ?: 'index';
 		$result[] = isset($params[1]) ? $params[1] : 'index'; // method
 		$result[] = array_slice($params, 2); // args

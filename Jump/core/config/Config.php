@@ -56,13 +56,14 @@ class Config{
 			$taxonomy = isset($options['taxonomy']) ? $options['taxonomy'] : [];
 			$router = HelperDI::get('router');
 			if(ENV != 'admin'){
+				$paged = '(/page/([2-9]|\d{2,}))?';
 				$router
-					->add($slug, $type . ':list')
+					->add($slug . $paged, $type . ':list///$2')
 					->add($slug . '/(' . URL_PATTERN . ')', $type . ':single/$1');
 					//->add($slug . '/style/(' . URL_PATTERN . ')', '*?post_type=' . $type. '&category_name=$matches[1]')
 				if(!empty($taxonomy)){
-					foreach($taxonomy as $t)
-						$router->add("{$slug}/{$t}/(" . URL_PATTERN . ')', $type . ":list/{$t}/$1");
+					foreach($taxonomy as $t => $values)
+						$router->add("{$slug}/{$t}/(.*)" . $paged, $type . ":list/{$t}/$1/$3");
 				}
 			}else{
 				$router
@@ -75,7 +76,7 @@ class Config{
 					->add($slug . '/edit', $type . ':edit', 'POST')
 					->add($slug . '/edit-term/(\d+)', $type . ':editTermForm/$1', 'GET')
 					->add($slug . '/edit-term/(\d+)', $type . ':editTerm', 'POST')
-					->add($slug . '/del/(post|category|tag)/(\d+)', $type . ':del/$2/$1', 'POST')
+					->add($slug . '/del/(post|term)/(\d+)', $type . ':del/$2/$1', 'POST')
 					->add($slug, $type . ':list', 'GET');
 			}
 		}

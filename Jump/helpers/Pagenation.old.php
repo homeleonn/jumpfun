@@ -22,12 +22,14 @@ class Pagenation
 	 * @return void
 	 * 
 	 */
-	public function run($currentPageNumber, $all, $perPage, $filters = NULL, $idStyle = 'pagenation')
+	public function run($currentPageNumber, $all, $perPage, $filters, $idStyle = 'pagenation')
 	{
 		$this->currentPageNumber = $currentPageNumber;
+		$this->filters = $filters;
 		$html = '';
 		// Узнаем сколько всего страниц
 		$countPages = ($perPage > $all) ? 1 : ceil($all / $perPage);
+		
 		if($countPages == 1) return false;
 		
 		if($countPages > 10){
@@ -71,15 +73,28 @@ class Pagenation
 	private function getLink($i, $ellipsis = NULL){
 		$activePageLink = 'javascript:void(0);" class="active-page-link"';
 		$link = $activePageLink;
-		if($this->currentPageNumber == 1){
-			$link = $i == 1 ? $activePageLink : FULL_URL . "page/{$i}/";
-		}else{
-			if($this->currentPageNumber != $i){
-				$replace = $i != 1 ? "/page/{$i}/" : '/';
-				$link = str_replace("/page/{$this->currentPageNumber}/", $replace, FULL_URL);
+		if($this->filters){//var_dump($this->filters);
+			$currentPage = preg_match('~page=(\d+)~', FULL_URL, $matches) ? $matches[1] : null;
+			if($this->currentPageNumber == 1){
+				$link = $i == 1 ? $activePageLink : str_replace($this->filters, 'page=' . $i . ';' .$this->filters , FULL_URL);
+			}else{
+				if($currentPage != $i){
+					$firstPage = $i == 1;
+					$moreFilters = (strpos($this->filters , ';') !== false);
+					$search  = 'page=' . $currentPage . ($firstPage ? ($moreFilters ? ';' : '/') : '');
+					$replace = ($firstPage ? '' : 'page=' . $i);
+					//var_dump(strpos($this->filters , ';'), $this->filters, $moreFilters, $search, $replace);
+					$link = str_replace($search, $replace, FULL_URL);
+				}
 			}
+		}else{
+			if($i != 1)
+				$link = FULL_URL . 'page=' . $i . '/';
 		}
-		return '<li><a href="'.$link.'">'.($ellipsis ? ' ... ' : $i).'</a></li>';
+		
+		$link .= '"';
+			
+		return '<li><a href="'.$link.'>'.($ellipsis ? ' ... ' : $i).'</a></li>';
 	}
 }
 

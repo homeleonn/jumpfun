@@ -8,4 +8,5 @@ $this->di->get('config')->addPageType([
 		'delete' => 'Удалить страницу',
 		'common' => 'страниц',
 		'hierarchical' => true,
+		'taxonomy' => [],
 ]);

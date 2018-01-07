@@ -25,7 +25,7 @@ class PostController extends AdminController{
 	
 	public function actionTermList(){
 		$data['term'] = $_GET['term'];
-		if(!isset($this->options['taxonomy']) || !in_array($data['term'], $this->options['taxonomy'])) return false;
+		if(!isset($this->options['taxonomy']) || !in_array($data['term'], array_keys($this->options['taxonomy']))) return false;
 		return array_merge($data, ['terms' => $this->model->termList($data['term'])]);
 	}
 	
@@ -33,16 +33,12 @@ class PostController extends AdminController{
 		return $this->model->addForm();
 	}
 	
-	public function actionAdd($type = NULL, $value = NULL){
-		if(!$type){
-			if($this->request->post['title'] == '') exit;
-			list($title, $url, $content, $parent, $modified) = $this->postProcessing($this->request->post['title']);
-			$url 		= $this->model->checkUrl($url, $parent);
-			$posType	= $this->options['type'];
-			$data = $this->model->add($title, $url, $content, $parent, $posType);
-		}else{
-			$data = $this->model->addTermHelper($value, $type);
-		}
+	public function actionAdd(){//var_dump($this->model->editTerms(0, $this->model->checkTermExists($this->request->post['terms'])), $this->request->post);exit;
+		if($this->request->post['title'] == '') Msg::json('Заголовок не должен быть пуст!', 0);
+		list($title, $url, $content, $parent, $modified, $terms) = $this->postProcessing($this->request->post['title']);
+		$url 		= $this->model->checkUrl($url, $parent);
+		$posType	= $this->options['type'];
+		$data = $this->model->add($title, $url, $content, $parent, $posType, $terms);
 		return $data;
 	}	
 	
@@ -60,7 +56,7 @@ class PostController extends AdminController{
 	}
 	
 	private function postProcessing($transitString){
-		$parent 	= (int)$this->request->post['parent'];
+		$parent = isset($this->request->post['parent']) ? (int)$this->request->post['parent'] : 0;
 		if(!$this->model->checkExistsPostById($parent))
 			Msg::json('Данного родителя не существует', 0);
 		
@@ -68,7 +64,8 @@ class PostController extends AdminController{
 		$url 		= Transliteration::run($transitString);
 		$content 	= $this->textSanitize($this->request->post['content']); 
 		$modified 	= MyDate::getDateTime();
-		return [$title, $url, $content, $parent, $modified];
+		$terms 		= isset($this->request->post['terms'])  ? $this->request->post['terms'] : [];
+		return [$title, $url, $content, $parent, $modified, $terms];
 	}
 	
 	public function actionDel($id, $type){
@@ -80,35 +77,35 @@ class PostController extends AdminController{
 	// TERMS
 	public function actionAddTermForm(){
 		$this->checkGettingTermType();
-		return $this->model->addTermForm($this->request->get['type']);
+		return $this->model->addTermForm($this->request->get['term']);
 	}
 	
 	public function actionAddTerm(){
 		$async = isset($this->request->post['async']) ? $this->request->post['async'] : false;
 		
-		if(!$this->request->post['name']){
+		if(!$name = $this->request->post['name']){
 			if(!$async)
 				$this->request->location(FULL_URL);
 			else
 				exit;
 		}
 		
-		$whisper = true;
-		
 		if($async){
+			$slug 	 = $description = '';
 			$whisper = false;
-			$this->request->post['slug'] = '';
-			$this->request->post['description'] = '';
+		}else{
+			$slug 		 = $this->request->post['slug'];
+			$description = $this->request->post['description'];
+			$whisper 	 = true;
 		}
 		
-		$result = $this->model->addTerm($this->request->post['name'], $this->request->post['type'], $whisper, $this->request->post['slug'], $this->request->post['description']);
+		$result = $this->model->addTerm($name, $this->request->post['term'], $whisper, $slug, $description);
 		
 		if($result && $async){
 			exit('1');
 		}
 			
-		
-		$url = $result ? (SITE_URL . 'admin/' . $this->options['slug'] . '/edit-term/' . $this->db->insertId() . '/') : (FULL_URL . '&msg=Термин уже существует');
+		$url = $result ? (SITE_URL . 'admin/' . $this->options['slug'] . '/terms/?term=' . $this->request->post['term']) : (FULL_URL . '&msg=Термин уже существует');
 		
 		$this->request->location($url);
 	}
@@ -140,7 +137,7 @@ class PostController extends AdminController{
 	}
 	
 	private function checkValidTerms($term){
-		return isset($this->options['taxonomy']) ? in_array($term, $this->options['taxonomy']) : false;
+		return isset($this->options['taxonomy']) ? in_array($term, array_keys($this->options['taxonomy'])) : false;
 	}
 	
 	

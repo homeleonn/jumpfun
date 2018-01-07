@@ -61,12 +61,6 @@ class Post extends Model{
 		return $this->db->getAll($this->select . 'parent = ?i', (int)$parentId);
 	}
 	
-	public function getPostsByPostType($type){
-		$query = $this->select . 'post_type = ?s order by id DESC';
-		$this->checkInLimit($query, [$type]);
-		return $this->db->getAll($query . $this->limit, $type);
-	}
-	
 	public function getPostsByFilters($filters, $postType){
 		$sqlFilters = '';
 		// Соберем таксономии и проверим их валидность
@@ -87,7 +81,7 @@ class Post extends Model{
 			$sqlFilters .= " (tt.taxonomy = '{$postType}-{$taxonomy}' and t.slug IN('" . str_replace(',', "','", $slugs) . "')) OR";
 		}
 		
-		$query = $this->select . 'id IN(Select DISTINCT p.id from ' . $this->relationship . ' and ('.substr($sqlFilters, 0, -3).')) order by id DESC';
+		$query = $this->select . 'id IN(Select DISTINCT p.id from ' . $this->relationship . ' and ('.substr($sqlFilters, 0, -3).')) and post_type = \''.$postType.'\' order by id DESC';
 		$this->checkInLimit($query, []);
 		$data = $this->db->getAll($query . $this->limit);
 		//var_dump($q, $data);exit;
@@ -126,14 +120,19 @@ class Post extends Model{
 		return $newValidFilters;
 	}
 	
-	public function getPostList($taxonomy, $value){
+	public function getPostList($taxonomy, $value){//var_dump(func_get_args());exit;
 		// Проверим есть ли вообще такой термин
 		if(!$termName = $this->checkTermExists($taxonomy, $value)) 
 			return 0;
-		$query = $this->select . 'id IN(Select DISTINCT p.id from ' . $this->relationship . ' and t.slug = ?s and tt.taxonomy = ?s) order by id DESC';
+		$query = $this->select . 'id IN(Select DISTINCT p.id from ' . $this->relationship . ' and t.slug = ?s and tt.taxonomy = ?s) and post_type = \''.$this->options['type'].'\' order by id DESC';
 		$post = $this->getAll($query, [$value, $taxonomy]);
 		$post['termName'] = $termName;
 		return $post;
+	}
+	
+	public function getPostsByPostType($type){
+		$query = $this->select . 'post_type = ?s order by id DESC';
+		return $this->getAll($query, [$type]);
 	}
 	
 	private function checkTermExists($taxonomy, $value){
@@ -158,9 +157,7 @@ class Post extends Model{
 	}
 	
 	private function checkInLimit($query, $params){
-		if(!$this->page || $this->page == 1) return;
 		$this->allItemsCount = (int)call_user_func_array([$this->db, 'getOne'], array_merge([str_replace('Select *', 'Select COUNT(*) as count', $query)], $params));
-		
 		if($this->allItemsCount && $this->allItemsCount <= $this->start){
 			$newUrl = Filter::clearFilter(FULL_URL, 'page=' . $this->page, ';');
 			if(!$this->filters)
@@ -187,42 +184,48 @@ class Post extends Model{
 	}
 	
 	private function getFiltersHTMLForList($terms, $postSlug){
-		$html['all']= '<a href="'. SITE_URL . $postSlug . '/">Все</a><br>';
 		$tmpTaxonomy = $terms[0]['taxonomy'];
 		foreach($terms as $key => $term){
-			if(!isset($html[$term['taxonomy']])){
-				$html[$term['taxonomy']] = '<div class="filters"><div class="title">' . $term['taxonomy'] . '</div><div class="content">';
-				if($term['taxonomy'] != $tmpTaxonomy) $html[$tmpTaxonomy] .= '</div></div>';
-			}
-			$html[$term['taxonomy']] .= "<a href=\"" . SITE_URL . "{$postSlug}/{$term['taxonomy']}/{$term['slug']}/\">{$term['name']}</a> ({$term['count']})";
-			$tmpTaxonomy = $term['taxonomy'];
+			if(!isset($html[$term['taxonomy']])) $html[$term['taxonomy']] = '';
+			$link = SITE_URL . "{$postSlug}/{$term['taxonomy']}/{$term['slug']}/";
+			$html[$term['taxonomy']] .= $this->setTermLinkHelper($link, $term['name'], $term['count']) . '<br>';
 		}
-		$html[$tmpTaxonomy] .= '</div></div>';
+		foreach($html as $tax => $h) 
+			$html[$tax] = '<div class="filters"><div class="title">' . $tax . '</div><div class="content">' . $h . '</div></div>';
 		
-		return implode('', $html);
+		return implode('', array_merge(['all' => '<a href="'. SITE_URL . $postSlug . '/">Все</a><br>'], $html));
 	}
 	
 	public function getTermsByPostId($postId, $taxonomies){
-		$terms = $this->db->getAll('Select t.*, tt.* from terms as t, term_taxonomy as tt, term_relationships as tr where t.id = tt.term_id and tt.term_taxonomy_id = tr.term_taxonomy_id and tr.object_id = ' . $postId . ' and tt.taxonomy IN(\'' . implode("','", $this->options['taxonomy']) . '\')');
+		$terms = $this->db->getAll('Select t.*, tt.* from terms as t, term_taxonomy as tt, term_relationships as tr where t.id = tt.term_id and tt.term_taxonomy_id = tr.term_taxonomy_id and tr.object_id = ' . $postId . ' and tt.taxonomy IN(\'' . implode("','", array_keys($this->options['taxonomy'])) . '\')');
 		if(!$terms) return false;
 		$html = [];
 		if($terms){
 			foreach($terms as $key => $term){
-				if(!isset($html[$term['taxonomy']])) $html[$term['taxonomy']] = ($key ? '<br>' : '') . $term['taxonomy'] . ': ';
-				$html[$term['taxonomy']] .= "<a href='" . SITE_URL . "{$this->options['slug']}/{$term['taxonomy']}/{$term['slug']}/'>{$term['name']}</a><br>";
+				if(!isset($html[$term['taxonomy']])) $html[$term['taxonomy']] = ($key ? '<br>' : '') . $this->options['taxonomy'][$term['taxonomy']]['title'] . ': ';
+				$html[$term['taxonomy']] .= "<a href='" . SITE_URL . "{$this->options['slug']}/{$term['taxonomy']}/{$term['slug']}/'>{$term['name']}</a>, ";
 			}
+			foreach($html as &$h) 
+				$h = substr($h, 0, -2);
 		}
 		return implode('', $html);
 	}
 	
 	
-	public function getTermsListByTaxonomy($taxonomy, $postType){
-		if(!$terms = $this->db->getAll('Select DISTINCT t.*, tt.* from ' . $this->relationship . ' and p.post_type = \''.$postType.'\' and tt.taxonomy = \''.$taxonomy.'\'')) return false;
-		
+	public function getTermsListByTaxonomy($taxonomy, $delimiter = false, $getCount = true){
+		if(!$terms = $this->db->getAll('Select DISTINCT t.*, tt.* from ' . $this->relationship . ' and p.post_type = \''.$this->options['type'].'\' and tt.taxonomy = \''.$taxonomy.'\'')) return false;
+		$allCount = 0;
 		foreach($terms as $t){
-			$html[] = "<a href='" . SITE_URL . "{$this->options['slug']}/{$t['taxonomy']}/{$t['slug']}/'>{$t['name']}</a>";
+			if(!$getCount) $t['count'] = 0;
+			$allCount += $t['count'];
+			$html[] = $this->setTermLinkHelper(SITE_URL . "{$this->options['slug']}/{$t['taxonomy']}/{$t['slug']}/", $t['name'], $t['count']);
 		}
-		
-		return $html;
+		$result = array_merge([$this->setTermLinkHelper(SITE_URL . "{$this->options['slug']}/", 'all')], $html);
+		return ($delimiter && is_string($delimiter)) ? ($this->options['taxonomy'][$taxonomy]['title'] . ': ' . implode($delimiter, $result)) : $result;
+	}
+	
+	private function setTermLinkHelper($link, $text, $count = 0){
+		$count = $count ? " ({$count})" : '';
+		return urldecode(FULL_URL_WITHOUT_PARAMS) == $link ? "<span style='border-bottom: 3px #de1d1d solid;'>{$text}{$count}</span>" : "<a href='{$link}'>{$text}</a>{$count}";
 	}
 }

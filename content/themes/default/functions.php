@@ -22,5 +22,20 @@ $di->get('config')->addPageType([
 		'delete' => 'Удалить педагога',
 		'common' => 'педагогов',
 		'hierarchical' => false,
-		'taxonomy' => ['style', 'age']
+		'taxonomy' => [
+			'style' => [
+				'title' => 'Стиль педагога',
+				'add' => 'Добавить стиль',
+				'edit' => 'Редактировать стиль',
+				'delete' => 'Удалить стиль',
+				'hierarchical' => false,
+			],
+			'age' => [
+				'title' => 'Возрастная категория',
+				'add' => 'Добавить возрастную категорию',
+				'edit' => 'Редактировать возрастную категорию',
+				'delete' => 'Удалить возрастную категорию',
+				'hierarchical' => false,
+			],
+		]
 ]);

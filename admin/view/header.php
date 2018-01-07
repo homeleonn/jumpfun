@@ -4,11 +4,10 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>Панель администратора</title>
-	<link rel="stylesheet" type="text/css" href="<?php echo ADMIN_THEME;?>css/bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="<?php echo ADMIN_THEME;?>css/fontello.css">
 	<link rel="stylesheet" type="text/css" href="<?php echo ADMIN_THEME;?>css/style.css">
 	<link rel="stylesheet" type="text/css" href="<?php echo ADMIN_THEME;?>css/style1.css">
-	<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,700italic,400,800,700,600"/>
+	<!--<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,700italic,400,800,700,600"/>-->
 	<link rel="shortcut icon" type="image/x-icon" href="<?php echo ADMIN_THEME;?>img/favicon.ico"/>
 	<script src="<?=SITE_URL?>admin/view/js/jq3.js"></script>
 	<script src="<?=SITE_URL?>admin/view/js/admin.js"></script>

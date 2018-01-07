@@ -166,20 +166,20 @@ function checkElemets(type, act){
 }
 
 //----------------------------
-function addTerm(type){
-	var termNameInput = $('#post-' + type).find('input#new-' + type);
+function addTerm(term){
+	var termNameInput = $('#post-' + term).find('input#new-' + term);
 	var newTerm = termNameInput.val();
 	if(!newTerm) return;
-	var existingTerms = $('#' + type + ' > input[type="checkbox"]');
+	var existingTerms = $('#term-' + term + ' > input[type="checkbox"]');
 	
 	if(issetTerm(existingTerms, newTerm)){
 		termNameInput.val('');
 		return;
 	}
 	
-	$.post(root + 'admin/' + postSlug + '/add-term/' ,{type: type, name: newTerm, async: 1}, function(data){
+	$.post(root + 'admin/' + postSlug + '/add-term/' ,{term: term, name: newTerm, async: 1}, function(data){
 		if(data)
-			$('#post-' + type).find('#' + type).append('<input type="checkbox" value="'+newTerm+'" /> '+newTerm + '<br>');
+			$('#post-' + term).find('#term-' + term).append('<input type="checkbox" value="'+newTerm+'" /> '+newTerm + '<br>');
 		else
 			termNameInput.val('');
 	});
