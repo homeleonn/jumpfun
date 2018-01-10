@@ -43,7 +43,10 @@ class PostController extends AdminController{
 	}	
 	
 	public function actionEditForm($id){
-		return $this->model->editForm($id);
+		$data = $this->model->editForm($id);
+		$data['__model'] = $this->model;
+		//var_dump($data, array_pop($data['selfTerms']));exit;
+		return $data;
 	}
 	
 	public function actionEdit(){
@@ -55,13 +58,13 @@ class PostController extends AdminController{
 		return $this->model->edit($title, $url, $content, $parent, $modified, $id);
 	}
 	
-	private function postProcessing($transitString){
+	private function postProcessing($urlStringForTranslit){
 		$parent = isset($this->request->post['parent']) ? (int)$this->request->post['parent'] : 0;
 		if(!$this->model->checkExistsPostById($parent))
 			Msg::json('Данного родителя не существует', 0);
 		
 		$title 		= $this->textSanitize($this->request->post['title'], 'title'); 
-		$url 		= Transliteration::run($transitString);
+		$url 		= Transliteration::run($urlStringForTranslit);
 		$content 	= $this->textSanitize($this->request->post['content']); 
 		$modified 	= MyDate::getDateTime();
 		$terms 		= isset($this->request->post['terms'])  ? $this->request->post['terms'] : [];
@@ -105,7 +108,7 @@ class PostController extends AdminController{
 			exit('1');
 		}
 			
-		$url = $result ? (SITE_URL . 'admin/' . $this->options['slug'] . '/terms/?term=' . $this->request->post['term']) : (FULL_URL . '&msg=Термин уже существует');
+		$url = $result ? (SITE_URL . 'admin/' . $this->options['type'] . '/terms/?term=' . $this->request->post['term']) : (FULL_URL . '&msg=Термин уже существует');
 		
 		$this->request->location($url);
 	}
@@ -133,7 +136,7 @@ class PostController extends AdminController{
 	
 	
 	private function goToPostTypePage(){
-		$this->request->location(SITE_URL . 'admin/' . $this->options['slug'] . '/');
+		$this->request->location(SITE_URL . 'admin/' . $this->options['type'] . '/');
 	}
 	
 	private function checkValidTerms($term){

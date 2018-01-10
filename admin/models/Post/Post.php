@@ -35,7 +35,7 @@ class Post extends Model{
 	
 	public function addForm(){
 		$data = [];
-		if(!Common::isPage()) 				$data['terms'] = $this->getTermList(array_keys($this->options['taxonomy']));
+		if($this->options['taxonomy']) 		$data['terms'] = $this->getTermList(array_keys($this->options['taxonomy']));
 		if($this->options['hierarchical']) 	$data['listForParents'] = $this->getPossibleParents();
 		return $data;
 	}
@@ -50,13 +50,14 @@ class Post extends Model{
 	 *  @return
 	 */
 	private function getPossibleParents($selfId = NULL, $parent = NULL, $getPosts = false){
+		
 		$allPosts = $this->getAllPosts();
 		foreach($allPosts as $post)
 			$ids[] = $post['id'];
 		$postsTerms = $this->getTermsByPostsId($ids);
 		foreach($allPosts as $post){
 			if($post['id'] == $selfId) continue;
-			$post['_terms'] = $postsTerms[$post['id']];
+			$post['_terms'] = isset($postsTerms[$post['id']]) ? $postsTerms[$post['id']] : [];
 			$postsToParents[$post['parent']][] = $post;
 		}
 		//var_dump($postsToParents);exit;
@@ -116,8 +117,8 @@ class Post extends Model{
 	}
 	
 	private function hierarchyListHtml($page, $level, $urlHierarchy){//var_dump($page);exit;
-		$link = '<a target="_blank" href="' . ROOT_URI . $urlHierarchy .(Common::isPage() ? '' : $this->options['slug'] . '/') . $page['url'] . '/">перейти</a>';
-		$edit = '<a target="blank" href="' . SITE_URL . 'admin/' . $this->options['slug'] . '/edit/' . $page['id'] . '/">%s</a>';
+		$link = '<a target="_blank" href="' . ROOT_URI . $urlHierarchy .(Common::isPage() ? '' : $this->options['rewrite']['slug'] . '/') . $page['url'] . '/">перейти</a>';
+		$edit = '<a target="blank" href="' . SITE_URL . 'admin/' . $this->options['type'] . '/edit/' . $page['id'] . '/">%s</a>';
 		ob_start();
 		?>
 			<tr>
@@ -127,7 +128,7 @@ class Post extends Model{
 						[<?=$link;?>]
 						[<a href="#">свойства</a>]
 						[<?=sprintf($edit, 'изменить');?>]
-						[<a style="color: red;" href="javascript:void(0);" title="<?=$this->options['delete']?>" onclick="if(confirm('Подтвердите удаление')) delItem(this,'<?=$this->options['slug']?>',<?=$page['id'];?> );">удалить</span></a>]
+						[<a style="color: red;" href="javascript:void(0);" title="<?=$this->options['delete']?>" onclick="if(confirm('Подтвердите удаление')) delItem(this,'<?=$this->options['type']?>',<?=$page['id'];?> );">удалить</span></a>]
 					</div>
 				</td>
 				<?php 
@@ -135,7 +136,7 @@ class Post extends Model{
 						echo '<td>';
 						ob_start();
 						foreach($page['_terms'] as $term){
-							echo '<a href="'. SITE_URL . $this->options['slug'] . '/' . $term['taxonomy'] . '/' . $term['slug'] . '/">'.$term['name'].'</a>, ';
+							echo '<a href="'. SITE_URL . $this->options['rewrite']['slug'] . '/' . $term['taxonomy'] . '/' . $term['slug'] . '/">'.$term['name'].'</a>, ';
 						}
 						echo substr(ob_get_clean(), 0, -2);
 						echo '</td>';
@@ -217,7 +218,7 @@ class Post extends Model{
 			$post['urlHierarchy'] = $this->getUrlHierarchy($post['id']);
 			$post['listForParents'] = $this->getPossibleParents($post['id'], $post['parent']);
 		}else{
-			$post['urlHierarchy'] = $this->options['slug'] . '/';
+			$post['urlHierarchy'] = $this->options['rewrite']['slug'] . '/';
 		}
 		if(Common::isPage()){
 			return $post;
@@ -254,7 +255,7 @@ class Post extends Model{
 		$this->db->query('UPDATE posts SET title = ?s, url = ?s, content = ?s, parent = ?i, modified = ?s where id = ?i', $title, $url, $content, $parent, $modified, $id);
 		$this->editTerms($this->request->post['id'], isset($this->request->post['terms']) ? $this->request->post['terms'] : []);
 		
-		Msg::json(array('link' => ROOT_URI . ($this->options['slug'] != 'pages' ? $this->options['slug'] . '/' : '') . $this->request->post['url'] . '/'));
+		Msg::json(array('link' => ROOT_URI . ($this->options['rewrite']['slug'] != 'pages' ? $this->options['rewrite']['slug'] . '/' : '') . $this->request->post['url'] . '/'));
 	}
 	
 	// Добавляем новые термины или удаляем ненужные
@@ -395,7 +396,7 @@ class Post extends Model{
 	}
 	
 	public function getTermsIdByPostId($postId){
-		$terms = $this->db->getAll('Select tt.term_id from term_taxonomy as tt, term_relationships as tr where tt.term_taxonomy_id = tr.term_taxonomy_id and tr.object_id = ?i order by tt.term_id', $postId);
+		$terms = $this->getTermsByPostId($postId);
 		
 		$data = [];
 		if($terms)
@@ -404,6 +405,12 @@ class Post extends Model{
 			}
 		//var_dump($terms);exit;
 		return $data;
+	}
+	
+	public function getTermsByPostId($postId){
+		$this->terms = isset($this->terms) ? $this->terms : $this->terms = $this->db->getAll('Select t.*, tt.* from terms as t, term_taxonomy as tt, term_relationships as tr where t.id = tt.term_id and tt.term_taxonomy_id = tr.term_taxonomy_id and tr.object_id = ?i order by tt.term_id', $postId);
+		return $this->terms;
+		
 	}
 	
 	public function getFormattedTermList(){
@@ -429,5 +436,9 @@ class Post extends Model{
 	public function checkExistsPostById($postId){
 		if($postId === 0) return true;
 		return $this->db->getOne('Select id from posts where id = ?i', $postId);
+	}
+	
+	public function link(){
+		
 	}
 }

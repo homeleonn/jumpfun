@@ -32,7 +32,7 @@ class Router{
 	}
 	
 	public function searchController(){
-		$uri = urldecode($this->request->uri());
+		$uri = urldecode(URI);
 		$uri = $this->replaceUriIfAdmin($uri);
 		
 		$this->routesReverse();

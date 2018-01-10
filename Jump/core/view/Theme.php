@@ -21,7 +21,7 @@ class Theme
 	
 	public function template($template){
 		$options = $this->config->getCurrentPageOptions();
-		return (ENV != 'admin' && isset($options['slug'])) ? preg_replace('/^\w+(\/.*)/', $options['slug'] .  '$1', $template) : $template;
+		return (ENV != 'admin' && isset($options['rewrite']['slug'])) ? preg_replace('/^\w+(\/.*)/', $options['rewrite']['slug'] .  '$1', $template) : $template;
 	}
 	
 	public function title(){

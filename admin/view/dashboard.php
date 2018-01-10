@@ -3,18 +3,19 @@
 $sections = array(
 	'Главная панель||gauge' => '',
 	'Страницы||' => [
-		'Все страницы' => 'pages',
-		'Добавить новую' => 'pages/add',
+		'Все страницы' => 'page',
+		'Добавить новую' => 'page/add',
 	],
 	'Педагоги||' => [
-		'Все педагоги' => 'educators',
-		'Добавить новую' => 'educators/add',
-		'Стили' => 'educators/terms/?term=style',
-		'Возраст' => 'educators/terms/?term=age',
+		'Все педагоги' => 'educator',
+		'Добавить новую' => 'educator/add',
+		'Стили' => 'educator/terms/?term=style',
+		'Возраст' => 'educator/terms/?term=age',
 	],
 	'Новости||' => [
-		'Все новости' => 'news',
-		'Добавить новую' => 'news/add',
+		'Все новости' => 'new',
+		'Добавить новую' => 'new/add',
+		'Категории' => 'new/terms/?term=newcat',
 	],
 	'Настройки||cog' => [
 		'Меню' => 'menu',

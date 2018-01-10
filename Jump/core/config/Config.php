@@ -10,6 +10,7 @@ class Config{
 	private $db;
 	private $router;
 	private $options;
+	public $pageTypesWithFront = [];
 	
 	private $breadcrumbs = [];
 	public $breadcrumbsType = false;
@@ -48,38 +49,62 @@ class Config{
 	}
 	
 	public function addPageType($options){
-		$this->options['jump_pageTypes'][$options['type']] = $options;
-		if(!isset($options['rewrite'])) $options['rewrite'] = true;
+		if(!isset($options['rewrite']['with_front'])) 	$options['rewrite']['with_front'] = false;
+		if(!isset($options['has_archive'])) 			$options['has_archive'] = false;
+		if(!isset($options['rewrite']['slug']))			$options['rewrite']['slug']	= $options['type'];
 		if($options['rewrite']){
-			$slug = $options['slug'];
+			if(!isset($options['rewrite']['paged'])) 	$options['rewrite']['paged'] = true;
+			if(!isset($options['taxonomy'])) 			$options['taxonomy'] = [];
+			
+			$replaceCount = 0;
+			$slug = preg_replace('~%.+%~', '([^/]+)', $options['rewrite']['slug'], -1, $replaceCount);
+			// $slug = $options['rewrite']['slug'];
 			$type = $options['type'];
-			$taxonomy = isset($options['taxonomy']) ? $options['taxonomy'] : [];
+			$sep  = '/';
+			$addArgs = '';
+			$i = 2;
+			while($replaceCount--){
+				$addArgs .= '/$' . $i++;
+			}
+			
+			// Routing
 			$router = HelperDI::get('router');
 			if(ENV != 'admin'){
-				$paged = '(/page/([2-9]|\d{2,}))?';
-				$router
-					->add($slug . $paged, $type . ':list///$2')
-					->add($slug . '/(' . URL_PATTERN . ')', $type . ':single/$1');
-					//->add($slug . '/style/(' . URL_PATTERN . ')', '*?post_type=' . $type. '&category_name=$matches[1]')
-				if(!empty($taxonomy)){
-					foreach($taxonomy as $t => $values)
-						$router->add("{$slug}/{$t}/(.*)" . $paged, $type . ":list/{$t}/$1/$3");
+				if($options['rewrite']['with_front']){
+					$slug  = $sep = '';
+					$this->pageTypesWithFront[] = $options['type'];
+				}
+				$paged = $options['rewrite']['paged'] ? "({$sep}page/([2-9]|\d{2,}))?" : '';
+							
+				if(!$options['rewrite']['with_front']){
+					if($options['has_archive']) 
+						$router->add($slug . $paged, $type . ':list///$2');
+					$router->add($slug . $sep . '(.*)', $type . ':single/$1' . $addArgs);
+					//$router->add($slug . $sep . '(' . URL_PATTERN . ')', $type . ':single/$1');
+				}
+				//->add($slug . '/style/(' . URL_PATTERN . ')', '*?post_type=' . $type. '&category_name=$matches[1]')
+				if(!empty($options['taxonomy'])){
+					//$slug = preg_replace('~\/%.+%~', '', $options['rewrite']['slug']);
+					foreach($options['taxonomy'] as $t => $values)
+						$router->add("{$slug}{$sep}{$t}/(.*)" . $paged, $type . ":list/{$t}/$1/$3");
 				}
 			}else{
 				$router
-					->add($slug . '/terms', $type . ':termList', 'GET')
-					->add($slug . '/add', $type . ':addForm', 'GET')
-					->add($slug . '/add', $type . ':add', 'POST')
-					->add($slug . '/add-term', $type . ':addTermForm', 'GET')
-					->add($slug . '/add-term', $type . ':addTerm', 'POST')
-					->add($slug . '/edit/(\d+)', $type . ':editForm/$1', 'GET')
-					->add($slug . '/edit', $type . ':edit', 'POST')
-					->add($slug . '/edit-term/(\d+)', $type . ':editTermForm/$1', 'GET')
-					->add($slug . '/edit-term/(\d+)', $type . ':editTerm', 'POST')
-					->add($slug . '/del/(post|term)/(\d+)', $type . ':del/$2/$1', 'POST')
-					->add($slug, $type . ':list', 'GET');
+					->add($type . '/terms', $type . ':termList', 'GET')
+					->add($type . '/add', $type . ':addForm', 'GET')
+					->add($type . '/add', $type . ':add', 'POST')
+					->add($type . '/add-term', $type . ':addTermForm', 'GET')
+					->add($type . '/add-term', $type . ':addTerm', 'POST')
+					->add($type . '/edit/(\d+)', $type . ':editForm/$1', 'GET')
+					->add($type . '/edit', $type . ':edit', 'POST')
+					->add($type . '/edit-term/(\d+)', $type . ':editTermForm/$1', 'GET')
+					->add($type . '/edit-term/(\d+)', $type . ':editTerm', 'POST')
+					->add($type . '/del/(post|term)/(\d+)', $type . ':del/$2/$1', 'POST')
+					->add($type, $type . ':list', 'GET');
 			}
 		}
+		
+		$this->options['jump_pageTypes'][$options['type']] = $options;
 	}
 	
 	public function getCurrentPageOptions(){
@@ -91,6 +116,11 @@ class Config{
 			$option = $options;
 		
 		return $option;
+	}
+	
+	public function getPageOptionsByType($type){
+		$options = isset($this->options['jump_pageTypes'][$type]) ? $this->options['jump_pageTypes'][$type] : NULL;
+		return $options;
 	}
 		
 	public function __get($option){//var_dump($option, $this->getOption($option));

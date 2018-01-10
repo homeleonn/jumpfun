@@ -13,7 +13,8 @@
 
 var root = '<?=ROOT_URI?>', 
 ajaxUrl = root + "admin/ajax/",
-postSlug = '<?=$options['slug'];?>',
+postSlug = '<?=$options['rewrite']['slug'];?>',
+postType = '<?=$options['type'];?>',
 contents = ['content', 'description'],
 text, editor, tinymceInit = false,
 urlPattern = /^<?=URL_PATTERN?>$/;

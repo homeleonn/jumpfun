@@ -35,7 +35,7 @@ class Category extends Model{
 	
 		//var_dump($filters, $validFilters, $filtersAsString, $validFiltersAsString);exit;
 		
-		if(strcmp($filtersAsString, $validFiltersAsString) !== 0){var_dump(1);exit;
+		if(strcmp($filtersAsString, $validFiltersAsString) !== 0){
 			$this->request->location(str_replace($filtersAsString . (!$validFiltersAsString ? '/' : ''), $validFiltersAsString, FULL_URL), 301);
 		}
 		

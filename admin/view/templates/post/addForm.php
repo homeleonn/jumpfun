@@ -4,7 +4,7 @@
 //var_dump($options, $data);exit;
 ?>
 <h2><?=$options['add']?></h2>
-<form method="POST" id="add-<?=$options['slug']?>" class="post-from-admin" name="" autocomplete="off">
+<form method="POST" id="add-<?=$options['type']?>" class="post-from-admin" name="" autocomplete="off">
 	<div id="center">
 		<input type="hidden" name="id">
 		<div class="block1">

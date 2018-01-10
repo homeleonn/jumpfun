@@ -6,6 +6,7 @@ use Jump\Controller;
 use Jump\helpers\Filter;
 use Jump\helpers\Common;
 use Jump\helpers\Pagenation;
+use frontend\models\Post\Options;
 
 class PostController extends Controller{
 	use \Jump\traits\PostControllerTrait;
@@ -19,7 +20,8 @@ class PostController extends Controller{
 	public function __construct($di, $model){
 		parent::__construct($di, $model);
 		$this->options = $this->config->getCurrentPageOptions();
-		$this->model->setOptions($this->options);
+		Options::setOptions($this->options);
+		//$this->model->setOptions($this->options);
 	}
 	
 	public function actionIndex(){
@@ -33,7 +35,7 @@ class PostController extends Controller{
 	 *  
 	 *  @return array post
 	 */
-	public function actionSingle($url, $id = NULL){
+	public function actionSingle($url, $id = NULL){//var_dump(func_get_args());exit;
 		$hierarchy =  func_get_args();
 		
 		if($url && count($hierarchy) > 1){
@@ -45,12 +47,21 @@ class PostController extends Controller{
 			$id = NULL;
 		}
 		$url = array_pop($hierarchy);
-		
-		if(!$post = $this->model->single($url, $id)) return 0;
+		$postTypes = Options::get('type') ? [Options::get('type')] : $this->config->pageTypesWithFront;
+		if(!$post = $this->model->single($url, $id, $postTypes)) return 0;
+		$this->setPostOptions($post['post_type']);
 		$post['__model'] = $this->model;
 		if($post['id'] == $this->config->front_page) return $post;
-		$this->checkHierarchy($post['url'], $post['parent'], $hierarchy);
-		if(!Common::isPage())
+		if(!empty($hierarchy)){
+			if(!$this->options['hierarchical']){
+				$this->checkTermHierarchy($post['id'], $hierarchy);
+			}else{
+				$this->checkHierarchy($post['url'], $post['parent'], $hierarchy);
+			}
+		}
+			
+		
+		if(!$this->options['hierarchical'])
 			$post['terms'] 	= $this->model->getTermsByPostId($post['id'], array_keys($this->options['taxonomy']));
 		
 		$this->addBreadCrumbs($post);
@@ -58,6 +69,11 @@ class PostController extends Controller{
 		return $post;
 	}
 	
+	
+	private function setPostOptions($postType){
+		$this->options = $this->config->getPageOptionsByType($postType);
+		Options::setOptions($this->options);
+	}
 	public function actionCategory(){
 		$funcParams = func_get_args();
 		$category = array_pop($funcParams);
@@ -75,7 +91,7 @@ class PostController extends Controller{
 		}else{
 			if(!$hierarchy){
 				// взять все страницы, создать иерархию и перенаправить
-				$this->request->location(SITE_URL . $this->getParentHierarchy($parent) . '/' . $url . '/', 301);
+				$this->request->location(SITE_URL . $this->getParentHierarchy($this->model->getPostsByPostType('page') , $parent, 'url') . '/' . $url . '/', 301);
 			}else{
 				$parents = $this->db->getAll('Select id, title, url, parent from posts where url IN(\''.implode("','", $hierarchy).'\') order by parent DESC');
 				if(count($parents) < count($hierarchy)){
@@ -102,21 +118,43 @@ class PostController extends Controller{
 		}
 	}
 	
-	private function getParentHierarchy($parentId){
-		$posts = $this->db->getAll('Select id, url, parent from posts where post_type = \'page\'');
-		foreach($posts as $post){
-			$postsOnId[$post['id']] = $post;
+	private function checkTermHierarchy($postId, $hierarchy){
+		$term = $this->model->getPostTerms('and p.id = ' . $postId . ' and t.slug IN(\''.implode("','", [end($hierarchy)]).'\')');
+		//y, , $this->getParentHierarchy($parentId, $items)
+		//foreach
+		//var_dump($term, $hierarchy);exit;
+		if(!$term)
+			$this->request->location(null, 404);
+		//var_dump($this->getParentHierarchy($term[0]['parent'], $validTerms, 'slug'));
+		if(!$term[0]['parent']){
+			if(count($hierarchy) > 1)
+				$this->request->location(null, 404);
+		}else{
+			// определить валидную иерархию **-
+			$validTerms = $this->model->getTaxonomies($postId);
+			$urlHierarchy = implode('/', $hierarchy);
+			$validUrlHierarchy = $this->getParentHierarchy($term[0]['parent'], $validTerms, 'slug') . '/' . end($hierarchy);
+			//var_dump($validUrlHierarchy, $urlHierarchy);
+			if($validUrlHierarchy != $urlHierarchy){
+				$this->request->location(str_replace($urlHierarchy, $validUrlHierarchy , FULL_URL), 301);
+			}
 		}
-		
-		$hierarchy = $this->setHierarchy($postsOnId, $parentId);
+	}
+	
+	private function getParentHierarchy($parentId, $items, $compare){
+		foreach($items as $item){
+			$itemsOnId[$item['id']] = $item;
+		}
+		$hierarchy = $this->setHierarchy($itemsOnId, $parentId, $compare);
 		$hierarchy = implode('/', array_reverse(explode('|', substr($hierarchy, 0, -1))));
 		return $hierarchy;
 	}
 	
-	private function setHierarchy($posts, $parentId){
-		$hierarchy = $posts[$parentId]['url'] . '|';
-		if(isset($posts[$parentId]['parent']) && $posts[$parentId]['parent']) 
-			$hierarchy .= $this->setHierarchy($posts, $posts[$parentId]['parent']);
+	private function setHierarchy($items, $parentId, $compare){
+		if(!isset($items[$parentId])) return false;
+		$hierarchy = $items[$parentId][$compare] . '|';
+		if(isset($items[$parentId]['parent']) && $items[$parentId]['parent']) 
+			$hierarchy .= $this->setHierarchy($items, $items[$parentId]['parent']);
 		return $hierarchy;
 	}
 	
@@ -133,6 +171,7 @@ class PostController extends Controller{
 			$list[$listMark] = $this->model->getPostsByPostType($this->options['type']);
 		}else
 			$list[$listMark] = $this->model->getPostList($taxonomy, $taxonomySlug);
+		
 		if(!$list[$listMark]) return 0;
 		// Узнаем имя таксономии по метке для хлебных крошек
 		$taxonomyName = $taxonomySlug;
@@ -140,9 +179,11 @@ class PostController extends Controller{
 			$taxonomyName = $list[$listMark]['termName'];
 			unset($list[$listMark]['termName']);
 		}
-		$this->addBreadCrumbs($list, $taxonomy, $taxonomyName, $taxonomyName);
+		
+		$taxonomyTitle = $taxonomy ? $this->options['taxonomy'][$taxonomy]['title'] : '';
+		$this->addBreadCrumbs($list, $taxonomyTitle, $taxonomyName, $taxonomyName);
 		$list['pagenation'] = (new Pagenation())->run($this->page, $this->model->getAllItemsCount(), $this->perPage);
-		$list['filters'] = $this->model->getFiltersHTML(array_keys($this->options['taxonomy']), $this->options['type'], $this->options['slug']);
+		$list['filters'] = $this->model->getFiltersHTML(array_keys($this->options['taxonomy']), $this->options['type'], $this->options['rewrite']['slug']);
 		$list['__model'] = $this->model;
 		
 		return $list;
@@ -153,23 +194,23 @@ class PostController extends Controller{
 	/*** BreadCrumbs ***/
 	/*******************/
 	
-	private function addBreadCrumbs(&$post, $taxonomy = null, $value = null, $type = null){
-		if(isset($this->options['slug']))
-			$this->config->addBreadCrumbs($this->options['slug'], $this->options['title']);
+	private function addBreadCrumbs(&$post, $taxonomyTitle = null, $value = null, $type = null){
+		if(isset($this->options['rewrite']['slug']) && !Options::front())
+			$this->config->addBreadCrumbs($this->options['rewrite']['slug'], $this->options['title']);
 		
 		
 		if($type){
-			$this->addBreadCrumbsHelper($taxonomy, $value, $taxonomy, $post['title']);
+			$this->addBreadCrumbsHelper($taxonomyTitle, $value, $taxonomyTitle, $post['title']);
 		}elseif(isset($post['id']) && $this->config->front_page != $post['id']){
 			$this->config->addBreadCrumbs($post['url'], $post['title']);
-			if(isset($this->options['slug']))
+			if(isset($this->options['rewrite']['slug']))
 				$post['title'] .= ' - ' . $this->options['title'];
 		}
 			
 	}
 	
-	private function addBreadCrumbsHelper($taxonomy, $value, $text, &$postTitle){
-		$this->config->addBreadCrumbs($taxonomy, $text . ': ' . $value);
+	private function addBreadCrumbsHelper($taxonomyTitle, $value, $text, &$postTitle){
+		$this->config->addBreadCrumbs($taxonomyTitle, $text . ': ' . $value);
 		$postTitle = $value . " - {$text} " . $postTitle;
 	}
 }

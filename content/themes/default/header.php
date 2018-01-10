@@ -42,6 +42,15 @@
 				</div>
 				<nav>
 					<?php //wp_nav_menu( 'main' );?>
+					<nav>
+						<ul id="menu-main" class="menu">
+							<li><a href="<?=SITE_URL?>">Главная</a></li>
+							<li><a href="<?=SITE_URL?>javascript/">JavaScript</a></li>
+							<li><a href="<?=SITE_URL?>sedans/">Седаны</a></li>
+							<li><a href="<?=SITE_URL?>educators/">Преподаватели</a></li>
+							<li><a href="<?=SITE_URL?>eli-c2/">Ели</a></li>
+						</ul>			
+					</nav>
 					<div id="hide-nav"><img src="<?=THEME?>img/hide-nav.png"></div>
 				</nav>
 			</div>

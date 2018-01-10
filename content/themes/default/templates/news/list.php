@@ -1,40 +1,31 @@
-<?php
-//var_dump(get_defined_vars());
-if(!isset($news_list) || empty($news_list)) {
-	echo 'Новостей нет!';
-	return;
-}
-
-?>
-
-<div class="new list-wrapper container-fluid">
+<div class="list-wrapper container-fluid">
 	<div class="col-sm-9" style="float: right;">
-		<?php foreach($news_list as $new):?>
-		<div class="list-item">
-			<div class="title">
-				<a href="<?=SITE_URL . 'news/' . $new['url']?>/"><?=$new['title']?></a>
-			</div>
-			<div class="content">
-				<div class="thumb"><img src="<?=THEME . 'img/news_thumb.jpg'?>" alt=""></div>
-				<div class="text"><?=$new['content']?></div>
+		<?php 
+		if($this->haveChild()):
+			while($new = $this->theChild()):
+		?>
+		<div class="col-sm-3 list-item">
+			<div>
+				<a href="<?=SITE_URL . $rewrite['slug'] . '/' . $new['url']?>/">
+					<div class="thumb"><img src="<?=THEME . 'img/news_thumb.jpg'?>" alt="" width="100%"></div>
+					<div class="name"><?=$new['title']?></div>
+				</a>
 			</div>
 		</div>
+		<?php 
+			endwhile;
+		else:
+			echo 'Новостей нет!';
+		endif;
+		?>
 		
-		<?php endforeach;?>
 	</div>
 	<div class="col-sm-3">
-		<?php
-			$filters = $this->di->get('db')->getAll('Select DISTINCT t.*, tt.* from terms as t, term_taxonomy as tt where t.id = tt.term_id and tt.count > 0 and (tt.taxonomy = \''.$category_slug.'\' OR tt.taxonomy = \''.$tag_slug.'\')');
-			
-			if($filters){
-				echo '<a href="', SITE_URL ,  $slug, '/">Cбросить фильтр</a><br>';
-				foreach($filters as $filter){
-					echo '<a href="', SITE_URL , $filter['taxonomy'], '/' . $filter['slug'], '/">', $filter['name'], '</a><br>';
-				}
-			}
-		?>
+		<?=$filters;?>
 	</div>
+	
 </div>
+<?=$pagenation;?>
 
 <?php 
 

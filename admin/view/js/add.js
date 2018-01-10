@@ -112,7 +112,7 @@ function item(act, data){
 	
 	if(typeof(tinymce) != "undefined" && data.elements['content']/*data.type != 'page' && data.type != 'news'*/&& $('textarea#simple-editor')) 
 		data.elements['content'].value = $('#editors span.active').attr('id') == 'visual' ? tinymce.get('content').getContent() : $('textarea#simple-editor').val();
-	
+	console.log(act, data);
 	if((valid = checkData(act, data)) !== true){
 		getMsg({text:valid, eType:'err', el:self, delay: 5});
 		return false;
@@ -161,8 +161,8 @@ function checkElemets(type, act){
 		},
 	}
 	//console.log(type, act);
-	
-	return checkElemets[type][act];
+	return [];
+	//return checkElemets[type][act];
 }
 
 //----------------------------
@@ -177,7 +177,7 @@ function addTerm(term){
 		return;
 	}
 	
-	$.post(root + 'admin/' + postSlug + '/add-term/' ,{term: term, name: newTerm, async: 1}, function(data){
+	$.post(root + 'admin/' + postType + '/add-term/' ,{term: term, name: newTerm, async: 1}, function(data){
 		if(data)
 			$('#post-' + term).find('#term-' + term).append('<input type="checkbox" value="'+newTerm+'" /> '+newTerm + '<br>');
 		else

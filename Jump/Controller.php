@@ -19,11 +19,14 @@ class Controller{
 		$model = $this->defineModel($model);
 		// gets model dependencies
 		if(!isset($this->config->getOption('frontend_deps')['models'][$model])){
-			throw new \Exception("Dependencies not defined for model {$model}");
+			$modelArguments = [];
+			//throw new \Exception("Dependencies not defined for model {$model}");
+		}else{
+			$modelDependencies = $this->config->getOption('frontend_deps')['models'][$model];
+			// create model dependencies
+			$modelArguments = $this->createModelArguments($di, $model, $modelDependencies);
 		}
-		$modelDependencies = $this->config->getOption('frontend_deps')['models'][$model];
-		// create model dependencies
-		$modelArguments = $this->createModelArguments($di, $model, $modelDependencies);
+		
 		// create model with created dependencies
 		$this->model = (new \ReflectionClass($model))->newInstanceArgs(array_merge([$di], $modelArguments));
 	}
