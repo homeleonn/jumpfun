@@ -18,7 +18,7 @@
 	<header>
 		<div id="tools">
 			<ul>
-				<li><a href='javascript:void(0);' onclick='window.open("<?php echo ROOT_URI?>admin/filemanager/", "Файловый менеджер", "width=500,height=500");' title="Открыть файловый менеджер"> Файловый менеджер</a></li>
+				<!--<li><a href='javascript:void(0);' onclick='window.open("<?php echo ROOT_URI?>admin/filemanager/", "Файловый менеджер", "width=500,height=500");' title="Открыть файловый менеджер"> Файловый менеджер</a></li>-->
 				<li><a href="<?php echo ROOT_URI;?>" target="_blank" class="icon-home" title="Открыть сайт"></a></li>
 				<li><a href="<?php echo ROOT_URI;?>user/exit/" class="icon-logout" title="Выйти"></a></li>
 			</ul>

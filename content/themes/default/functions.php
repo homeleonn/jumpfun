@@ -32,10 +32,10 @@ $di->get('config')->addPageType([
 		'common' => 'педагогов',
 		'hierarchical' => false,
 		'has_archive'  => true,
-		'rewrite' => ['slug' => 'educators', 'with_front' => false],
+		'rewrite' => ['slug' => 'educators', 'with_front' => false, 'paged' => 20],
 		'taxonomy' => [
 			'style' => [
-				'title' => 'Стиль педагога',
+				'title' => 'Стиль',
 				'add' => 'Добавить стиль',
 				'edit' => 'Редактировать стиль',
 				'delete' => 'Удалить стиль',

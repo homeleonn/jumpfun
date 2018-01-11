@@ -23,7 +23,7 @@ class Pagenation
 	 * 
 	 */
 	public function run($currentPageNumber, $all, $perPage, $filters = NULL, $idStyle = 'pagenation')
-	{
+	{//var_dump(func_get_args());exit;
 		$this->currentPageNumber = $currentPageNumber;
 		$html = '';
 		// Узнаем сколько всего страниц

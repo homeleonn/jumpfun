@@ -3,11 +3,11 @@
 namespace admin\controllers;
 
 use Jump\Controller;
+use Jump\traits\PostControllerTrait;
 
 class DashboardController extends Controller{
-	
-	
+	use PostControllerTrait;
 	public function actionIndex(){
-		//var_dump(__METHOD__);
+		return $this->options;
 	}
 }

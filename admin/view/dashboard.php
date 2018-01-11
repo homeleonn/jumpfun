@@ -1,26 +1,77 @@
 <?php
 
-$sections = array(
-	'Главная панель||gauge' => '',
-	'Страницы||' => [
-		'Все страницы' => 'page',
-		'Добавить новую' => 'page/add',
-	],
-	'Педагоги||' => [
-		'Все педагоги' => 'educator',
-		'Добавить новую' => 'educator/add',
-		'Стили' => 'educator/terms/?term=style',
-		'Возраст' => 'educator/terms/?term=age',
-	],
-	'Новости||' => [
-		'Все новости' => 'new',
-		'Добавить новую' => 'new/add',
-		'Категории' => 'new/terms/?term=newcat',
-	],
-	'Настройки||cog' => [
-		'Меню' => 'menu',
-	],
-);
+function getSections($type, $pageTypes){
+	if($type == 'production'){
+		$sections = ['Главная панель||gauge' => ''];
+		if($pageTypes){
+			foreach($pageTypes as $pt){
+				$key = $pt['title'] . '||' . $pt['icon'];
+				$sections[$key] = [
+					'Все ' . mb_strtolower($pt['title']) => $pt['type'],
+					'Добавить новую' => $pt['type'] . '/add',
+				];
+				if(!empty($pt['taxonomy'])){
+					$ptTaxes = [];
+					foreach($pt['taxonomy'] as $tax => $values){
+						$tempTax = [$values['title'] => $pt['type'] . '/terms/?term=' . $tax];
+						if(empty($ptTaxes)){
+							$ptTaxes = $tempTax;
+							continue;
+						}
+						$ptTaxes = array_merge($ptTaxes, $tempTax);
+					}
+					$sections[$key] = array_merge($sections[$key], $ptTaxes);
+				}
+			}
+		}
+		$sections['Настройки||cog'] = ['Меню' => 'menu'];
+	}else{
+		$sections = [
+			'Главная панель||gauge' => '',
+			'Страницы||tags' => [
+				'Все страницы' => 'page',
+				'Добавить новую' => 'page/add',
+			],
+			'Новости||tags' => [
+				'Все новости' => 'new',
+				'Добавить новую' => 'new/add',
+				'Категории' => 'new/terms/?term=newcat',
+			],
+			'Преподаватели||tags' => [
+				'Все преподаватели' => 'educator',
+				'Добавить новую' => 'educator/add',
+				'Стиль' => 'educator/terms/?term=style',
+				'Возрастная категория' => 'educator/terms/?term=age',
+			],
+			'Настройки||cog' => [
+				'Меню' => 'menu',
+			],
+		];
+	}
+	// echo "\n".'$sections = [';
+	// foreach($sections as $key => $s){
+		// echo "\n\t".'\''.$key . '\' => ';
+		// if(is_array($s)){
+			// echo "[\n\t";
+			// foreach($s as $k => $ss){
+				// echo "\t" . '\''.$k.'\' => \''.$ss."',\n\t";
+			// }
+			// echo "],";
+		// }else{
+			// echo '\''.$s."',";
+		// }
+	// }
+	// echo "\n];";
+	// exit;
+	return $sections;
+}
+
+$type = /*local*/'local'/**/;
+$pageTypes = NULL;
+if($type == 'production'){
+	$pageTypes = $this->di->get('config')->getOption('jump_pageTypes');
+}
+$sections = getSections($type, $pageTypes);
 
 function menu1($menu, $title = 0, $stage = 0){
 	$menuStr = '';

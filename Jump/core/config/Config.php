@@ -6,7 +6,7 @@ use Jump\helpers\Common;
 use Jump\helpers\HelperDI;
 
 class Config{
-	
+	const POSTS_PER_PAGE = 20;
 	private $db;
 	private $router;
 	private $options;
@@ -49,23 +49,27 @@ class Config{
 	}
 	
 	public function addPageType($options){
+		if(!isset($options['icon'])) 					$options['icon'] = 'tags';
 		if(!isset($options['rewrite']['with_front'])) 	$options['rewrite']['with_front'] = false;
-		if(!isset($options['has_archive'])) 			$options['has_archive'] = false;
 		if(!isset($options['rewrite']['slug']))			$options['rewrite']['slug']	= $options['type'];
+		if(!isset($options['has_archive'])) 			$options['has_archive'] = false;
 		if($options['rewrite']){
-			if(!isset($options['rewrite']['paged'])) 	$options['rewrite']['paged'] = true;
+			if(!isset($options['rewrite']['paged'])) 	$options['rewrite']['paged'] = self::POSTS_PER_PAGE;
 			if(!isset($options['taxonomy'])) 			$options['taxonomy'] = [];
 			
 			$replaceCount = 0;
-			$slug = preg_replace('~%.+%~', '([^/]+)', $options['rewrite']['slug'], -1, $replaceCount);
-			// $slug = $options['rewrite']['slug'];
-			$type = $options['type'];
-			$sep  = '/';
+			$singleSlug = preg_replace('~%.+%~', '([^/]+)', $options['rewrite']['slug'], -1, $replaceCount);
 			$addArgs = '';
 			$i = 2;
 			while($replaceCount--){
 				$addArgs .= '/$' . $i++;
 			}
+			
+			$options['rewrite']['slug'] = preg_replace('~/%.+%~', '', $options['rewrite']['slug']);
+			$slug = $options['rewrite']['slug'];
+			$type = $options['type'];
+			$sep  = '/';
+			
 			
 			// Routing
 			$router = HelperDI::get('router');
@@ -77,16 +81,17 @@ class Config{
 				$paged = $options['rewrite']['paged'] ? "({$sep}page/([2-9]|\d{2,}))?" : '';
 							
 				if(!$options['rewrite']['with_front']){
+					$router->add($singleSlug . $sep . '(' . URL_PATTERN . ')', $type . ':single/$1' . $addArgs);
 					if($options['has_archive']) 
-						$router->add($slug . $paged, $type . ':list///$2');
-					$router->add($slug . $sep . '(.*)', $type . ':single/$1' . $addArgs);
+						$router->add($slug . $paged, $type . ':list///$1');
+					
 					//$router->add($slug . $sep . '(' . URL_PATTERN . ')', $type . ':single/$1');
 				}
 				//->add($slug . '/style/(' . URL_PATTERN . ')', '*?post_type=' . $type. '&category_name=$matches[1]')
 				if(!empty($options['taxonomy'])){
 					//$slug = preg_replace('~\/%.+%~', '', $options['rewrite']['slug']);
 					foreach($options['taxonomy'] as $t => $values)
-						$router->add("{$slug}{$sep}{$t}/(.*)" . $paged, $type . ":list/{$t}/$1/$3");
+						$router->add("{$slug}{$sep}{$t}/([^/]+)" . $paged, $type . ":list/{$t}/$1/$3");
 				}
 			}else{
 				$router

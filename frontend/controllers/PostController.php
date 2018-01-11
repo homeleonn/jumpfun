@@ -163,7 +163,7 @@ class PostController extends Controller{
 	}
 	
 	public function actionList($taxonomy = null, $taxonomySlug = null, $page = 1){//var_dump(func_get_args());exit;
-		$this->model->setLimit($this->page = $page, $this->perPage);
+		$this->model->setLimit($this->page = $page, $this->options['rewrite']['paged']);
 		$list = $this->options;
 		$listMark = '__list';
 		
@@ -182,7 +182,7 @@ class PostController extends Controller{
 		
 		$taxonomyTitle = $taxonomy ? $this->options['taxonomy'][$taxonomy]['title'] : '';
 		$this->addBreadCrumbs($list, $taxonomyTitle, $taxonomyName, $taxonomyName);
-		$list['pagenation'] = (new Pagenation())->run($this->page, $this->model->getAllItemsCount(), $this->perPage);
+		$list['pagenation'] = (new Pagenation())->run($this->page, $this->model->getAllItemsCount(), $this->options['rewrite']['paged']);
 		$list['filters'] = $this->model->getFiltersHTML(array_keys($this->options['taxonomy']), $this->options['type'], $this->options['rewrite']['slug']);
 		$list['__model'] = $this->model;
 		

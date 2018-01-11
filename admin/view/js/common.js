@@ -16,7 +16,7 @@ $(function(){
 	
 	// select active menu element
 	var activeTemp = document.URL;
-	var $active = document.URL;
+	var $active = activeTemp;
 	if(!($active = menuSelector(activeTemp)).length){
 		var i = 3;
 		while(i--){

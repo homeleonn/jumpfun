@@ -26,7 +26,7 @@ class View
         $this->theme = $theme;
     }
 
-    public function render($template, $data = []){
+    public function render($template, $data = []){//var_dump(get_defined_vars());exit;
 		$contentFile = '';
 		$this->path = $this->getPath($template);
 		if(ENV != 'admin'){

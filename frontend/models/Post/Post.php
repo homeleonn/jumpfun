@@ -165,20 +165,13 @@ class Post extends Model{
 	private function checkInLimit($query, $params){
 		$this->allItemsCount = (int)call_user_func_array([$this->db, 'getOne'], array_merge([str_replace('Select *', 'Select COUNT(*) as count', $query)], $params));
 		if($this->allItemsCount && $this->allItemsCount <= $this->start){
-			$newUrl = Filter::clearFilter(FULL_URL, 'page=' . $this->page, ';');
-			if(!$this->filters)
-				$newUrl = substr($newUrl, 0, -1);
-			
-			$this->request->location($newUrl);
+			$this->request->location(preg_replace('~page/\d+/?~', '', FULL_URL));
 		}
 	}
 	
 	private function getAll($query, $params){
-		//$this->checkInLimit($query, $params);
+		$this->checkInLimit($query, $params);
 		$data = call_user_func_array([$this->db, 'getAll'], array_merge([$query . $this->limit], $params));
-		if(!$data)
-			$this->request->location(preg_replace('~page/\d+/?~', '', FULL_URL));
-		
 		return $data;
 	}
 	

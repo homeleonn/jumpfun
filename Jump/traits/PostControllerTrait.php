@@ -11,7 +11,13 @@ trait PostControllerTrait{
 	];
 	
 	private $page = 1;
-	private $perPage = 20;
+	private $perPage = 2;
+	
+	public function __construct($di, $model){
+		parent::__construct($di, $model);
+		$this->options = $this->config->getCurrentPageOptions();
+		$this->model->setOptions($this->options);
+	}
 	
 	
 	private function filtersProcessed($filters){

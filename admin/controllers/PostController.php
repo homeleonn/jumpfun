@@ -12,11 +12,6 @@ use Jump\helpers\Transliteration;
 class PostController extends AdminController{
 	use PostControllerTrait;
 	
-	public function __construct($di, $model){
-		parent::__construct($di, $model);
-		$this->options = $this->config->getCurrentPageOptions();
-		$this->model->setOptions($this->options);
-	}
 		
 	
 	public function actionList(){
@@ -25,8 +20,8 @@ class PostController extends AdminController{
 	
 	public function actionTermList(){
 		$data['term'] = $_GET['term'];
-		if(!isset($this->options['taxonomy']) || !in_array($data['term'], array_keys($this->options['taxonomy']))) return false;
-		return array_merge($data, ['terms' => $this->model->termList($data['term'])]);
+		if(!isset($this->options['taxonomy']) || !in_array($data['term'], array_keys($this->options['taxonomy']))) return 0;
+		return ['term' => $data['term'], 'terms' => $this->model->termList($data['term'])];
 	}
 	
 	public function actionAddForm(){
@@ -42,7 +37,7 @@ class PostController extends AdminController{
 		return $data;
 	}	
 	
-	public function actionEditForm($id){
+	public function actionEditForm($id){//var_dump($id);exit;
 		$data = $this->model->editForm($id);
 		$data['__model'] = $this->model;
 		//var_dump($data, array_pop($data['selfTerms']));exit;
