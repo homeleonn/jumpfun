@@ -7,16 +7,16 @@ return [
 	// ['news', 'news:list'],
 	
 	
-	['', 'post/index'],
-	['(.+)', 'post/single/$1'],
+	['', 'post|index'],
+	['(.+)', 'post|single|$1'],
 	
-	['('.URL_PATTERN.')-c(\d+)(/(' . FILTER_PATTERN . '))?', 'category/single/$1/$2/$4'],
-	['('.URL_PATTERN.')-p(\d+)', 'product/single/$1/$2'],
+	// ['('.URL_PATTERN.')-c(\d+)(/(' . FILTER_PATTERN . '))?', 'category/single/$1/$2/$4'],
+	// ['('.URL_PATTERN.')-p(\d+)', 'product/single/$1/$2'],
 	
-	['login', 'user/login'],
-	['login/auth', 'user/auth', 'POST'],
+	// ['login', 'user/login'],
+	// ['login/auth', 'user/auth', 'POST'],
 	
-	['user', 'user'],
+	// ['user', 'user'],
 	
 	
 ];

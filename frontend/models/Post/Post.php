@@ -35,6 +35,7 @@ class Post extends Model{
 	private $allItemsCount;
 	private $select = 'Select * from posts where ';
 	private $relationship = 'posts p, terms t, term_taxonomy tt, term_relationships tr where t.id = tt.term_id and tt.term_taxonomy_id = tr.term_taxonomy_id and p.id = tr.object_id ';
+	private $relationships = 'posts p LEFT JOIN term_relationships tr ON(p.id = tr.object_id) LEFT JOIN term_taxonomy tt ON(tt.term_taxonomy_id = tr.term_taxonomy_id) LEFT JOIN terms t ON(t.id = tt.term_id)';
 	
 	public function __construct(DI $di, Taxonomy $taxonomy){
 		parent::__construct($di);
@@ -46,7 +47,7 @@ class Post extends Model{
 		var_dump(Options::get('title'));exit;
 	}
 	
-	public function single($url, $id = NULL, $pageTypes){//var_dump($url, $pageTypes, Options::get('type'));
+	public function single($url, $id = NULL, $pageTypes = NULL){//var_dump($url, $pageTypes, Options::get('type'));
 		return $id ? $this->getPostById($id) : $this->getPostByUrl($url, $pageTypes);
 	}
 	
@@ -54,8 +55,10 @@ class Post extends Model{
 		return $this->db->getRow($this->select . 'id = ?i', $id);
 	}
 	
-	public function getPostByUrl($url, $pageTypes){ 
-		return $this->db->getRow($this->select . 'url = ?s and post_type IN(?a)', $url, $pageTypes ?: Options::get('type'));
+	public function getPostByUrl($url, $pageTypes = NULL){
+		$pageTypes = implode($pageTypes ?: [Options::get('type')]);
+		$sqlPageTypes = $pageTypes ? ' and post_type IN('.$pageTypes.')' : '';
+		return $this->db->getRow($this->select . 'url = ?s ' . $sqlPageTypes, $url);
 	}
 	
 	public function getChildrens($parentId){
@@ -121,7 +124,7 @@ class Post extends Model{
 		return $newValidFilters;
 	}
 	
-	public function getPostList($taxonomy, $value){//var_dump(func_get_args());exit;
+	public function getPostList($taxonomy, $value){var_dump(func_get_args());exit;
 		// Проверим есть ли вообще такой термин
 		if(!$termName = $this->checkTermExists($taxonomy, $value)) 
 			return 0;
@@ -137,8 +140,9 @@ class Post extends Model{
 	}
 	
 	public function getPostsByPostType($type){
-		$query = $this->select . 'post_type = ?s order by id DESC';
-		return $this->getAll($query, [$type]);
+		$query = $this->select . 'post_type = ?s order by created DESC';
+		return $this->db->getAll($query, $type);
+		//return $this->getAll($query, [$type]);
 	}
 	
 	private function checkTermExists($taxonomy, $value){
@@ -147,6 +151,13 @@ class Post extends Model{
 	
 	public function getTermNameByTermSlug($slug){
 		return $this->db->getOne('Select name from terms where slug = ?s LIMIT 1', $slug);
+	}
+	
+	public function getPostsBysTermsTaxonomyIds($termsTaxonomyIds){
+		//$query = 'Select p.*, t.id as term_id, t.name, t.slug, tt.* from ' . $this->relationship . 'and tt.term_taxonomy_id IN(?a) group by p.id order by p.created DESC, t.name ASC';
+		$query = 'Select distinct p.* from ' . $this->relationship . 'and tt.term_taxonomy_id IN(?a) group by p.id order by p.created DESC';
+		return $this->db->getAll($query, [$termsTaxonomyIds]);
+		//return $this->getAll($query, [$termsTaxonomyIds]);
 	}
 	
 	
@@ -191,13 +202,13 @@ class Post extends Model{
 		foreach($terms as $key => $term){
 			$key1 = Options::get('taxonomy')[$term['taxonomy']]['title'];
 			if(!isset($html[$key1])) $html[$key1] = '';
-			$link = SITE_URL . "{$postSlug}/{$term['taxonomy']}/{$term['slug']}/";
+			$link = SITE_URL . $this->getArchiveSlug() . "{$term['taxonomy']}/{$term['slug']}/";
 			$html[$key1] .= $this->setTermLinkHelper($link, $term['name'], $term['count']) . '<br>';
 		}
 		foreach($html as $tax => $h) 
 			$html[$tax] = '<div class="filters"><div class="title">' . $tax . '</div><div class="content">' . $h . '</div></div>';
 		
-		return implode('', array_merge(['all' => '<a href="'. SITE_URL . $postSlug . '/">Все</a><br>'], $html));
+		return implode('', array_merge(['all' => '<a href="'. SITE_URL . $this->getArchiveSlug() . '">Все</a><br>'], $html));
 	}
 	
 	public function getTermsByPostId($postId, $taxonomies = false){
@@ -207,7 +218,7 @@ class Post extends Model{
 		if($terms){
 			foreach($terms as $key => $term){
 				if(!isset($html[$term['taxonomy']])) $html[$term['taxonomy']] = ($key ? '<br>' : '') . Options::get('taxonomy')[$term['taxonomy']]['title'] . ': ';
-				$html[$term['taxonomy']] .= "<a href='" . SITE_URL . Options::slug() . "/{$term['taxonomy']}/{$term['slug']}/'>{$term['name']}</a>, ";
+				$html[$term['taxonomy']] .= "<a href='" . SITE_URL . $this->getArchiveSlug() . "{$term['taxonomy']}/{$term['slug']}/'>{$term['name']}</a>, ";
 			}
 			foreach($html as &$h) 
 				$h = substr($h, 0, -2);
@@ -228,14 +239,26 @@ class Post extends Model{
 		foreach($terms as $t){
 			if(!$getCount) $t['count'] = 0;
 			$allCount += $t['count'];
-			$html[] = $this->setTermLinkHelper(SITE_URL . Options::slug() . "/{$t['taxonomy']}/{$t['slug']}/", $t['name'], $t['count']);
+			$html[] = $this->setTermLinkHelper(SITE_URL . $this->getArchiveSlug() . "{$t['taxonomy']}/{$t['slug']}/", $t['name'], $t['count']);
 		}
-		$result = array_merge([$this->setTermLinkHelper(SITE_URL . Options::slug() . "/", 'all')], $html);
+		$result = array_merge([$this->setTermLinkHelper(SITE_URL . $this->getArchiveSlug(), 'all')], $html);
 		return ($delimiter && is_string($delimiter)) ? (Options::get('taxonomy')[$taxonomy]['title'] . ': ' . implode($delimiter, $result)) : $result;
 	}
 	
 	private function setTermLinkHelper($link, $text, $count = 0){
 		$count = $count ? " ({$count})" : '';
 		return urldecode(FULL_URL_WITHOUT_PARAMS) == $link ? "<span style='border-bottom: 3px #de1d1d solid;'>{$text}{$count}</span>" : "<a href='{$link}'>{$text}</a>{$count}";
+	}
+	
+	public function getArchiveSlug(){
+		return Options::get('has_archive') . (Options::get('has_archive') ? '/' : '');
+	}
+	
+	public function getPostsByTermNames($termNames){
+		return $this->db->getAll('Select DISTINCT p.* from ' . $this->relationship . ' and t.name IN(?a)', [$termNames]);
+	}
+	
+	public function getPostsByTaxonomyAndPostType($taxonomy, $postType){
+		return $this->db->getAll('Select DISTINCT p.* from ' . $this->relationship . ' and tt.taxonomy = ?s and p.post_type = ?s', $taxonomy, $postType);
 	}
 }

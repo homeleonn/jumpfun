@@ -55,6 +55,11 @@ class View
 		}
 		
 		if(!file_exists($contentFile)){
+			$contentFile = $this->path . $this->is() . '.php';
+			//var_dump($contentFile);
+		}
+		
+		if(!file_exists($contentFile)){
 			//var_dump('File ' . $contentFile . ' not exists!');
 			$contentFile = $this->path . 'index.php';
 		}
@@ -112,6 +117,7 @@ class View
 	
 	private function haveChild($id = 0){
 		if(is_null($this->children)){
+			if(!isset($this->senderModel)) return;
 			$this->children = $this->senderModel->getChildrens($id);
 			if(!$this->children) $this->children = false;
 		}
@@ -127,5 +133,31 @@ class View
 	public function __get($property){
 		if($property == 'date')
 			return \Jump\helpers\MyDate::class;
+	}
+	
+	/**
+	 *  set or get template
+	 *  
+	 *  @param type $template
+	 *  
+	 */
+	public function is($template = NULL){
+		$baseTemplate = 'index';
+		if($template){
+			$validTemplates = ['list', 'single'];
+			if(!in_array($template, $validTemplates))
+				$template = $baseTemplate;
+			$this->templateFile = $template;
+		}elseif(!$this->templateFile){
+			return $baseTemplate;
+		}else{
+			return $this->templateFile;
+		}
+		
+	}
+	
+	
+	private function getSingleLink($url, $slug){
+		//return str_replace()
 	}
 }

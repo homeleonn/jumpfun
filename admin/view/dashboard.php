@@ -66,7 +66,7 @@ function getSections($type, $pageTypes){
 	return $sections;
 }
 
-$type = /*local*/'local'/**/;
+$type = /*local*/'production'/**/;
 $pageTypes = NULL;
 if($type == 'production'){
 	$pageTypes = $this->di->get('config')->getOption('jump_pageTypes');

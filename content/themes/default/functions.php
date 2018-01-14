@@ -1,26 +1,26 @@
 <?php
 
-$di->get('config')->addPageType([
-		'type' => 'new',
-		'title' => 'Новости',
-		'description' => 'news1',
-		'add' => 'Добавить новость',
-		'edit' => 'Редактировать новость',
-		'delete' => 'Удалить новость',
-		'common' => 'новостей',
-		'hierarchical' => false,
-		'has_archive'  => true,
-		'rewrite' => ['slug' => 'news'],
-		'taxonomy' => [
-			'newcat' => [
-				'title' => 'Категории',
-				'add' => 'Добавить категорию',
-				'edit' => 'Редактировать категорию',
-				'delete' => 'Удалить категорию',
-				'hierarchical' => false,
-			]
-		]
-]);
+// $di->get('config')->addPageType([
+		// 'type' => 'new',
+		// 'title' => 'Новости',
+		// 'description' => 'news1',
+		// 'add' => 'Добавить новость',
+		// 'edit' => 'Редактировать новость',
+		// 'delete' => 'Удалить новость',
+		// 'common' => 'новостей',
+		// 'hierarchical' => false,
+		// 'has_archive'  => true,
+		// 'rewrite' => ['slug' => 'news'],
+		// 'taxonomy' => [
+			// 'newcat' => [
+				// 'title' => 'Категории',
+				// 'add' => 'Добавить категорию',
+				// 'edit' => 'Редактировать категорию',
+				// 'delete' => 'Удалить категорию',
+				// 'hierarchical' => false,
+			// ]
+		// ]
+// ]);
 
 $di->get('config')->addPageType([
 		'type' => 'educator',
@@ -31,8 +31,9 @@ $di->get('config')->addPageType([
 		'delete' => 'Удалить педагога',
 		'common' => 'педагогов',
 		'hierarchical' => false,
-		'has_archive'  => true,
-		'rewrite' => ['slug' => 'educators', 'with_front' => false, 'paged' => 20],
+		'has_archive'  => 'educators',
+		//'has_archive'  => 'educators',
+		'rewrite' => ['slug' => 'educators/%style%', 'with_front' => false, 'paged' => 20],
 		'taxonomy' => [
 			'style' => [
 				'title' => 'Стиль',

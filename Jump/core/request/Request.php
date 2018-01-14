@@ -48,14 +48,15 @@ class Request{
 		
 		// Определим есть ли тип поста
 		$params = explode(':', $uri);
-		
+		$sep = ENV == 'admin' ? '/' : '|';
 		// Если есть тип поста, скажем что это PostController и запишем тип в массив конфигурации
 		if(isset($params[1])){
 			HelperDI::get('config')->setOption('postType', $params[0]);
-			$uri = 'post/' . $params[1];
+			$uri = 'post' . $sep . $params[1];
 		}
 			
-		$params = explode('/', trim($uri, '/'));
+		$params = explode($sep, trim($uri, '/'));
+		//var_dump($params,ENV, $sep, $uri);
 		if($needController) $result[] = $params[0] ?: 'index';
 		$result[] = isset($params[1]) ? $params[1] : 'index'; // method
 		$result[] = array_slice($params, 2); // args

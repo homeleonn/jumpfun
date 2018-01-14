@@ -7,7 +7,7 @@
 		?>
 		<div class="col-sm-3 list-item">
 			<div>
-				<a href="<?=SITE_URL . $rewrite['slug'] . '/' . $educator['url']?>/">
+				<a href="<?=$educator['url']?>/">
 					<div class="thumb"><img src="<?=THEME . 'img/news_thumb.jpg'?>" alt="" width="100%"></div>
 					<div class="name"><?=$educator['title']?></div>
 				</a>
