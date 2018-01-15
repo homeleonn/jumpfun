@@ -48,4 +48,8 @@ class Taxonomy{
 	public function getAllByObjectsIds($objectsIds){//var_dump($objectsIds);//exit;
 		return $this->db->getAll('Select t.*, tt.*, tr.object_id from terms as t, term_taxonomy as tt, term_relationships as tr where t.id = tt.term_id and tt.term_taxonomy_id = tr.term_taxonomy_id and tr.object_id IN(?a)', [$objectsIds]);
 	}
+	
+	public function getByTaxonomies($taxonomies){
+		return $this->db->getAll('Select t.*, tt.* from terms as t, term_taxonomy as tt where t.id = tt.term_id and tt.taxonomy IN(?a)', [$taxonomies]);
+	}
 }

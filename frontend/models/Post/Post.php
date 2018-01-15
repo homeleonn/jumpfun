@@ -35,6 +35,7 @@ class Post extends Model{
 	private $allItemsCount;
 	private $select = 'Select * from posts where ';
 	private $relationship = 'posts p, terms t, term_taxonomy tt, term_relationships tr where t.id = tt.term_id and tt.term_taxonomy_id = tr.term_taxonomy_id and p.id = tr.object_id ';
+	
 	private $relationships = 'posts p LEFT JOIN term_relationships tr ON(p.id = tr.object_id) LEFT JOIN term_taxonomy tt ON(tt.term_taxonomy_id = tr.term_taxonomy_id) LEFT JOIN terms t ON(t.id = tt.term_id)';
 	
 	public function __construct(DI $di, Taxonomy $taxonomy){
@@ -124,19 +125,9 @@ class Post extends Model{
 		return $newValidFilters;
 	}
 	
-	public function getPostList($taxonomy, $value){var_dump(func_get_args());exit;
-		// Проверим есть ли вообще такой термин
-		if(!$termName = $this->checkTermExists($taxonomy, $value)) 
-			return 0;
-		$query = $this->select . 'id IN(Select DISTINCT p.id from ' . $this->relationship . ' and t.slug = ?s and tt.taxonomy = ?s) and post_type = \''.Options::get('type').'\' order by id DESC';
-		$post = $this->getAll($query, [$value, $taxonomy]);
-		$post['termName'] = $termName;
-		return $post;
-	}
-	
 	public function getPostTerms($where){
 		if(!$where) return false;
-		return $this->db->getAll('Select t.*, tt.* from ' . $this->relationship . $where);
+		return $this->db->getAll('Select t.*, tt.* from ' . str_replace(['posts p,', 'and p.id = tr.object_id'], '', $this->relationship) . $where);
 	}
 	
 	public function getPostsByPostType($type){
@@ -211,9 +202,10 @@ class Post extends Model{
 		return implode('', array_merge(['all' => '<a href="'. SITE_URL . $this->getArchiveSlug() . '">Все</a><br>'], $html));
 	}
 	
-	public function getTermsByPostId($postId, $taxonomies = false){
+	
+	public function getTermListByPostId($terms){
 		
-		if(!$terms = $this->getTaxonomies($postId)) return false;
+		//if(!$terms = $this->getTaxonomies($postId)) return false;
 		$html = [];
 		if($terms){
 			foreach($terms as $key => $term){

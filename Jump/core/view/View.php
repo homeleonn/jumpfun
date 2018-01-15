@@ -47,12 +47,16 @@ class View
 			$contentFile = $this->path . 'page-' . $title . '.php';	
 		}else{
 			$options = $this->di->get('config')->getCurrentPageOptions();
+			if(!file_exists($contentFile)){
+				$templateFile 	= $this->theme->template($template);
+				$contentFile = $this->path . 'templates/' . $templateFile . '.php';
+			}
 		}
 		
-		if(!file_exists($contentFile)){
-			$templateFile 	= $this->theme->template($template);
-			$contentFile = $this->path . 'templates/' . $templateFile . '.php';
-		}
+		// if(!file_exists($contentFile)){
+			// $templateFile 	= $this->theme->template($template);
+			// $contentFile = $this->path . 'templates/' . $templateFile . '.php';
+		// }
 		
 		if(!file_exists($contentFile)){
 			$contentFile = $this->path . $this->is() . '.php';
@@ -153,7 +157,6 @@ class View
 		}else{
 			return $this->templateFile;
 		}
-		
 	}
 	
 	

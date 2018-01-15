@@ -53,50 +53,48 @@ class Config{
 		if(!isset($options['has_archive']) || $options['has_archive'] === true) 			
 			$options['has_archive'] = $options['type'];
 		if(!isset($options['rewrite'])) $options['rewrite'] = false;
-		if($options['rewrite']){
-			if(!isset($options['rewrite']['with_front'])) 	$options['rewrite']['with_front'] = false;
-			if(!isset($options['rewrite']['slug']))			$options['rewrite']['slug']	= $options['type'];
-			if(!isset($options['rewrite']['paged'])) 		$options['rewrite']['paged'] = self::POSTS_PER_PAGE;
-			if(!isset($options['taxonomy'])) 				$options['taxonomy'] = [];
-			
-			// $replaceCount = 0;
-			// $slug = preg_replace('~%.+%~', '([^/]+)', $options['rewrite']['slug'], -1, $replaceCount);
-			// $addArgs = '';
-			// $i = 2;
-			// while($replaceCount--){
-				// $addArgs .= '/$' . $i++;
-			// }
-			$type = $options['type'];
-			$sep  = '/';
-			
-			
-			// Routing
-			$router = HelperDI::get('router');
-			if(ENV != 'admin'){
-				$paged = $options['rewrite']['paged'] ? "({$sep}page/([2-9]|\d{2,}))?" : '';
-				//$router->add($singleSlug . $sep . '(' . URL_PATTERN . ')', $type . ':single/$1' . $addArgs);
-				if($options['has_archive']){
-					$router->add($options['has_archive'] . $paged, $type . ':list'.S.S.S.'$1');
-				}
-				if(!empty($options['taxonomy'])){
-					if($options['has_archive'] === false) $sep = '';
-					foreach($options['taxonomy'] as $t => $values)
-						$router->add("{$options['has_archive']}{$sep}{$t}/(.*)" . $paged, $type . ":list|{$t}|$1|$3");
-				}
-			}else{
-				$router
-					->add($type . '/terms', $type . ':termList', 'GET')
-					->add($type . '/add', $type . ':addForm', 'GET')
-					->add($type . '/add', $type . ':add', 'POST')
-					->add($type . '/add-term', $type . ':addTermForm', 'GET')
-					->add($type . '/add-term', $type . ':addTerm', 'POST')
-					->add($type . '/edit/(\d+)', $type . ':editForm/$1', 'GET')
-					->add($type . '/edit', $type . ':edit', 'POST')
-					->add($type . '/edit-term/(\d+)', $type . ':editTermForm/$1', 'GET')
-					->add($type . '/edit-term/(\d+)', $type . ':editTerm', 'POST')
-					->add($type . '/del/(post|term)/(\d+)', $type . ':del/$2/$1', 'POST')
-					->add($type, $type . ':list', 'GET');
+		if(!isset($options['rewrite']['with_front'])) 	$options['rewrite']['with_front'] = false;
+		if(!isset($options['rewrite']['slug']))			$options['rewrite']['slug']	= $options['type'];
+		if(!isset($options['rewrite']['paged'])) 		$options['rewrite']['paged'] = self::POSTS_PER_PAGE;
+		if(!isset($options['taxonomy'])) 				$options['taxonomy'] = [];
+		
+		// $replaceCount = 0;
+		// $slug = preg_replace('~%.+%~', '([^/]+)', $options['rewrite']['slug'], -1, $replaceCount);
+		// $addArgs = '';
+		// $i = 2;
+		// while($replaceCount--){
+			// $addArgs .= '/$' . $i++;
+		// }
+		$type = $options['type'];
+		$sep  = '/';
+		
+		
+		// Routing
+		$router = HelperDI::get('router');
+		if(ENV != 'admin'){
+			$paged = $options['rewrite']['paged'] ? "({$sep}page/([2-9]|\d{2,}))?" : '';
+			//$router->add($singleSlug . $sep . '(' . URL_PATTERN . ')', $type . ':single/$1' . $addArgs);
+			if($options['has_archive']){
+				$router->add($options['has_archive'] . $paged, $type . ':list'.S.S.S.'$1');
 			}
+			if(!empty($options['taxonomy'])){
+				if($options['has_archive'] === false) $sep = '';
+				foreach($options['taxonomy'] as $t => $values)
+					$router->add("{$options['has_archive']}{$sep}{$t}/(.*)" . $paged, $type . ":list|{$t}|$1|$3");
+			}
+		}else{
+			$router
+				->add($type . '/terms', $type . ':termList', 'GET')
+				->add($type . '/add', $type . ':addForm', 'GET')
+				->add($type . '/add', $type . ':add', 'POST')
+				->add($type . '/add-term', $type . ':addTermForm', 'GET')
+				->add($type . '/add-term', $type . ':addTerm', 'POST')
+				->add($type . '/edit/(\d+)', $type . ':editForm/$1', 'GET')
+				->add($type . '/edit', $type . ':edit', 'POST')
+				->add($type . '/edit-term/(\d+)', $type . ':editTermForm/$1', 'GET')
+				->add($type . '/edit-term/(\d+)', $type . ':editTerm', 'POST')
+				->add($type . '/del/(post|term)/(\d+)', $type . ':del/$2/$1', 'POST')
+				->add($type, $type . ':list', 'GET');
 		}
 		
 		$this->options['jump_pageTypes'][$options['type']] = $options;

@@ -22,7 +22,7 @@ class Post extends Model{
 	public function postList(){
 		// Get all posts
 		$posts = $this->getAllPosts();
-		
+		if(!$posts) return false;
 		// Get posts terms
 		foreach($posts as $post) $ids[] = $post['id'];
 		$terms = $this->getTermsByPostsId($ids);
@@ -44,7 +44,9 @@ class Post extends Model{
 	public function addForm(){
 		$data = [];
 		if($this->options['taxonomy']) 		$data['terms'] = $this->getTermList(array_keys($this->options['taxonomy']));
-		if($this->options['hierarchical']) 	$data['listForParents'] = $this->getPossibleParents();
+		if($this->options['hierarchical']){
+			$data['listForParents'] = $this->getPossibleParents();
+		}
 		return $data;
 	}
 	

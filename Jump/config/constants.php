@@ -16,8 +16,8 @@ if($_SERVER['PHP_SELF'] == '/index.php'){
 define('URI', explode('?', FULL_URI)[0]);
 
 define('SITE_URL', $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . ROOT_URI);
-define('FULL_URL', SITE_URL . FULL_URI);
-define('FULL_URL_WITHOUT_PARAMS', SITE_URL . URI);
+define('FULL_URL', SITE_URL . (FULL_URI != '/' ? FULL_URI : ''));
+define('FULL_URL_WITHOUT_PARAMS', SITE_URL . (URI != '/' ? URI : ''));
 
 
 define('THEME', SITE_URL . 'content/themes/default/');

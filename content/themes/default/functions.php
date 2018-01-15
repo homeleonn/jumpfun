@@ -9,15 +9,15 @@
 		// 'delete' => 'Удалить новость',
 		// 'common' => 'новостей',
 		// 'hierarchical' => false,
-		// 'has_archive'  => true,
-		// 'rewrite' => ['slug' => 'news'],
+		// 'has_archive'  =>'news',
+		// 'rewrite' => ['slug' => 'news/%newcat%'],
 		// 'taxonomy' => [
 			// 'newcat' => [
 				// 'title' => 'Категории',
 				// 'add' => 'Добавить категорию',
 				// 'edit' => 'Редактировать категорию',
 				// 'delete' => 'Удалить категорию',
-				// 'hierarchical' => false,
+				// 'hierarchical' => true,
 			// ]
 		// ]
 // ]);
@@ -40,14 +40,14 @@ $di->get('config')->addPageType([
 				'add' => 'Добавить стиль',
 				'edit' => 'Редактировать стиль',
 				'delete' => 'Удалить стиль',
-				'hierarchical' => false,
+				'hierarchical' => true,
 			],
 			'age' => [
 				'title' => 'Возрастная категория',
 				'add' => 'Добавить возрастную категорию',
 				'edit' => 'Редактировать возрастную категорию',
 				'delete' => 'Удалить возрастную категорию',
-				'hierarchical' => false,
+				'hierarchical' => true,
 			],
 		]
 ]);

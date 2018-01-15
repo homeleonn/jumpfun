@@ -42,7 +42,7 @@ class Common{
 		return $hierarchy;
 	}
 
-	public static function builtHierarchyUp(&$itemsOnParent, $current, $mergeKey, $level = 0){
+	public static function builtHierarchyUp1(&$itemsOnParent, $current, $mergeKey, $level = 0){
 		if($level > 10) exit('stop recursion');
 		$hierarchy = '';
 		
@@ -54,6 +54,23 @@ class Common{
 			}
 			if(isset($next))
 				$hierarchy = $next[$mergeKey] . '|' . self::builtHierarchyUp($itemsOnParent, $next, $mergeKey, $level + 1);
+		}
+		return $hierarchy;
+	}
+	
+	public static function builtHierarchyUp($itemsOnParent, $current, $postTermsOnId, $mergeKey, $level = 0){//var_dump(func_get_args());exit;
+		if($level > 10) exit('stop recursion');
+		$hierarchy = '';
+		
+		if(isset($itemsOnParent[$current['id']])){
+			foreach($itemsOnParent[$current['id']] as $possibleNext){
+				//var_dump($possibleNext, $current,$postTermsOnId, ';');
+				if($possibleNext['parent'] == $current['id'] && isset($postTermsOnId[$possibleNext['id']])){
+					$next = $possibleNext;
+				}
+			}
+			if(isset($next))
+				$hierarchy = $next[$mergeKey] . '|' . Common::builtHierarchyUp($itemsOnParent, $next, $mergeKey, $level + 1);
 		}
 		return $hierarchy;
 	}
@@ -119,5 +136,31 @@ class Common{
 		}
 		return true;
 	}
+	
+	public static function termsHTML($taxonomies, $archive){
+		if(!is_array($taxonomies)) return false;
+		$html = '';
+		foreach($taxonomies as $taxName => $terms){
+			$html .= "<li>{$taxName}:";
+			foreach($terms as $termName => $termLink){
+				$html .= " <a href='". SITE_URL . $archive . "{$termLink}/'>{$termName}</a>,";
+			}
+			$html = substr($html, 0, -1) . '</li>';
+		}
+		return $html;
+	}
+	
+	public static function archiveTermsHTML($taxonomies, $archive){
+		if(!is_array($taxonomies)) return false;
+		$html = '';
+		foreach($taxonomies as $taxName => $terms){
+			$html .= '<div class="filters"><div class="title">' . $taxName . '</div><div class="content">';
+			foreach($terms as $termName => $termLink){
+				$html .= " <a href='". SITE_URL . $archive . "{$termLink}/'>{$termName}</a><br>";
+			}
+			$html .= '</div></div>';
+		}
+		return $html;
+	}	
 	
 }

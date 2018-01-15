@@ -6,7 +6,7 @@
 		?>
 		<div class="col-sm-3 list-item">
 			<div>
-				<a href="<?=SITE_URL . $rewrite['slug'] . '/' . $new['url']?>/">
+				<a href="<?=$new['url']?>/">
 					<div class="thumb"><img src="<?=THEME . 'img/news_thumb.jpg'?>" alt="" width="100%"></div>
 					<div class="name"><?=$new['title']?></div>
 				</a>
