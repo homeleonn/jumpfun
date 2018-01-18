@@ -11,8 +11,6 @@ use frontend\models\Post\Options;
 class PostController extends Controller{
 	use \Jump\traits\PostControllerTrait;
 	
-	private $taxonomyModel;
-	
 	/**
 	 *  @param $di dependency injection container
 	 *  @param object $model base model for this controller
@@ -20,7 +18,6 @@ class PostController extends Controller{
 	public function __construct($di, $model){
 		parent::__construct($di, $model);
 		$this->setOptions();
-		//$this->model->setOptions($this->options);
 	}
 	
 	private function setOptions(){
@@ -29,78 +26,53 @@ class PostController extends Controller{
 	}
 	
 	public function actionIndex(){
-		$a = $this->actionSingle(NULL, $this->config->front_page);
-		return $a;
+		return $this->actionSingle(NULL, $this->config->front_page);
 	}
 	
 	/**
-	 *  @param string $url
+	 *  @param string $url (.*)
 	 *  @param int $id
 	 *  
 	 *  @return array post
 	 */
 	public function actionSingle($url, $id = NULL){//var_dump(func_get_args());exit;
+		
 		// get all args, but mey be come 'foo/bar/baz/zab/'
 		$hierarchy = explode('/', $url);
-		// recognize that this it
-		//echo 'Валидация урлов иерархии запущена...<br>';
+		
+		// The validation of each section of the hierarchy
 		if($url && count($hierarchy) > 1){
-			foreach($hierarchy as $url){
-				if(!preg_match('~^'.URL_PATTERN.'$~u', $url)){
-					$this->request->location(NULL, 404);
-				}
-			}
+			foreach($hierarchy as $url) 
+				if(!preg_match('~^'.URL_PATTERN.'$~u', $url)) $this->request->location(NULL, 404);
 			$id = NULL;
 		}
+		
 		// get last component from url(url in db), find in posts with this url and if this a front page - return
 		$url = array_pop($hierarchy);
-		// may be postType exist
-		$postTypes = Options::get('type');
-		//echo "Запрос записи из базы(урл: $url, айди: $id)...<br>";
-		if(!$post = $this->model->single($url, $id, $postTypes)) return 0;
 		
+		//echo "Запрос записи из базы(урл: $url, айди: $id)...<br>";
+		if(!$post = $this->model->single($url, $id)) return 0;
+		$post['__model'] = $this->model;
+		
+		// Set post type and type options
 		$this->config->setOption('postType', $post['post_type']);
 		$this->setOptions();
 		
+		// If this post is the front
 		if($post['id'] == $this->config->front_page){
-			if(SITE_URL != FULL_URL_WITHOUT_PARAMS)
-				$this->request->location(SITE_URL, 301);
-			$post['__model'] = $this->model;
+			if(SITE_URL != FULL_URL_WITHOUT_PARAMS) $this->request->location(SITE_URL, 301);
 			return $post;
 		}
 		
-		// else
+		// If type of this post related taxonomy
 		if(!$this->options['hierarchical']){
-			$PostTypeTaxonomies = array_keys(Options::get('taxonomy'));
-			$terms = $this->model->taxonomy->getByTaxonomies($PostTypeTaxonomies); 
-			$postTerms = $this->model->getPostTerms(' and tr.object_id = ' . $post['id'] . ' and tt.taxonomy IN(\''.implode("','", $PostTypeTaxonomies).'\')');
-			//$post['terms'] = $this->model->getTermListByPostId($postTerms);
-			//$post['terms'] = Common::archiveTermsHTML(array_reverse($postTerms), $this->model->getArchiveSlug());;
-			//var_dump($terms, $postTerms);exit;
-			list($termsOnId, $termsOnParent) = Common::itemsOnKeys($terms, ['id', 'parent']);
-			$post['terms'] = Common::termsHTML($this->postTermsLink($termsOnId, $termsOnParent, $postTerms), $this->model->getArchiveSlug());
-			$this->filterPermalink($post, $termsOnId, $termsOnParent, $postTerms);
-			
-			if(SITE_URL . URI != $post['url']){
-				exit('$this->request->location('.$post['url'].')');
-				//$this->request->location($permalink);
-			}
-			$this->view->is('single');
-		}else{
+			$post = $this->taxonomyPost($post);
+		}
+		// If type of this post is hierarchical structure, check hierarchy
+		else{
 			if(!empty($hierarchy))
 				$this->checkHierarchy($post['url'], $post['parent'], $hierarchy);
 		}
-		//exit;
-	
-	
-		
-		// if(!empty($hierarchy)){
-			// if(!$this->options['hierarchical']){
-				// $this->checkTermHierarchy($post['id'], $hierarchy);
-			// }else{
-				// $this->checkHierarchy($post['url'], $post['parent'], $hierarchy);
-			// }
-		// }
 			
 		
 		
@@ -109,19 +81,47 @@ class PostController extends Controller{
 		return $post;
 	}
 	
-	private function setPostOptions($postType){
-		$this->options = $this->config->getPageOptionsByType($postType);
-		Options::setOptions($this->options);
-	}
-	public function actionCategory(){
-		$funcParams = func_get_args();
-		$category = array_pop($funcParams);
-		$hierarchy = $funcParams;
+	/**
+	 *  Запись связанная таксономией
+	 *  Строит правильную ссылку, опираясь на пренадлежность к терминам и проверяем с пришедшей
+	 *  Строит html список терминов, к котором пренадлежит запись
+	 *  
+	 *  @param type $post
+	 *  
+	 *  @return post
+	 */
+	private function taxonomyPost($post)
+	{
+		// What are the taxonomies of the post
+		$postTypeTaxonomies = array_keys(Options::get('taxonomy'));
 		
+		// Get terms by post taxonomies
+		$terms = $this->model->taxonomy->getByTaxonomies($postTypeTaxonomies); 
+		
+		// Получим термины относящиеся к данной записи, которые привязаны к таксономиям данного типа записи
+		$postTerms = $this->model->getPostTerms(' and tr.object_id = ' . $post['id'] . ' and tt.taxonomy IN(\''.implode("','", $postTypeTaxonomies).'\')');
+		
+		// Сгрупируем все термины данных таксономий по айди и родителю
+		list($termsOnId, $termsOnParent) = Common::itemsOnKeys($terms, ['id', 'parent']);
+		
+		// Получим термины в виде списка html
+		$post['terms'] = Common::termsHTML($this->postTermsLink($termsOnId, $termsOnParent, $postTerms), $this->model->getArchiveSlug());
+		
+		// Сформируем полную ссылку на пост, учитывая иерархию терминов к которым принадлежит запись
+		$this->postPermalink($post, $termsOnId, $termsOnParent, $postTerms);
+		
+		// Если правильная ссылка на запись и пришедшая не совпадают - отправляем по правильному адресу
+		if(FULL_URL != $post['url']){
+			exit('$this->request->location('.$post['url'].')');
+			//$this->request->location($permalink);
+		}
+		
+		// Указываем что выводить данную запись следует шаблоном single
+		$this->view->is('single');
+		return $post;
 	}
 	
 	private function checkHierarchy($url, $parent, $hierarchy){
-		
 		if(!$parent){
 			if($hierarchy)
 				$this->request->location(NULL, 404);
@@ -158,12 +158,8 @@ class PostController extends Controller{
 	
 	private function checkTermHierarchy($postId, $hierarchy){
 		$term = $this->model->getPostTerms('and p.id = ' . $postId . ' and t.slug IN(\''.implode("','", [end($hierarchy)]).'\')');
-		//y, , $this->getParentHierarchy($parentId, $items)
-		//foreach
-		//var_dump($term, $hierarchy);exit;
 		if(!$term)
 			$this->request->location(null, 404);
-		//var_dump($this->getParentHierarchy($term[0]['parent'], $validTerms, 'slug'));
 		if(!$term[0]['parent']){
 			if(count($hierarchy) > 1)
 				$this->request->location(null, 404);
@@ -172,7 +168,6 @@ class PostController extends Controller{
 			$validTerms = $this->model->getTaxonomies($postId);
 			$urlHierarchy = implode('/', $hierarchy);
 			$validUrlHierarchy = $this->getParentHierarchy($term[0]['parent'], $validTerms, 'slug') . '/' . end($hierarchy);
-			//var_dump($validUrlHierarchy, $urlHierarchy);
 			if($validUrlHierarchy != $urlHierarchy){
 				$this->request->location(str_replace($urlHierarchy, $validUrlHierarchy , FULL_URL), 301);
 			}
@@ -207,7 +202,6 @@ class PostController extends Controller{
 		
 		// Если не пришла таксономия и у данного типа поста есть архив -  выдаем просто весь архив
 		
-		//$termsByPostType = $this->model->taxonomy->getAllByPostTypes(Options::get('type'));
 		$hierarchy = explode('/', $taxonomySlug);
 		if(!$taxonomy && $this->options['has_archive']){
 			if(!$list[$listMark] = $this->model->getPostsByPostType(Options::get('type'))) return 0;
@@ -279,18 +273,22 @@ class PostController extends Controller{
 		//var_dump($termsOnId, $termsOnParent, $termsByPostId);exit;
 		foreach($list[$listMark] as &$post){
 			if(!isset($termsByPostId[$post['id']])) $termsByPostId[$post['id']] = false;
-			$this->filterPermalink($post, $termsOnId, $termsOnParent, isset($termsByPostId[$post['id']])?$termsByPostId[$post['id']]:false);
+			$this->postPermalink($post, $termsOnId, $termsOnParent, isset($termsByPostId[$post['id']])?$termsByPostId[$post['id']]:false);
 			$post['terms'] = Common::termsHTML($this->postTermsLink($termsOnId, $termsOnParent, $termsByPostId[$post['id']]), $this->model->getArchiveSlug());
 		}
 		
 		// Узнаем имя таксономии по метке для хлебных крошек
-		$taxonomyName = $taxonomySlug;
+		$taxonomyName = [];
 		foreach($terms1 as $term){
-			if($term['slug'] == $taxonomySlug){
-				$taxonomyName = $term['name'];
-				break;
+			foreach($hierarchy as $section){
+				if($term['slug'] == $section){
+					$taxonomyName[] = $term['name'];
+					break;
+				}
 			}
 		}
+		if(empty($taxonomyName))
+			$taxonomyName = $taxonomySlug;
 		
 		$taxonomyTitle = $taxonomy ? $this->options['taxonomy'][$taxonomy]['title'] : '';
 		$this->addBreadCrumbs($list, $taxonomyTitle, $taxonomyName, $taxonomyName);
@@ -311,7 +309,7 @@ class PostController extends Controller{
 		return (new Pagenation())->run($this->page, $this->model->getAllItemsCount(), $this->options['rewrite']['paged']);;
 	}
 	
-	private function filterPermalink(&$post, $termsOnId, $termsOnParent, $termsByPostId){//var_dump(func_get_args());exit;
+	private function postPermalink(&$post, $termsOnId, $termsOnParent, $termsByPostId){//var_dump(func_get_args());exit;
 		$permalink 	 = SITE_URL . trim(Options::slug(), '/') . '/' . $post['url'] . '/';
 		$post['url'] = applyFilter('postTypeLink', $permalink, $termsOnId, $termsOnParent, $termsByPostId);
 	}
@@ -337,18 +335,20 @@ class PostController extends Controller{
 		
 		
 		if($type){
+			if(is_array($value)) $value = implode(' > ', $value);
 			$this->addBreadCrumbsHelper($taxonomyTitle, $value, $taxonomyTitle, $post['title']);
 		}elseif(isset($post['id']) && $this->config->front_page != $post['id']){
 			$this->config->addBreadCrumbs($post['url'], $post['title']);
-			if(isset($this->options['rewrite']['slug']))
-				$post['title'] .= ' - ' . $this->options['title'];
+			//if(isset($this->options['rewrite']['slug']))
+				//$post['title'] .= ' - ' . $this->options['title'];
 		}
 			
 	}
 	
 	private function addBreadCrumbsHelper($taxonomyTitle, $value, $text, &$postTitle){
 		$this->config->addBreadCrumbs($taxonomyTitle, $text . ': ' . $value);
-		$postTitle = $value . " - {$text} " . $postTitle;
+		$postTitle = $value; //. " - {$text} " . $postTitle;
+		//$postTitle = $value . " - {$text} " . $postTitle;
 	}
 	
 	private function stats(){

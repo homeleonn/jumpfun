@@ -58,13 +58,6 @@ class Config{
 		if(!isset($options['rewrite']['paged'])) 		$options['rewrite']['paged'] = self::POSTS_PER_PAGE;
 		if(!isset($options['taxonomy'])) 				$options['taxonomy'] = [];
 		
-		// $replaceCount = 0;
-		// $slug = preg_replace('~%.+%~', '([^/]+)', $options['rewrite']['slug'], -1, $replaceCount);
-		// $addArgs = '';
-		// $i = 2;
-		// while($replaceCount--){
-			// $addArgs .= '/$' . $i++;
-		// }
 		$type = $options['type'];
 		$sep  = '/';
 		

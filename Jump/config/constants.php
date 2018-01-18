@@ -26,9 +26,9 @@ define('THEME_DIR', ROOT . 'content/themes/default/');
 define('ADMIN_THEME', SITE_URL . 'admin/view/');
 
 define('URL_PATTERN', '[а-яА-ЯЁa-zA-Z0-9-]+');
+define('URL_PATTERN_SLASH', '[а-яА-ЯЁa-zA-Z0-9-\/]+');
 define('FILTER_PATTERN', '[^;\-,=][a-zA-Z0-9-,=;]+[^;,=]');
 
 define('S', '|'); //sumbol separator for args parse
-
 
 //var_dump($_SERVER, ROOT_URI, FULL_URI, URI, SITE_URL, FULL_URL_WITHOUT_PARAMS, FULL_URL);exit;

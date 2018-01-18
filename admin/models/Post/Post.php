@@ -326,7 +326,7 @@ class Post extends Model{
 	public function editTerm($id, $name, $slug, $description){
 		$this->db->query("Update terms SET name = '{$name}', slug = '{$slug}' where id = ?i", $id);
 		$this->db->query("Update term_taxonomy SET description = '{$description}' where term_id = ?i", $id);
-		$this->request->location(SITE_URL . URI . '?msg=успешно');
+		$this->request->location(FULL_URL . '?msg=успешно');
 	}
 	
 	/**
@@ -458,9 +458,5 @@ class Post extends Model{
 	public function checkExistsPostById($postId){
 		if($postId === 0) return true;
 		return $this->db->getOne('Select id from posts where id = ?i', $postId);
-	}
-	
-	public function link(){
-		
 	}
 }

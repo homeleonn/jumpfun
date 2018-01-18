@@ -36,30 +36,66 @@ $this->di->get('config')->addPageType([
 		//'rewrite' => ['slug' => 'pages', 'with_front' => true, 'paged' => false],
 ]);
 
-function addFilter($actionName, $funcName){
-	if(isset($GLOBALS['jump_actions'][$actionName])){
-		foreach($GLOBALS['jump_actions'][$actionName] as $actionFunc){
-			if($actionFunc == $funcName) return;
-		}
-	}
-	$GLOBALS['jump_actions'][$actionName][] = $funcName;
+
+function add($type, $funcName, $userFunc){
+	$GLOBALS['jump_'.$type][$funcName][] = $userFunc;
 }
 
-function applyFilter(){
+function addAction($actionName, $userFunc){
+	add('actions', $actionName, $userFunc);
+}
+
+function addFilter($filterName, $userFunc){
+	add('filters', $filterName, $userFunc);
+}
+
+function apply(){
 	$args = func_get_args();
 	if(empty($args)) 
 		return;
 	
-	$actionName = array_shift($args);
+	$type = 'jump_' . array_shift($args);
+	if(!count($args)) return;
+	$funcName = array_shift($args);
 	
-	if(!isset($GLOBALS['jump_actions'][$actionName]))
+	if(!isset($GLOBALS[$type][$funcName]))
 		return;
 	
-	foreach($GLOBALS['jump_actions'][$actionName] as $action){
-		$args[0] = call_user_func_array($action, $args);
+	$isfilters = $type == 'jump_filters';
+	
+	foreach($GLOBALS[$type][$funcName] as $key => $filter){
+		$result = call_user_func_array($filter, $args);
+		if($isfilters){//echo $result;
+			$args[0] = $result;
+		}
 	}
-	return($args[0]);
+	
+	return $args[0];
 }
+
+function doAction(){
+	call_user_func_array('apply', array_merge(['actions'], func_get_args()));
+}
+function applyFilter(){
+	return call_user_func_array('apply', array_merge(['filters'], func_get_args()));
+}
+
+// function applyFilter(){
+	// $args = func_get_args();
+	// if(empty($args)) 
+		// return;
+	
+	// $filterName = array_shift($args);
+	
+	// if(!isset($GLOBALS['jump_filters'][$filterName]))
+		// return;
+	
+	// foreach($GLOBALS['jump_filters'][$filterName] as $key => $filter){
+		// $args[0] = call_user_func_array($filter, $args);
+	// }
+	
+	// return($args[0]);
+// }
 
 
 //addFilter('postTypeLink', 'jumpPostTypeLink');
@@ -94,4 +130,8 @@ function myPostTypeLink($link, $termsOnId, $termsOnParent, $postTerms){//var_dum
 		$formatComponent = str_replace('|', '/', substr(Common::builtHierarchyDown($termsOnId, $current, $mergeKey) . '|' . $current[$mergeKey] . '|' . Common::builtHierarchyUp($termsOnParent, $current, $postTermsOnId, $mergeKey), 1, -1));
 	}
 	return preg_replace($replaceFormat, $formatComponent, $link);
+}
+
+function jHead(){
+	doAction('jhead');
 }

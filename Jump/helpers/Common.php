@@ -163,4 +163,17 @@ class Common{
 		return $html;
 	}	
 	
+	public static function arrayValidation($pattern, $array){
+		if(!is_array($taxonomies)) return false;
+		$html = '';
+		foreach($taxonomies as $taxName => $terms){
+			$html .= '<div class="filters"><div class="title">' . $taxName . '</div><div class="content">';
+			foreach($terms as $termName => $termLink){
+				$html .= " <a href='". SITE_URL . $archive . "{$termLink}/'>{$termName}</a><br>";
+			}
+			$html .= '</div></div>';
+		}
+		return $html;
+	}	
+	
 }

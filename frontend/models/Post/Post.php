@@ -48,18 +48,16 @@ class Post extends Model{
 		var_dump(Options::get('title'));exit;
 	}
 	
-	public function single($url, $id = NULL, $pageTypes = NULL){//var_dump($url, $pageTypes, Options::get('type'));
-		return $id ? $this->getPostById($id) : $this->getPostByUrl($url, $pageTypes);
+	public function single($url, $id = NULL){
+		return $id ? $this->getPostById($id) : $this->getPostByUrl($url);
 	}
 	
 	public function getPostById($id){
 		return $this->db->getRow($this->select . 'id = ?i', $id);
 	}
 	
-	public function getPostByUrl($url, $pageTypes = NULL){
-		$pageTypes = implode($pageTypes ?: [Options::get('type')]);
-		$sqlPageTypes = $pageTypes ? ' and post_type IN('.$pageTypes.')' : '';
-		return $this->db->getRow($this->select . 'url = ?s ' . $sqlPageTypes, $url);
+	public function getPostByUrl($url){
+		return $this->db->getRow($this->select . 'url = ?s', $url);
 	}
 	
 	public function getChildrens($parentId){

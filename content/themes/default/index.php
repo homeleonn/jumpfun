@@ -1,23 +1,14 @@
-<div class="container">
 <?php 
-if(isset($content)){
-	echo $content; 
+	if(isset($content)){
+		echo $content; 
+		if($this->haveChild($id)): 
+			echo '<ul>';
+			while($child = $this->theChild()):
+				echo '<li><a href="' . $child['url'] . '/">'.$child['title'].'</a></li>';
+			endwhile;
+			echo '<ul>';
+		endif;
+	}else{
+		echo 'Не найдено';
+	}
 ?>
-<?php 
-	if($this->haveChild($id)): 
-		echo '<ul>';
-		while($child = $this->theChild()):
-			echo '<li><a href="' . $child['url'] . '/">'.$child['title'].'</a></li>';
-		endwhile;
-		echo '<ul>';
-	endif;
-?>
-<?php
-}else{
-	echo 'Не найдено';
-}
-
-//var_dump(get_defined_vars());
-
-?>
-</div>

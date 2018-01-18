@@ -8,6 +8,7 @@
 	<link rel="stylesheet" type="text/css" href="<?=THEME?>css/style1.css" />
 	<link rel="stylesheet" type="text/css" href="<?=THEME?>css/new.css" />
 	<!--<link href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,700italic,400,800,700,600" rel="stylesheet" type="text/css">-->
+	<?php jHead() ?>
 	<link rel="shortcut icon" href="<?=THEME?>favicon.ico" type="image/x-icon">
 </head>
 <body>
@@ -49,6 +50,7 @@
 							<li><a href="<?=SITE_URL?>sedans/">Седаны</a></li>
 							<li><a href="<?=SITE_URL?>educators/">Преподаватели</a></li>
 							<li><a href="<?=SITE_URL?>news/">Новости</a></li>
+							<li><a href="<?=SITE_URL?>category/news/">Новости</a></li>
 							<li><a href="<?=SITE_URL?>eli-c2/">Ели</a></li>
 						</ul>			
 					</nav>
