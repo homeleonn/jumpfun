@@ -4,12 +4,13 @@ namespace Jump\core\router;
 
 use Jump\core\request\Request;
 use Jump\DI\DI;
+use Jump\helpers\HelperDI;
 
 class Router{
 	private $di;
 	private $request;
 	
-	private $routes = [];
+	public $routes = [];
 	
 	private $controller;
 	private $action;
@@ -115,4 +116,11 @@ class Router{
 		}
 		return $uri;
 	}
+	
+	public static function add1($pattern, $controller){
+		$Router = DI::getD('router');
+		$Router->add($pattern, $controller);
+		var_dump($Router->routes);
+	}
+	
 }

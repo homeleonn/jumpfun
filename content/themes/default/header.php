@@ -8,7 +8,7 @@
 	<link rel="stylesheet" type="text/css" href="<?=THEME?>css/style1.css" />
 	<link rel="stylesheet" type="text/css" href="<?=THEME?>css/new.css" />
 	<!--<link href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,700italic,400,800,700,600" rel="stylesheet" type="text/css">-->
-	<?php jHead() ?>
+	<?php jmpHead() ?>
 	<link rel="shortcut icon" href="<?=THEME?>favicon.ico" type="image/x-icon">
 </head>
 <body>

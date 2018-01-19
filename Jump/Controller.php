@@ -29,6 +29,7 @@ class Controller{
 		
 		// create model with created dependencies
 		$this->model = (new \ReflectionClass($model))->newInstanceArgs(array_merge([$di], $modelArguments));
+		$this->di->set('model', $this->model);
 	}
 	
 	private function initVars($di){

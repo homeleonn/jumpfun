@@ -43,11 +43,6 @@ class Post extends Model{
 		$this->taxonomy = $taxonomy;
 	}
 	
-	public function setOptions($options){
-		//$this->options = $options;
-		var_dump(Options::get('title'));exit;
-	}
-	
 	public function single($url, $id = NULL){
 		return $id ? $this->getPostById($id) : $this->getPostByUrl($url);
 	}
@@ -62,65 +57,6 @@ class Post extends Model{
 	
 	public function getChildrens($parentId){
 		return $this->db->getAll($this->select . 'parent = ?i', (int)$parentId);
-	}
-	
-	public function getPostsByFilters($filters, $postType){
-		$sqlFilters = '';
-		// Соберем таксономии и проверим их валидность
-		// Если найдутся невалидные, нужно вырезать из запроса данный фильтр и перенаправить
-		// Если валидных меньше чем присланных, проходимся по валидным, сверяемся с присланными, сохраняем невалидные присланные, формируем и режем
-		$validFilters = $this->taxonomyValidation($filters, $postType);
-		
-		$filtersAsString = Filter::stringFromFilters($filters);
-		$validFiltersAsString = Filter::stringFromFilters($validFilters);
-	
-		//var_dump($filters, $validFilters, $filtersAsString, $validFiltersAsString);
-		
-		if(strcmp($filtersAsString, $validFiltersAsString) !== 0){var_dump(1);exit;
-			$this->request->location(str_replace($filtersAsString . (!$validFiltersAsString ? '/' : ''), $validFiltersAsString, FULL_URL), 301);
-		}
-		// Формируем условие из валидных фильтров
-		foreach($validFilters as $taxonomy => $slugs){
-			$sqlFilters .= " (tt.taxonomy = '{$postType}-{$taxonomy}' and t.slug IN('" . str_replace(',', "','", $slugs) . "')) OR";
-		}
-		
-		$query = $this->select . 'id IN(Select DISTINCT p.id from ' . $this->relationship . ' and ('.substr($sqlFilters, 0, -3).')) and post_type = \''.$postType.'\' order by id DESC';
-		$this->checkInLimit($query, []);
-		$data = $this->db->getAll($query . $this->limit);
-		//var_dump($q, $data);exit;
-		return $data;
-	}
-	
-	// Поиск валидных фильтров и их значений из присланных
-	private function taxonomyValidation($filters, $postType){
-		var_dump($postType);
-		$type = Options::get('type') . '-';
-		$taxonomies = '';
-		
-		// Формируем условие из фильтров и их значений
-		// Узнаем ваилидные фильтры, и валидные значения
-		foreach($filters as $taxonomy => $values){
-			$taxonomies .= "(tt.taxonomy = '{$type}{$taxonomy}' AND t.slug IN('" . str_replace(',', "','", $values) . "')) OR ";
-		}
-		
-		$validTaxonomies = $this->db->getAll('Select DISTINCT tt.taxonomy as filter, t.slug as value from term_taxonomy as tt, terms as t where tt.term_taxonomy_id = t.id and ' . substr($taxonomies, 0, -3));
-		
-		return $this->creatingValidFilters($validTaxonomies, $postType);
-	}
-	
-	// Форматирование новых валидных фильтров и их значеий
-	private function creatingValidFilters($validFilters, $postType){
-		$newValidFilters = [];
-		
-		foreach($validFilters as $filter){
-			$newValidFilters[str_replace($postType . '-', '', $filter['filter'])][] = $filter['value'];
-		}
-		
-		foreach($newValidFilters as $filters => $values){
-			$newValidFilters[$filters] = implode(',', $values);
-		}
-		
-		return $newValidFilters;
 	}
 	
 	public function getPostTerms($where){
@@ -148,7 +84,6 @@ class Post extends Model{
 		return $this->db->getAll($query, [$termsTaxonomyIds]);
 		//return $this->getAll($query, [$termsTaxonomyIds]);
 	}
-	
 	
 	public function getMeta($postId){
 		return $this->metaProcessing($this->db->getAll('Select meta_key, meta_value from postmeta where post_id = ?i', $postId));
@@ -191,13 +126,13 @@ class Post extends Model{
 		foreach($terms as $key => $term){
 			$key1 = Options::get('taxonomy')[$term['taxonomy']]['title'];
 			if(!isset($html[$key1])) $html[$key1] = '';
-			$link = SITE_URL . $this->getArchiveSlug() . "{$term['taxonomy']}/{$term['slug']}/";
+			$link = SITE_URL . Options::getArchiveSlug() . "{$term['taxonomy']}/{$term['slug']}/";
 			$html[$key1] .= $this->setTermLinkHelper($link, $term['name'], $term['count']) . '<br>';
 		}
 		foreach($html as $tax => $h) 
 			$html[$tax] = '<div class="filters"><div class="title">' . $tax . '</div><div class="content">' . $h . '</div></div>';
 		
-		return implode('', array_merge(['all' => '<a href="'. SITE_URL . $this->getArchiveSlug() . '">Все</a><br>'], $html));
+		return implode('', array_merge(['all' => '<a href="'. SITE_URL . Options::getArchiveSlug() . '">Все</a><br>'], $html));
 	}
 	
 	
@@ -208,7 +143,7 @@ class Post extends Model{
 		if($terms){
 			foreach($terms as $key => $term){
 				if(!isset($html[$term['taxonomy']])) $html[$term['taxonomy']] = ($key ? '<br>' : '') . Options::get('taxonomy')[$term['taxonomy']]['title'] . ': ';
-				$html[$term['taxonomy']] .= "<a href='" . SITE_URL . $this->getArchiveSlug() . "{$term['taxonomy']}/{$term['slug']}/'>{$term['name']}</a>, ";
+				$html[$term['taxonomy']] .= "<a href='" . SITE_URL . Options::getArchiveSlug() . "{$term['taxonomy']}/{$term['slug']}/'>{$term['name']}</a>, ";
 			}
 			foreach($html as &$h) 
 				$h = substr($h, 0, -2);
@@ -229,9 +164,9 @@ class Post extends Model{
 		foreach($terms as $t){
 			if(!$getCount) $t['count'] = 0;
 			$allCount += $t['count'];
-			$html[] = $this->setTermLinkHelper(SITE_URL . $this->getArchiveSlug() . "{$t['taxonomy']}/{$t['slug']}/", $t['name'], $t['count']);
+			$html[] = $this->setTermLinkHelper(SITE_URL . Options::getArchiveSlug() . "{$t['taxonomy']}/{$t['slug']}/", $t['name'], $t['count']);
 		}
-		$result = array_merge([$this->setTermLinkHelper(SITE_URL . $this->getArchiveSlug(), 'all')], $html);
+		$result = array_merge([$this->setTermLinkHelper(SITE_URL . Options::getArchiveSlug(), 'all')], $html);
 		return ($delimiter && is_string($delimiter)) ? (Options::get('taxonomy')[$taxonomy]['title'] . ': ' . implode($delimiter, $result)) : $result;
 	}
 	

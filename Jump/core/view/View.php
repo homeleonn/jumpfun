@@ -35,7 +35,7 @@ class View
 			if(is_array($data)){
 				extract($data);
 				unset($data);
-			}
+			}//var_dump(get_defined_vars());exit;
 			if(isset($__list)){
 				$this->children = $__list;
 				unset($__list);
@@ -44,7 +44,8 @@ class View
 				$this->senderModel = $__model;
 				unset($__model);
 			}
-			$contentFile = $this->path . 'page-' . $title . '.php';	
+			if(isset($title))
+				$contentFile = $this->path . 'page-' . $title . '.php';	
 		}else{
 			$options = $this->di->get('config')->getCurrentPageOptions();
 			if(!file_exists($contentFile)){

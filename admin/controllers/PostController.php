@@ -8,11 +8,20 @@ use Jump\helpers\Common;
 use Jump\helpers\Msg;
 use Jump\helpers\MyDate;
 use Jump\helpers\Transliteration;
+use frontend\models\Post\Options;
 
 class PostController extends AdminController{
 	use PostControllerTrait;
 	
-		
+	public function __construct($di, $model){
+		parent::__construct($di, $model);
+		$this->setOptions();
+	}
+	
+	private function setOptions(){
+		$this->options = $this->model->options = $this->config->getCurrentPageOptions();
+		Options::setOptions($this->options);
+	}
 	
 	public function actionList(){
 		return $this->model->postList();
@@ -89,15 +98,16 @@ class PostController extends AdminController{
 		}
 		
 		if($async){
-			$slug 	 = $description = '';
+			$slug 	 = $description = $parent = '';
 			$whisper = false;
 		}else{
 			$slug 		 = $this->request->post['slug'];
 			$description = $this->request->post['description'];
+			$parent 	 = $this->request->post['parent'];
 			$whisper 	 = true;
 		}
 		
-		$result = $this->model->addTerm($name, $this->request->post['term'], $whisper, $slug, $description);
+		$result = $this->model->addTerm($name, $this->request->post['term'], $whisper, $slug, $description, $parent);
 		
 		if($result && $async){
 			exit('1');
@@ -117,7 +127,8 @@ class PostController extends AdminController{
 			$this->request->post['id'],
 			$this->request->post['name'],
 			$this->request->post['slug'],
-			$this->request->post['description']
+			$this->request->post['description'],
+			$this->request->post['parent']
 		);
 	}
 	

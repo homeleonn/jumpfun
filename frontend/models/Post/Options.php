@@ -20,4 +20,8 @@ class Options{
 	public static function slug(){
 		return self::$options['rewrite']['slug'];
 	}
+	
+	public static function getArchiveSlug(){
+		return self::$options['has_archive'] . (self::$options['has_archive'] ? '/' : '');
+	}
 }

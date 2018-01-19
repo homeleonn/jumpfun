@@ -25,5 +25,7 @@ class DI{
 		return isset($this->container[$dependencyName]);
 	}
 	
-	
+	public static function getD($dependencyName){
+		return self::getInstance()->get($dependencyName);
+	}
 }

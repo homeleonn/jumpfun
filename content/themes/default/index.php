@@ -1,4 +1,4 @@
-<?php 
+<?php
 	if(isset($content)){
 		echo $content; 
 		if($this->haveChild($id)): 

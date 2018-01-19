@@ -1,10 +1,5 @@
 <?php  
-$anchor = SITE_URL;
-//var_dump($data['__model']->getTermsByPostId($data['id']));
-$cat = ($terms = $data['__model']->getTermsByPostId($data['id'])) ? end($terms)['slug'] : 'uncat';
-$data['urlHierarchy'] = str_replace('%cat%', $cat, $data['urlHierarchy']);
 
-$url = $anchor . $data['urlHierarchy'] . $data['url'] . '/';
 ?>
 <a href="<?=SITE_URL?>admin/<?=$options['type']?>/add/" class="action-tool plus" title="Добавить"><span class="icon-plus">Добавить новую</span></a>
 <h2><?=$options['edit']?></h2>
@@ -16,7 +11,7 @@ $url = $anchor . $data['urlHierarchy'] . $data['url'] . '/';
 			<div>Заголовок</div>
 			<div><input class="w100" value="<?=$data['title']?>" type="text" name="title" id="title" placeholder=""></div>
 			<div>
-				<a id="url" href="<?=$url?>"><span class="anchor"><?=$anchor . $data['urlHierarchy']?></span><span class="editing-part"><?=$data['url']?></span><span id="url-end">/</span></a> 
+				<a id="url" href="<?=$data['permalink']?>"><span class="anchor"><?=$data['anchor']?></span><span class="editing-part"><?=$data['url']?></span><span id="url-end">/</span></a> 
 				<input type="button" id="edit-url-init" value="Изменить" style="padding: 0px 4px;">
 				<input type="button" id="edit-url-ok" value="ок" style="padding: 0px 4px; display: none;">
 				<input type="button" id="edit-url-cancel" value="отмена" style="padding: 0px 4px; display: none;">

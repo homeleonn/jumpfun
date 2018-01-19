@@ -114,4 +114,7 @@ class Request{
 		exit;
 	}
 	
+	public function get404(){
+		$this->location(NULL, 404);
+	}
 }

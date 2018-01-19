@@ -1,4 +1,4 @@
-<?//=var_dump(get_defined_vars());?>
+<?//=var_dump(get_defined_vars());exit;?>
 <div class="list-wrapper container-fluid">
 	<div class="col-sm-<?php if(empty($filters)): ?>12<?php else: ?>9<?php endif; ?>" style="float: right;">
 		<?php 

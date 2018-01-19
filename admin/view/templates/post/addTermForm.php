@@ -26,6 +26,7 @@ if(isset($_GET['msg']))
 	<div id="sidebar-right">
 		<!--<input type="button" id="item-factory" value="Добавить">-->
 		<input type="submit" id="" value="Добавить">
+		<?php include $this->getFile('sidebar/listForParents');?>
 	</div>
 	
 	<div class="sep"></div>

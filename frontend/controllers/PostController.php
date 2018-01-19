@@ -40,10 +40,11 @@ class PostController extends Controller{
 		// get all args, but mey be come 'foo/bar/baz/zab/'
 		$hierarchy = explode('/', $url);
 		
-		// The validation of each section of the hierarchy
+		//The validation of each section of the hierarchy
 		if($url && count($hierarchy) > 1){
-			foreach($hierarchy as $url) 
-				if(!preg_match('~^'.URL_PATTERN.'$~u', $url)) $this->request->location(NULL, 404);
+			if(in_array('', $hierarchy)) $this->request->get404();
+			// foreach($hierarchy as $url) 
+				// if(!preg_match('~^'.URL_PATTERN.'$~u', $url)) $this->request->location(NULL, 404);
 			$id = NULL;
 		}
 		
@@ -96,7 +97,7 @@ class PostController extends Controller{
 		$postTypeTaxonomies = array_keys(Options::get('taxonomy'));
 		
 		// Get terms by post taxonomies
-		$terms = $this->model->taxonomy->getByTaxonomies($postTypeTaxonomies); 
+		$terms = $this->model->taxonomy->getByTaxonomies(); 
 		
 		// Получим термины относящиеся к данной записи, которые привязаны к таксономиям данного типа записи
 		$postTerms = $this->model->getPostTerms(' and tr.object_id = ' . $post['id'] . ' and tt.taxonomy IN(\''.implode("','", $postTypeTaxonomies).'\')');
@@ -105,7 +106,7 @@ class PostController extends Controller{
 		list($termsOnId, $termsOnParent) = Common::itemsOnKeys($terms, ['id', 'parent']);
 		
 		// Получим термины в виде списка html
-		$post['terms'] = Common::termsHTML($this->postTermsLink($termsOnId, $termsOnParent, $postTerms), $this->model->getArchiveSlug());
+		$post['terms'] = Common::termsHTML($this->postTermsLink($termsOnId, $termsOnParent, $postTerms), Options::getArchiveSlug());
 		
 		// Сформируем полную ссылку на пост, учитывая иерархию терминов к которым принадлежит запись
 		$this->postPermalink($post, $termsOnId, $termsOnParent, $postTerms);
@@ -191,25 +192,19 @@ class PostController extends Controller{
 		return $hierarchy;
 	}
 	
-	public function actionRouter($params){
-		var_dump($params);exit;
-	}
-	
 	public function actionList($taxonomy = null, $taxonomySlug = null, $page = 1){//var_dump(func_get_args());exit;
 		$this->model->setLimit($this->page = $page, $this->options['rewrite']['paged']);
 		$list = $this->options;
 		$listMark = '__list';
 		
-		// Если не пришла таксономия и у данного типа поста есть архив -  выдаем просто весь архив
-		
 		$hierarchy = explode('/', $taxonomySlug);
+		
+		// Если не пришла таксономия и у данного типа поста есть архив -  выдаем просто весь архив
 		if(!$taxonomy && $this->options['has_archive']){
 			if(!$list[$listMark] = $this->model->getPostsByPostType(Options::get('type'))) return 0;
 			$terms = $this->model->taxonomy->getAllByObjectsIds(array_keys(Common::itemsOnKeys($list[$listMark], ['id'])));
 			$termsByPostId = Common::itemsOnKeys($terms, ['object_id']);
-			//$terms = Common::clearDuplicateOnKey($terms);
-			$terms1 = $this->model->taxonomy->getByTaxonomies(array_keys(Options::get('taxonomy')));
-			//var_dump($termsByPostId);exit;
+			$terms1 = $this->model->taxonomy->getByTaxonomies();
 		}else{
 			// taxonomy validation
 			if(!Common::checkValidation($hierarchy, '/^' . URL_PATTERN . '$/')){
@@ -228,7 +223,7 @@ class PostController extends Controller{
 				// 1.3 строим иерархию к первому родителю, компонуем потомков, сверяем иерархию с пришедшей
 			
 			// 1.1
-			$terms1 = $this->model->taxonomy->getByTaxonomies(array_keys(Options::get('taxonomy')));
+			$terms1 = $this->model->taxonomy->getByTaxonomies();
 			$terms  = $this->model->taxonomy->filter($terms1, 'taxonomy', $taxonomy);
 			//$terms2 = $this->model->taxonomy->getAll('tt.taxonomy = ?s', $taxonomy);
 			// 1.2
@@ -245,20 +240,24 @@ class PostController extends Controller{
 			if(!$findTerm) exit('404-3');
 			// 1.3
 			list($termsOnIds, $termsOnParents) = Common::itemsOnKeys($terms, ['id', 'parent']);
-			$builtedTermsParentHierarchy = substr(str_replace('|', '/', Common::builtHierarchyDown($termsOnIds, $currentTerm, 'slug') . '|' .$lastChild), 1);
+			$builtedTermsParentHierarchy = substr(str_replace('|', '/', Common::builtHierarchyDown($termsOnIds, $currentTerm, 'slug') . '|' .$lastChild), 1);//var_dump($termsOnIds, $termsOnParents, $builtedTermsParentHierarchy );
 			
 			if(implode('/', $hierarchy) != $builtedTermsParentHierarchy) 
 				exit('location: ' . $builtedTermsParentHierarchy);
 			
-			// 2
-			$children = isset($termsOnParents[$currentTerm['id']]) ? $termsOnParents[$currentTerm['id']] : [];
-			// 3
-			$children[] = $currentTerm;
-			$termsTaxonomyIds = [];
-			foreach($children as $child){
-				$termsTaxonomyIds[] = $child['term_taxonomy_id'];
+			// 2 // 3
+			// Создаем список всех дочерних позиций всей иерархии терминов относительно текущего термина
+			$toShow = isset($termsOnParents[$currentTerm['id']]) ? $termsOnParents[$currentTerm['id']] : NULL;
+			$i = 0;
+			$termsTaxonomyIds[] = $currentTerm['term_taxonomy_id'];
+			while(isset($toShow[$i])){
+				$termsTaxonomyIds[] = $toShow[$i]['term_taxonomy_id'];
+				if(isset($termsOnParents[$toShow[$i]['id']])){
+					$toShow = array_merge($toShow, $termsOnParents[$toShow[$i]['id']]);
+				}
+				$i++;
 			}
-			if(!$list[$listMark] = $this->model->getPostsBysTermsTaxonomyIds($termsTaxonomyIds)) return 0;
+			if(!$list[$listMark] = $this->model->getPostsBysTermsTaxonomyIds($termsTaxonomyIds)) return $this->options;
 			$terms = $this->model->taxonomy->getAllByObjectsIds(array_keys(Common::itemsOnKeys($list[$listMark], ['id'])));
 			//var_dump($getAllByObjectsIds);exit;
 			$termsByPostId = Common::itemsOnKeys($terms, ['object_id']);
@@ -274,13 +273,16 @@ class PostController extends Controller{
 		foreach($list[$listMark] as &$post){
 			if(!isset($termsByPostId[$post['id']])) $termsByPostId[$post['id']] = false;
 			$this->postPermalink($post, $termsOnId, $termsOnParent, isset($termsByPostId[$post['id']])?$termsByPostId[$post['id']]:false);
-			$post['terms'] = Common::termsHTML($this->postTermsLink($termsOnId, $termsOnParent, $termsByPostId[$post['id']]), $this->model->getArchiveSlug());
+			$post['terms'] = Common::termsHTML($this->postTermsLink($termsOnId, $termsOnParent, $termsByPostId[$post['id']]), Options::getArchiveSlug());
 		}
+		
+		
 		
 		// Узнаем имя таксономии по метке для хлебных крошек
 		$taxonomyName = [];
-		foreach($terms1 as $term){
-			foreach($hierarchy as $section){
+		
+		foreach($hierarchy as $section){
+			foreach($terms1 as $term){
 				if($term['slug'] == $section){
 					$taxonomyName[] = $term['name'];
 					break;
@@ -294,24 +296,24 @@ class PostController extends Controller{
 		$this->addBreadCrumbs($list, $taxonomyTitle, $taxonomyName, $taxonomyName);
 		$list['pagenation'] = $this->pagination();
 		
-		//$archiveTerms = $this->model->taxonomy->getByTaxonomies(array_keys(Options::get('taxonomy')));
 		$archiveTerms = $terms1;
 		
 		list($termsOnId, $termsOnParent) = Common::itemsOnKeys($archiveTerms, ['id', 'parent']);
 		$postTerms = $this->postTermsLink($termsOnId, $termsOnParent, $archiveTerms);
-		$list['filters'] = Common::archiveTermsHTML(array_reverse($postTerms), $this->model->getArchiveSlug());
+		$list['filters'] = Common::archiveTermsHTML(array_reverse($postTerms), Options::getArchiveSlug());
 		$list['__model'] = $this->model;
 		$this->view->is('list');
 		return $list;
 	}
 	
-	private function pagination(){
-		return (new Pagenation())->run($this->page, $this->model->getAllItemsCount(), $this->options['rewrite']['paged']);;
-	}
 	
 	private function postPermalink(&$post, $termsOnId, $termsOnParent, $termsByPostId){//var_dump(func_get_args());exit;
 		$permalink 	 = SITE_URL . trim(Options::slug(), '/') . '/' . $post['url'] . '/';
 		$post['url'] = applyFilter('postTypeLink', $permalink, $termsOnId, $termsOnParent, $termsByPostId);
+	}
+	
+	private function pagination(){
+		return (new Pagenation())->run($this->page, $this->model->getAllItemsCount(), $this->options['rewrite']['paged']);;
 	}
 	
 	private function postTermsLink($termsOnId, $termsOnParent, $termsByPostId, $mergeKey = 'slug'){//var_dump(func_get_args());exit;
@@ -329,7 +331,7 @@ class PostController extends Controller{
 	/*** BreadCrumbs ***/
 	/*******************/
 	
-	private function addBreadCrumbs(&$post, $taxonomyTitle = null, $value = null, $type = null){
+	private function addBreadCrumbs(&$post, $taxonomyTitle = null, $value = null, $type = null){//var_dump(func_get_args());exit;
 		if($this->options['has_archive'] && !Options::front())
 			$this->config->addBreadCrumbs($this->options['has_archive'], $this->options['title']);
 		

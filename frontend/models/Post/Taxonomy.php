@@ -6,6 +6,7 @@ class Taxonomy{
 	private $db;
 	private $select = 'Select t.*, tt.* from terms as t, term_taxonomy as tt where t.id = tt.term_id and ';
 	private $postTypeTaxonomies;
+	private static $cache;
 	
 	public function __construct($db){
 		$this->db = $db;
@@ -45,11 +46,23 @@ class Taxonomy{
 		return false;
 	}
 	
-	public function getAllByObjectsIds($objectsIds){//var_dump($objectsIds);//exit;
+	public function getAllByObjectsIds($objectsIds){
 		return $this->db->getAll('Select t.*, tt.*, tr.object_id from terms as t, term_taxonomy as tt, term_relationships as tr where t.id = tt.term_id and tt.term_taxonomy_id = tr.term_taxonomy_id and tr.object_id IN(?a)', [$objectsIds]);
 	}
 	
-	public function getByTaxonomies($taxonomies){
-		return $this->db->getAll('Select t.*, tt.* from terms as t, term_taxonomy as tt where t.id = tt.term_id and tt.taxonomy IN(?a)', [$taxonomies]);
+	public function getByTaxonomies($taxonomies = NULL){
+		$taxonomies = $taxonomies ?: array_keys(Options::get('taxonomy'));
+		if(($cache = self::cache($taxonomies)) === NULL)
+			self::cache($taxonomies, $this->db->getAll('Select t.*, tt.* from terms as t, term_taxonomy as tt where t.id = tt.term_id and tt.taxonomy IN(?a)', [$taxonomies]));
+		return self::cache($taxonomies);
+	}
+	
+	public static function cache($key, $value = NULL){
+		if(is_array($key)) $key = implode(',', $key);
+		if($value === NULL){
+			return isset(self::$cache[$key]) ? self::$cache[$key] : NULL;
+		}else{
+			self::$cache[$key] = $value;
+		}
 	}
 }

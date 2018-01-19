@@ -65,7 +65,7 @@ function apply(){
 	
 	foreach($GLOBALS[$type][$funcName] as $key => $filter){
 		$result = call_user_func_array($filter, $args);
-		if($isfilters){//echo $result;
+		if($isfilters){
 			$args[0] = $result;
 		}
 	}
@@ -79,24 +79,6 @@ function doAction(){
 function applyFilter(){
 	return call_user_func_array('apply', array_merge(['filters'], func_get_args()));
 }
-
-// function applyFilter(){
-	// $args = func_get_args();
-	// if(empty($args)) 
-		// return;
-	
-	// $filterName = array_shift($args);
-	
-	// if(!isset($GLOBALS['jump_filters'][$filterName]))
-		// return;
-	
-	// foreach($GLOBALS['jump_filters'][$filterName] as $key => $filter){
-		// $args[0] = call_user_func_array($filter, $args);
-	// }
-	
-	// return($args[0]);
-// }
-
 
 //addFilter('postTypeLink', 'jumpPostTypeLink');
 function jumpPostTypeLink($link, $post, $terms, $postTermId){
@@ -132,6 +114,15 @@ function myPostTypeLink($link, $termsOnId, $termsOnParent, $postTerms){//var_dum
 	return preg_replace($replaceFormat, $formatComponent, $link);
 }
 
-function jHead(){
+function getTermsByPostId($postId){
+	return isset(Cache::get('postTerms')[$postId]) ? Cache::get('postTerms')[$postId] : null;
+}
+
+function getTermsByTaxonomies(){
+	return Cache::get('allTerms');
+}
+
+//var_dump(getTermsByPostId(70));
+function jmpHead(){
 	doAction('jhead');
 }

@@ -11,7 +11,6 @@
 	<link rel="shortcut icon" type="image/x-icon" href="<?php echo ADMIN_THEME;?>img/favicon.ico"/>
 	<script src="<?=SITE_URL?>admin/view/js/jq3.js"></script>
 	<script src="<?=SITE_URL?>admin/view/js/admin.js"></script>
-	<?php //ju_head()?>
 </head>
 <body>
 <div id="wrapper">

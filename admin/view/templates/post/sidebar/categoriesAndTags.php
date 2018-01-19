@@ -1,7 +1,9 @@
 <?php 
 use Jump\helpers\Common;
-//var_dump($data, $options);exit;
+//var_dump(get_defined_vars());exit;
 if(Common::isPage()) return;
+
+$selfTerms = isset($data['selfTerms']) ? $data['selfTerms'] : [];
 
 if(isset($options['taxonomy'])):
 	foreach($options['taxonomy'] as $taxonomy => $taxValues):
@@ -14,14 +16,7 @@ if(isset($options['taxonomy'])):
 		<div id="term-<?=$taxonomy?>">
 			<?php 
 				if(isset($data['terms'])):
-					foreach($data['terms'] as $key => $termData):
-						if($termData['taxonomy'] != $taxonomy) continue;
-						$checked = isset($data['selfTerms']) && in_array($termData['id'], $data['selfTerms']) ? 'checked' : '';
-			?>
-						<label><input type="checkbox" name="terms[<?=$taxonomy?>][]" value="<?=$termData['id']?>" <?=$checked?> /> <?=$termData['name']?></label><br>
-			<?php 
-						unset($data['terms'][$key]);
-					endforeach;
+					showTermHierarchy($data['terms'], $taxonomy, $selfTerms);
 				endif;
 			?>
 		</div>
@@ -33,4 +28,18 @@ if(isset($options['taxonomy'])):
 <?php
 	endforeach;
 endif;
+
+function showTermHierarchy(&$terms, $taxonomy, $selfTerms, $level = 0){
+	foreach($terms as $key => $termData):
+		if($termData['taxonomy'] != $taxonomy) continue;
+		$checked = in_array($termData['id'], $selfTerms) ? 'checked' : '';
+		echo str_repeat('&nbsp;', $level * 5);
+		?>
+			<label><input type="checkbox" name="terms[<?=$taxonomy?>][]" value="<?=$termData['id']?>" <?=$checked?> /> <?=$termData['name']?></label><br>
+		<?php 
+		if(isset($termData['children']))
+			showTermHierarchy($termData['children'], $taxonomy, $selfTerms, $level + 1);
+		unset($terms[$key]);
+	endforeach;
+}
 ?>
