@@ -8,10 +8,12 @@ define('DS', DIRECTORY_SEPARATOR);
 define('ROOT_URI', str_replace($_SERVER['DOCUMENT_ROOT'], '', str_replace('\\', '/', ROOT)) ?: '/');
 
 if($_SERVER['PHP_SELF'] == '/index.php'){
-	define('FULL_URI', $_SERVER['REQUEST_URI'] == '/' ? '' : substr($_SERVER['REQUEST_URI'], 1));
+	$fullUri = $_SERVER['REQUEST_URI'] == '/' ? '' : substr($_SERVER['REQUEST_URI'], 1);
 }else{
-	define('FULL_URI', $_SERVER['REQUEST_URI'] == ROOT_URI ? '/' : (ROOT_URI == '/' ? substr($_SERVER['REQUEST_URI'], 1) : str_replace(ROOT_URI, '', $_SERVER['REQUEST_URI'])));
+	$fullUri = $_SERVER['REQUEST_URI'] == ROOT_URI ? '/' : (ROOT_URI == '/' ? substr($_SERVER['REQUEST_URI'], 1) : str_replace(ROOT_URI, '', $_SERVER['REQUEST_URI']));
 }
+
+define('FULL_URI', $fullUri != '' ? $fullUri : '/');
 
 define('URI', explode('?', FULL_URI)[0]);
 
@@ -30,5 +32,7 @@ define('URL_PATTERN_SLASH', '[а-яА-ЯЁa-zA-Z0-9-\/]+');
 define('FILTER_PATTERN', '[^;\-,=][a-zA-Z0-9-,=;]+[^;,=]');
 
 define('S', '|'); //sumbol separator for args parse
+
+define('TEMPLATE', '/^[ \t\/*#@]*Template:(.*)$/mi');
 
 //var_dump($_SERVER, ROOT_URI, FULL_URI, URI, SITE_URL, FULL_URL_WITHOUT_PARAMS, FULL_URL);exit;

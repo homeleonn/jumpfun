@@ -73,6 +73,7 @@ class PostController extends Controller{
 		else{
 			if(!empty($hierarchy))
 				$this->checkHierarchy($post['url'], $post['parent'], $hierarchy);
+			$post = $this->model->mergePostMeta($post);
 		}
 			
 		
@@ -309,7 +310,7 @@ class PostController extends Controller{
 	
 	private function postPermalink(&$post, $termsOnId, $termsOnParent, $termsByPostId){//var_dump(func_get_args());exit;
 		$permalink 	 = SITE_URL . trim(Options::slug(), '/') . '/' . $post['url'] . '/';
-		$post['url'] = applyFilter('postTypeLink', $permalink, $termsOnId, $termsOnParent, $termsByPostId);
+		$post['url'] = $post['permalink'] = applyFilter('postTypeLink', $permalink, $termsOnId, $termsOnParent, $termsByPostId);
 	}
 	
 	private function pagination(){

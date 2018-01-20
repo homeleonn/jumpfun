@@ -45,7 +45,7 @@ class Post extends Model{
 		// build hierarchy
 		$postsHierarchy = $this->hierarchyItems($posts, NULL, NULL, $addKeys);
 		$postsTable = $this->hierarchy($postsHierarchy, 'table');
-		return !$postsTable ? '' : '<table class="mytable"><tr align="center"><td>title/url</td>'.($this->options['taxonomy'] ? '<td width="10%">Метки</td>' : '').'<td width="1%">Дата публикации</td></tr>' . $postsTable . '</table>';
+		return !$postsTable ? '' : '<table class="mytable"><tr align="center"><td>title/url</td>'.($this->options['taxonomy'] ? '<td width="15%">Метки</td>' : '').'<td width="1%">Дата публикации</td></tr>' . $postsTable . '</table>';
 	}
 	
 	public function termList($term){
@@ -59,17 +59,33 @@ class Post extends Model{
 	
 	public function addForm(){
 		$data = [];
-		
 		if($this->options['hierarchical']){
 			$posts = $this->getAllPosts($this->options['type'], ['id', 'parent', 'title', 'url']);
 			$itemsToParents = $this->hierarchyItems($posts);
-			$data['listForParents'] = '<select style="width: 100%;"name="parent"><option value="0">(нет родительской)</option>' . $this->hierarchy($itemsToParents) . '</select>';
+			$data['listForParents'] = $this->htmlSelectForParentHierarchy($this->hierarchy($itemsToParents));
+			$data['templates'] 		= $this->htmlSelectForTemplateList();
 		}elseif($this->options['taxonomy']){
 			$data['terms'] = $this->getTermList(array_keys($this->options['taxonomy']));
 			$data['terms'] = $this->hierarchyItems($data['terms']);
 		}
 			
 		return $data;
+	}
+	
+	private function htmlSelectForParentHierarchy($hierarchyList){
+		return '<select style="width: 100%;"name="parent"><option value="0">(нет родительской)</option>' . $hierarchyList . '</select>';
+	}
+	
+	private function htmlSelectForTemplateList($postTeplate = NULL){
+		$templateList = '';
+		foreach(glob(THEME_DIR . '*.php') as $themeFile){
+			if(preg_match(TEMPLATE, file_get_contents($themeFile), $matches)){
+				$templateFile = basename($themeFile);
+				$selected = $templateFile === $postTeplate ? ' selected' : '';
+				$templateList .=  "<option value=\"{$templateFile}\"{$selected}>{$matches[1]}</option>";
+			}
+		}
+		return !$templateList ? false : '<select style="width: 100%;" name="template"><option value="0">(Базовый)</option>' . $templateList . '</select>';
 	}
 	
 	/**
@@ -162,9 +178,9 @@ class Post extends Model{
 		}
 		
 		if($isPost){
-			$url = $this->options['hierarchical'] ? ROOT_URI . $urlHierarchy . \Options::getArchiveSlug() . $item['url'] . '/' : $item['url'];
+			$url = $this->options['hierarchical'] ? ROOT_URI . $urlHierarchy . Options::getArchiveSlug() . $item['url'] . '/' : $item['url'];
 		}else{
-			$url = ROOT_URI . \Options::getArchiveSlug() . $item['taxonomy'] . '/' . $urlHierarchy . $item['slug'] . '/' ;
+			$url = ROOT_URI . Options::getArchiveSlug() . $item['taxonomy'] . '/' . $urlHierarchy . $item['slug'] . '/' ;
 		}
 		
 		
@@ -217,9 +233,10 @@ class Post extends Model{
 	
 	public function addTermForm($term){
 		$data['term'] = $data['add'] = $term;
-		$terms = $this->getAllTerms(array_keys($this->options['taxonomy']));
-		$itemsToParents = $this->hierarchyItems($terms);
-		$data['listForParents'] = '<select style="width: 100%;"name="parent"><option value="0">(нет родительской)</option>' . $this->hierarchy($itemsToParents) . '</select>';
+		if(!in_array($term, array_keys($this->options['taxonomy']))) return false;
+		$itemsToParents = $this->hierarchyItems($this->getAllTerms($term));
+		$data['listForParents'] = $this->htmlSelectForParentHierarchy($this->hierarchy($itemsToParents));
+		
 		return $data;
 	}
 	
@@ -227,10 +244,29 @@ class Post extends Model{
 		return $this->addTermHelper($name, $term, $whisper, $slug, $description, $parent );
 	}
 	
-	public function add($title, $url, $content, $parent, $posType, $terms){
+	public function add($title, $url, $content, $parent, $posType, $template, $extraFields, $terms){
 		$this->db->query('INSERT INTO posts (title, url, content, parent, post_type) VALUES (?s, ?s, ?s, ?i, ?s)', $title, $url, $content, $parent, $posType);
 		
 		$postId = $this->db->insertId();
+		
+		$meta = '';
+		// build post template
+		if($template){
+			$meta .= "({$postId}, '_jmp_post_template', '{$template}'),";
+		}
+		
+		// build post extra fields
+		if(!empty($extraFields)){
+			foreach($extraFields as $k => $f){
+				$key = $this->db->escapeString(htmlspecialchars($k));
+				$value = $this->db->escapeString(htmlspecialchars($f));
+				$meta .= "({$postId}, {$key}, {$value}),";
+			}
+		}
+		
+		// insert post meta
+		if($meta)
+			$this->db->query('INSERT INTO postmeta (post_id, meta_key, meta_value) VALUES ' . substr($meta, 0, -1));
 		
 		// Добавляем новые термины
 		$this->editTerms($postId, $terms);
@@ -281,13 +317,17 @@ class Post extends Model{
 	
 	public function editForm($id){
 		if(!$post = $this->db->getRow('Select * from posts where id = ?i', $id)) return 0;
+		$post = $this->mergePostMeta($post);
+		//var_dump($post);exit;
 		if($this->options['hierarchical']){
-			$post['urlHierarchy'] = $this->getUrlHierarchy($post['id']);
 			$posts = $this->getAllPosts($this->options['type'], ['id', 'parent', 'title', 'url']);
+			$post['urlHierarchy'] = $this->getUrlHierarchy($posts, $post['id']);
 			$itemsToParents = $this->hierarchyItems($posts, $post['id']);
-			$post['listForParents'] = '<select style="width: 100%;"name="parent"><option value="0">(нет родительской)</option>' . $this->hierarchy($itemsToParents, 'select', $post['parent']) . '</select>';
-			$post['anchor'] = SITE_URL . $post['urlHierarchy'];
-			$post['permalink'] = $post['anchor'] . $post['url'] . '/';
+			$post['listForParents'] = $this->htmlSelectForParentHierarchy($this->hierarchy($itemsToParents, 'select', $post['parent']));
+			$selfTemplate  = isset($post['_jmp_post_template']) ? $post['_jmp_post_template'] : false;
+			$post['templates'] 		= $this->htmlSelectForTemplateList($selfTemplate);
+			$post['anchor'] 	= SITE_URL . $post['urlHierarchy'];
+			$post['permalink'] 	= $post['anchor'] . $post['url'] . '/';
 		}
 		
 		else{
@@ -303,16 +343,14 @@ class Post extends Model{
 			$permalink 	 = SITE_URL . trim(Options::slug(), '/') . '/' . $post['url'] . '/';
 			$post['permalink'] = applyFilter('postTypeLink', $permalink, $termsOnId, $termsOnParent, $termsByPostId);
 			$post['anchor'] = str_replace($post['url'] . '/', '', $post['permalink']);
+			if($post['terms'])
+				$post['terms'] = $this->hierarchyItems($post['terms']);
 		}
-		if($post['terms'])
-			$post['terms'] = $this->hierarchyItems($post['terms']);
 		
 		return $post;
-		//return !isset($formattedTermList) ? $post : array_merge($post, $formattedTermList);
 	}
 	
-	public function getUrlHierarchy($childId){
-		$posts = $this->getAllPosts($this->options['type']);
+	public function getUrlHierarchy($posts, $childId){
 		foreach($posts as $post){
 			$postsKeysId[$post['id']] = $post;
 		}
@@ -332,16 +370,26 @@ class Post extends Model{
 	
 	public function editTermForm($id){
 		$data['term'] = $this->db->getRow('Select t.*, tt.* from terms as t, term_taxonomy as tt where t.id = tt.term_id and t.id = ?i', $id);
-		$terms = $this->getAllTerms(array_keys($this->options['taxonomy']));
-		$itemsToParents = $this->hierarchyItems($terms, $data['term']['id']);
-		$data['listForParents'] = '<select style="width: 100%;"name="parent"><option value="0">(нет родительской)</option>' . $this->hierarchy($itemsToParents, 'select', $data['term']['parent']) . '</select>';
+		$itemsToParents = $this->hierarchyItems($this->getAllTerms($data['term']['taxonomy']), $data['term']['id']);
+		$data['listForParents'] = $this->htmlSelectForParentHierarchy($this->hierarchy($itemsToParents, 'select', $data['term']['parent']));
+		
 		return $data;
 		
 	}
 	
-	public function edit($title, $url, $content, $parent, $modified, $id){//var_dump($_POST);exit;
+	public function edit($title, $url, $content, $parent, $modified, $template, $extraFields, $id){//var_dump($_POST);exit;
 		// Обновлям запись
 		$this->db->query('UPDATE posts SET title = ?s, url = ?s, content = ?s, parent = ?i, modified = ?s where id = ?i', $title, $url, $content, $parent, $modified, $id);
+		
+		$templateKey = '_jmp_post_template';
+		if($postMeta = $this->db->getRow('Select id, meta_value from postmeta where post_id = ?i AND meta_key = ?s', $id, $templateKey)){
+			if($postMeta['meta_value'] != $template){
+				$this->db->query('Update postmeta SET meta_value = ?s where post_id = ?i AND meta_key = ?s', $template, $id, $templateKey);
+			}
+		}else{
+			$this->db->query('INSERT INTO postmeta (post_id, meta_key, meta_value) VALUES (?i, ?s, ?s)', $id, $templateKey, $template);
+		}
+		
 		$this->editTerms($this->request->post['id'], isset($this->request->post['terms']) ? $this->request->post['terms'] : []);
 		
 		Msg::json(1);
@@ -511,6 +559,8 @@ class Post extends Model{
 	}
 	
 	public function getAllTerms($taxonomies){
+		if(!is_array($taxonomies)) 
+			$taxonomies = [$taxonomies];
 		$taxonomies = implode("','", $taxonomies);
 		if(!isset($this->allTerms[$taxonomies])){
 			$this->allTerms[$taxonomies] = $this->db->getAll('Select t.*, tt.* from terms as t, term_taxonomy as tt where t.id = tt.term_taxonomy_id and tt.taxonomy IN(\''.$taxonomies.'\')');

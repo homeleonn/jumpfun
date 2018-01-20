@@ -37,12 +37,12 @@ class PostController extends AdminController{
 		return $this->model->addForm();
 	}
 	
-	public function actionAdd(){//var_dump($this->model->editTerms(0, $this->model->checkTermExists($this->request->post['terms'])), $this->request->post);exit;
+	public function actionAdd(){//var_dump($this->request->post);exit;
 		if($this->request->post['title'] == '') Msg::json('Заголовок не должен быть пуст!', 0);
-		list($title, $url, $content, $parent, $modified, $terms) = $this->postProcessing($this->request->post['title']);
+		list($title, $url, $content, $parent, $modified, $template, $extraFields, $terms) = $this->postProcessing($this->request->post['title']);
 		$url 		= $this->model->checkUrl($url, $parent);
 		$posType	= $this->options['type'];
-		$data = $this->model->add($title, $url, $content, $parent, $posType, $terms);
+		$data = $this->model->add($title, $url, $content, $parent, $posType, $template, $extraFields, $terms);
 		return $data;
 	}	
 	
@@ -56,10 +56,10 @@ class PostController extends AdminController{
 	public function actionEdit(){
 		if($this->request->post['title'] == '') exit;
 		$id = (int)$this->request->post['id'];
-		list($title, $url, $content, $parent, $modified) = $this->postProcessing($this->request->post['url']);
+		list($title, $url, $content, $parent, $modified, $template, $extraFields) = $this->postProcessing($this->request->post['url']);
 		if($this->model->checkUrlExists($url, $parent, $id)) Msg::json('Введенный адрес уже существует!', 0);
 		
-		return $this->model->edit($title, $url, $content, $parent, $modified, $id);
+		return $this->model->edit($title, $url, $content, $parent, $modified, $template, $extraFields, $id);
 	}
 	
 	private function postProcessing($urlStringForTranslit){
@@ -71,8 +71,10 @@ class PostController extends AdminController{
 		$url 		= Transliteration::run($urlStringForTranslit);
 		$content 	= $this->textSanitize($this->request->post['content']); 
 		$modified 	= MyDate::getDateTime();
+		$template	= isset($this->request->post['template']) ? $this->request->post['template'] : 0;
 		$terms 		= isset($this->request->post['terms'])  ? $this->request->post['terms'] : [];
-		return [$title, $url, $content, $parent, $modified, $terms];
+		
+		return [$title, $url, $content, $parent, $modified, $template, $this->request->post['extra_fileds'], $terms];
 	}
 	
 	public function actionDel($id, $type){

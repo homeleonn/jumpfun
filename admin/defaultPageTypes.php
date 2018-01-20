@@ -70,7 +70,7 @@ function apply(){
 		}
 	}
 	
-	return $args[0];
+	return isset($args[0]) ? $args[0] : false;
 }
 
 function doAction(){
@@ -125,4 +125,30 @@ function getTermsByTaxonomies(){
 //var_dump(getTermsByPostId(70));
 function jmpHead(){
 	doAction('jhead');
+}
+
+addAction('add_extra_rows', 'my_add_extra_rows');
+function my_add_extra_rows($postType){
+	if($postType != 'post') return;
+}
+
+
+
+function getExtraField($index, $name, $value){
+	?>
+	<div class="field mtop10">
+		<div class="row">
+			<div class="col-md-4">
+				<input type="text" class="extra_name w100" value="<?=$name?>">
+				<div class="mtop10">
+					<input class="extra_field_delete" data-extra_index="<?=$index?>" type="button" value="Удалить">
+					<input class="extra_field_update" data-extra_index="<?=$index?>" type="button" value="Обновить">
+				</div>
+			</div>
+			<div class="col-md-8">
+				<textarea name="extra_fileds[<?=$name?>]" class="w100" rows="2"><?=$value?></textarea>
+			</div>
+		</div>
+	</div>
+	<?php
 }

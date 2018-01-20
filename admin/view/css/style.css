@@ -137,6 +137,14 @@ div.sep {
 	font-size: 18px;
 }
 
+.mtop10{
+	margin-top: 10px;
+}
+
+.w100{
+	width: 100%;
+}
+
 .product:after,
 .product #desc:after,
 .clearfix:after,

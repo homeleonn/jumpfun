@@ -44,8 +44,11 @@ class View
 				$this->senderModel = $__model;
 				unset($__model);
 			}
-			if(isset($title))
-				$contentFile = $this->path . 'page-' . $title . '.php';	
+			if(isset($_jmp_post_template) && $_jmp_post_template){
+				$contentFile = $_jmp_post_template;
+			}elseif(isset($title))
+				$contentFile = 'page-' . $title . '.php';	
+			$contentFile = $this->path . $contentFile;	
 		}else{
 			$options = $this->di->get('config')->getCurrentPageOptions();
 			if(!file_exists($contentFile)){

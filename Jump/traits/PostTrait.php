@@ -18,4 +18,13 @@ trait PostTrait{
 	public function setOptions($options){
 		$this->options = $options;
 	}
+	
+	public function mergePostMeta($post){
+		$meta = $this->db->getAll('Select meta_key, meta_value from postmeta where post_id = ?i', $post['id']);
+		if(!$meta) return $post;
+		foreach($meta as $m){
+			$post['meta_data'][$m['meta_key']] = $m['meta_value'];
+		}
+		return $post;
+	}
 }

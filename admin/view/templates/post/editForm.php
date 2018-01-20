@@ -1,5 +1,5 @@
 <?php  
-
+//var_dump(get_defined_vars());exit;
 ?>
 <a href="<?=SITE_URL?>admin/<?=$options['type']?>/add/" class="action-tool plus" title="Добавить"><span class="icon-plus">Добавить новую</span></a>
 <h2><?=$options['edit']?></h2>
@@ -23,6 +23,10 @@
 			<div>Текст</div>
 			<div id="editors"><textarea class="visual" name="content" id="content" value="1" style="width: 100%;height: 600px;display: none; visibility:hidden;"><?=htmlspecialchars($data['content'])?></textarea></div>
 		</div>
+		
+		
+		<?php include $this->getFile('sidebar/extraFields');?>
+		
 	</div>
 	<div id="sidebar-right">
 		<br><br>Добавлено: <?=$data['created']?>
@@ -32,5 +36,6 @@
 		<?php include $this->getFile('sidebar/categoriesAndTags');?>
 		<?php include $this->getFile('sidebar/listForParents');?>
 	</div>
-	
-</FORM>
+</form>
+
+<?php include $this->getFile('sidebar/extra-field-prototype');?>

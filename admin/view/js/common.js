@@ -67,3 +67,89 @@ function drawLoadingWait($el, del){
 	if(del) $el.children('.'+loadClass).remove();
 	else	$el.append('<div class="'+loadClass+'"></div>');
 }
+
+
+function ExtraFiled(){
+	this.state = 0;
+	this.counter = 0;
+	this.setNew = function(e){
+		e.preventDefault();
+		if(!this.state){
+			$('#select_extra_name').addClass('none');
+			$('#input_extra_name').removeClass('none');
+			$('#init_new_extra').text('Отмена');
+			this.state = !this.state;
+		}else{
+			extraFiled.cancel();
+		}
+	}
+	
+	this.set = function(){
+		if($('#select_extra_name')[0].selectedIndex == 1){
+			alert('Выберите имя поля или введите новое');return;
+		}else{
+			var nameEl 	= $('#input_extra_name');
+			var valueEl = $('#extra_value_editor');
+			var name 	= nameEl.val();
+			var value 	= valueEl.val();
+			if(name == ''){
+				alert('Выберите имя поля или введите новое');return;
+			}else if(value == ''){
+				alert('Введите значение');return;
+			}else if($('[name="'+name+'"]').length){
+				alert('Поле с данным именем уже существует');return;
+			}else if(name[0] == '_'){
+				alert('Недопустимое имя поля! Не может начинаться с "_"');return;
+			}
+		}
+		
+		if(!$('.new_extra_fields > .field').length){
+			$('.fields_caption').removeClass('none');
+		}
+		
+		
+		var field = $('.field.prototype').clone();
+		field.find('.extra_name').val(name);
+		field.find('textarea').val(value).attr({'name' : 'extra_fileds['+name+']'});
+		field.find('.extra_field_delete, .extra_field_update').attr({'data-extra_index' : extraFiled.counter});
+		nameEl.val(''); valueEl.val('');
+		$('.new_extra_fields').append(field.removeClass('prototype none'));
+		extraFiled.counter++;
+		extraFiled.cancel();
+	}
+	
+	
+	
+	this.cancel = function(){
+		$('#select_extra_name').removeClass('none');
+		$('#input_extra_name').addClass('none');
+		$('#init_new_extra').text('Введите новое');
+		this.state = !this.state;
+	}
+	
+	$(function(){
+		$('#add_new_extra_name').click(extraFiled.set);
+		$('#init_new_extra').click(function(e){
+			extraFiled.setNew(e);
+		});
+		
+		$('.new_extra_fields').click(function(e){console.log();
+			var className = '.' + e.target.className;
+			var field = $('[data-extra_index="'+$(e.target).data('extra_index')+'"]').closest('.field');
+			switch(className){
+				case '.extra_field_delete':{
+					field.remove();
+					if(!$('.new_extra_fields > .field').length){
+						$('.fields_caption').addClass('none');
+					}
+				}break;
+				case '.extra_field_update':{
+					field.find('textarea').attr('name', 'extra_fileds['+field.find('.extra_name').val()+']');
+				}break;
+			}
+		});
+	}); 
+}
+
+extraFiled = new ExtraFiled();
+
