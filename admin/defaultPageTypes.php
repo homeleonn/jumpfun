@@ -152,3 +152,12 @@ function getExtraField($index, $name, $value){
 	</div>
 	<?php
 }
+
+
+addAction('admin_post_options_form', 'my_admin_post_options_form');
+function my_admin_post_options_form(){
+	echo '<div>
+		<label style="display: inline-block; margin-right: 10px;"><input type="checkbox" onchange="if(!this.checked) $(\'.extra-fields\').addClass(\'none\'); else $(\'.extra-fields\').removeClass(\'none\')"> Произвольные поля</label>
+		<label style="display: inline-block; margin-right: 10px;"><input type="checkbox" checked onchange="if(!this.checked) $(\'#post-properties\').addClass(\'none\'); else $(\'#post-properties\').removeClass(\'none\')"> Свойстыва страницы</label>
+	</div>';
+}

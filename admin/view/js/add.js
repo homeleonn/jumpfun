@@ -112,7 +112,6 @@ function item(act, data){
 	
 	if(typeof(tinymce) != "undefined" && data.elements['content']/*data.type != 'page' && data.type != 'news'*/&& $('textarea#simple-editor')) 
 		data.elements['content'].value = $('#editors span.active').attr('id') == 'visual' ? tinymce.get('content').getContent() : $('textarea#simple-editor').val();
-	console.log(act, data);
 	if((valid = checkData(act, data)) !== true){
 		getMsg({text:valid, eType:'err', el:self, delay: 5});
 		return false;

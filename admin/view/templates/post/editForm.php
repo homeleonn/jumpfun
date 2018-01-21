@@ -1,6 +1,7 @@
 <?php  
 //var_dump(get_defined_vars());exit;
 ?>
+<?=doAction('admin_post_options_form');?>
 <a href="<?=SITE_URL?>admin/<?=$options['type']?>/add/" class="action-tool plus" title="Добавить"><span class="icon-plus">Добавить новую</span></a>
 <h2><?=$options['edit']?></h2>
 <form method="POST" id="edit-<?=$options['type']?>" class="post-from-admin" name="" autocomplete="off">

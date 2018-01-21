@@ -53,7 +53,7 @@ class PostController extends AdminController{
 		return $data;
 	}
 	
-	public function actionEdit(){
+	public function actionEdit(){//var_dump($this->request->post);//exit;
 		if($this->request->post['title'] == '') exit;
 		$id = (int)$this->request->post['id'];
 		list($title, $url, $content, $parent, $modified, $template, $extraFields) = $this->postProcessing($this->request->post['url']);
@@ -73,8 +73,9 @@ class PostController extends AdminController{
 		$modified 	= MyDate::getDateTime();
 		$template	= isset($this->request->post['template']) ? $this->request->post['template'] : 0;
 		$terms 		= isset($this->request->post['terms'])  ? $this->request->post['terms'] : [];
+		$extra_fileds = isset($this->request->post['extra_fileds']) ? $this->request->post['extra_fileds'] : [];
 		
-		return [$title, $url, $content, $parent, $modified, $template, $this->request->post['extra_fileds'], $terms];
+		return [$title, $url, $content, $parent, $modified, $template, $extra_fileds, $terms];
 	}
 	
 	public function actionDel($id, $type){

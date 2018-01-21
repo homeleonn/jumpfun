@@ -22,9 +22,15 @@ trait PostTrait{
 	public function mergePostMeta($post){
 		$meta = $this->db->getAll('Select meta_key, meta_value from postmeta where post_id = ?i', $post['id']);
 		if(!$meta) return $post;
-		foreach($meta as $m){
-			$post['meta_data'][$m['meta_key']] = $m['meta_value'];
-		}
+		$post['meta_data'] = $this->metaFormatting($meta);
 		return $post;
+	}
+	
+	public function metaFormatting($meta){
+		$newMeta = [];
+		foreach($meta as $m){
+			$newMeta[$m['meta_key']] = $m['meta_value'];
+		}
+		return $newMeta;
 	}
 }

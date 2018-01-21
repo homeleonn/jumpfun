@@ -96,7 +96,7 @@ function ExtraFiled(){
 				alert('Выберите имя поля или введите новое');return;
 			}else if(value == ''){
 				alert('Введите значение');return;
-			}else if($('[name="'+name+'"]').length){
+			}else if($('[name="'+name+'"]').length || $('[name="extra_fileds['+name+']"]').length){
 				alert('Поле с данным именем уже существует');return;
 			}else if(name[0] == '_'){
 				alert('Недопустимое имя поля! Не может начинаться с "_"');return;
@@ -133,7 +133,7 @@ function ExtraFiled(){
 			extraFiled.setNew(e);
 		});
 		
-		$('.new_extra_fields').click(function(e){console.log();
+		$('.new_extra_fields').click(function(e){
 			var className = '.' + e.target.className;
 			var field = $('[data-extra_index="'+$(e.target).data('extra_index')+'"]').closest('.field');
 			switch(className){

@@ -1,4 +1,4 @@
-<div class="extra-fields">
+<div class="extra-fields none">
 	<div class="title">Произвольные поля</div>
 	<div class="content">
 		<div class="new_extra_fields">

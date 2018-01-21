@@ -257,9 +257,8 @@ class Post extends Model{
 		
 		// build post extra fields
 		if(!empty($extraFields)){
+			$extraFields = clearArrayKeysAndValues($extraFields);
 			foreach($extraFields as $k => $f){
-				$key = $this->db->escapeString(htmlspecialchars($k));
-				$value = $this->db->escapeString(htmlspecialchars($f));
 				$meta .= "({$postId}, {$key}, {$value}),";
 			}
 		}
@@ -272,6 +271,16 @@ class Post extends Model{
 		$this->editTerms($postId, $terms);
 		
 		Msg::json(array('id' => $postId), 10);
+	}
+	
+	private function clearArrayKeysAndValues($array){
+		$clearArray = [];
+		foreach($array as $k => $v){
+			$k = $this->db->escapeString(htmlspecialchars($k));
+			$v = $this->db->escapeString(htmlspecialchars($v));
+			$clearArray[$k] = $v;
+		}
+		return $clearArray;
 	}
 	
 	
@@ -381,18 +390,64 @@ class Post extends Model{
 		// Обновлям запись
 		$this->db->query('UPDATE posts SET title = ?s, url = ?s, content = ?s, parent = ?i, modified = ?s where id = ?i', $title, $url, $content, $parent, $modified, $id);
 		
-		$templateKey = '_jmp_post_template';
-		if($postMeta = $this->db->getRow('Select id, meta_value from postmeta where post_id = ?i AND meta_key = ?s', $id, $templateKey)){
-			if($postMeta['meta_value'] != $template){
-				$this->db->query('Update postmeta SET meta_value = ?s where post_id = ?i AND meta_key = ?s', $template, $id, $templateKey);
-			}
-		}else{
-			$this->db->query('INSERT INTO postmeta (post_id, meta_key, meta_value) VALUES (?i, ?s, ?s)', $id, $templateKey, $template);
-		}
+		if($template) 
+			$extraFields['_jmp_post_template'] = $template;
+		
+		$this->updateMeta($id, $extraFields);
 		
 		$this->editTerms($this->request->post['id'], isset($this->request->post['terms']) ? $this->request->post['terms'] : []);
 		
 		Msg::json(1);
+	}
+	
+	private function updateMeta($postId, $extraFields){
+		$postMeta = $this->db->getAll('Select meta_key, meta_value from postmeta where post_id = ?i', $postId);
+		if($postMeta){
+			$postMeta = $this->metaFormatting($postMeta);
+		}
+		//var_dump($postMeta, $extraFields);exit;
+		
+		if(!$extraFields){
+			if($postMeta){
+				$this->db->query('Delete from postmeta where post_id = ?i', $postId);
+			}
+		}else{
+			$extraFields = $this->clearArrayKeysAndValues($extraFields);
+			
+			if($postMeta){
+				// Обновить существующие, если пришли данные с такими же ключами, но другими значениями
+				$existingPostMetaKeys = array_keys($postMeta);
+				$cond_s = '';
+				foreach($extraFields as $k => $v){
+					if(in_array($k, $existingPostMetaKeys)){
+						if($v != $postMeta[$k]){
+							$cond_s .= "WHEN id = {$postId} AND meta_key = {$k} THEN {$v} ";
+							$updateKeys[] = $k;
+						}
+						unset($extraFields[$k], $postMeta[$k]);
+					}
+				}
+				
+				if($cond_s){
+					$this->db->query("Update postmeta SET meta_value = CASE {$cond_s} END WHERE post_id = {$postId} AND meta_key IN('".implode("','", $updateKeys)."')");
+				}
+				
+				// Удалить существующие, ключи которых не пришли при редактировании
+				if(!empty($postMeta)){
+					$this->db->query('Delete from postmeta where post_id = ?i AND meta_key IN(\''.implode("','", array_keys($postMeta)).'\')', $postId);
+				}
+			}
+			
+			// Вставить пришедшие, ключи которых не были найдены в существующих
+			if(!empty($extraFields)){
+				$insert = '';
+				foreach($extraFields as $k => $v){
+					$insert .= "({$postId}, {$k}, {$v}),";
+				}
+				$this->db->query('INSERT INTO postmeta (post_id, meta_key, meta_value) VALUES ' . substr($insert, 0, -1));
+			}
+		}
+		//echo(json_encode(DI::getD('db')->getStats()));exit;
 	}
 	
 	// Добавляем новые термины или удаляем ненужные

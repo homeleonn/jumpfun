@@ -3,6 +3,7 @@
 //var_dump(get_defined_vars());exit;
 //var_dump($options, $data);exit;
 ?>
+<?=doAction('admin_post_options_form');?>
 <h2><?=$options['add']?></h2>
 <form method="POST" id="add-<?=$options['type']?>" class="post-from-admin" name="" autocomplete="off">
 	<div id="center">
