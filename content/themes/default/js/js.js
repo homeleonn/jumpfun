@@ -365,3 +365,108 @@ function Slider(element){
 		}
 	}
 		
+var shower = new Shower();
+
+function Shower(cl)
+{
+	if(!$('#shower').length){
+		$('body').after('<div id="shower"><span></span><div id="img"><img src="" alt="Просмотр изображения"><div  id="showerTools"> <div></div><div></div> </div> <div id="counter">0 / 0</div> <div id="close">x</div></div></div>');
+	}
+	var cl = cl || '.shower';
+	var $imgs = $('img'+cl);
+	var $wrapper = $('#shower');
+	var $imgWrap = $('#shower > #img');
+	var $img = $imgWrap.children('img');
+	var self = this;
+	
+	this.index = 0;
+	
+	$imgWrap.children('#counter').html((this.index+1)+' / '+$imgs.length);
+	
+	this.get = function(img){
+		var newSrc = $(img).attr('data-large-img') ? 'data-large-img' : 'src';
+		$img.attr({'src':$(img).attr(newSrc)});
+		
+		if(!$wrapper.hasClass('block')){
+			$wrapper.addClass('block');
+			$wrapper.animate({'opacity': 1}, 500);
+		}
+		if($imgWrap.height() > $(window).height() - 30) {
+			$img.css('max-height', $(window).height() - 150);
+			$img.css('min-width', 'auto');
+		}
+		$imgWrap.css({
+			'margin-left': ((-$imgWrap.width()/2-20)+'px'), 
+			'margin-top': (($imgWrap.height() > $(window).height() ? 0 : 20)+'px'), 
+			'visibility':'visible'
+		});
+		
+		$img.animate({'opacity': 1}, 300);
+	}
+	
+	this.hide = function(){
+		self.index = 0;
+		self.setCounter();
+		$wrapper.animate({'opacity': 0}, 500, function(){
+			$wrapper.removeClass('block');
+			$imgWrap.css({'visibility':'hidden'});
+		})
+	}
+	
+	this.getIndex = function(src){
+		var index = 0;
+		$imgs.each(function(i, img){
+			if($(img).attr('src') == src){
+				index = i;
+				return false;
+			}
+		});
+		
+		return index;
+	}
+	
+	this.setCounter = function(){
+		$imgWrap.children('#counter').html((self.index+1)+' / '+$imgs.length);
+	}
+	$(function(){
+		$('body').on('click', 'img'+cl, function(){
+			self.index = self.getIndex($(this).attr('src'));
+			self.setCounter();
+			self.get(this);
+		});
+		// $imgs.click(function(){
+			// self.index = self.getIndex($(this).attr('src'));
+			// self.setCounter();
+			// self.get(this);
+		// });
+		
+		$('#shower #close, #shower > span').click(function(){
+			self.hide();
+		});
+		
+		$('#showerTools div:first').click(function(){
+			
+			self.index--;
+			if(self.index < 0){
+				self.hide();
+				return false;
+			}else
+				$img.animate({'opacity': 0}, 300, function(){self.get($imgs[self.index])});
+				
+			
+			self.setCounter();
+		});
+		
+		$('#showerTools div:last').click(function(){
+			self.index++;
+			if(self.index >= $imgs.length){
+				self.index = 0;
+				self.hide();
+				return false;
+			}else
+				$img.animate({'opacity': 0}, 300, function(){self.get($imgs[self.index])});
+			
+			self.setCounter();
+		});
+	});
+}

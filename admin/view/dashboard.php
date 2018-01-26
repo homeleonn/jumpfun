@@ -3,6 +3,7 @@
 function getSections($type, $pageTypes){
 	if($type == 'production'){
 		$sections = ['Главная панель||gauge' => ''];
+		$sections['Медиафайлы||picture'] = 'media';
 		if($pageTypes){
 			foreach($pageTypes as $pt){
 				$key = $pt['title'] . '||' . $pt['icon'];

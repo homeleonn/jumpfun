@@ -159,5 +159,33 @@ function my_admin_post_options_form(){
 	echo '<div>
 		<label style="display: inline-block; margin-right: 10px;"><input type="checkbox" onchange="if(!this.checked) $(\'.extra-fields\').addClass(\'none\'); else $(\'.extra-fields\').removeClass(\'none\')"> Произвольные поля</label>
 		<label style="display: inline-block; margin-right: 10px;"><input type="checkbox" checked onchange="if(!this.checked) $(\'#post-properties\').addClass(\'none\'); else $(\'#post-properties\').removeClass(\'none\')"> Свойстыва страницы</label>
+		<label style="display: inline-block; margin-right: 10px;"><input type="checkbox" checked onchange="if(!this.checked) $(\'#post-images\').addClass(\'none\'); else $(\'#post-images\').removeClass(\'none\')">Изображение страницы</label>
 	</div>';
+}
+
+
+function addPostImgForm($img = false){
+	$src = $id = $none = $del = '';
+	if($img){
+		$src = UPLOADS.$img['src'];
+		$id  = $img['id'];
+	}else{
+		$none  = 'none';
+		$del = 'none';
+	}
+	?>
+	<div id="post-images" class="side-block">
+		<div class="block-title">Изображение страницы</div>
+		<div class="block-content">
+			<span class="icon-plus" id="add-post-img"></span>
+			<span class="icon-cancel red cancel <?=$del?>"></span>
+			<div id="post-img-container" class="<?=$none?>"><img src="<?=$src?>" class="shower"></div>
+			<input class="none-impt" type="hidden" name="_jmp_post_img" value="<?=$id?>">
+		</div>
+	</div>
+	<div id="alpha-back" class="none">
+		<div id="media-modal"></div>
+	</div>
+	
+	<?php
 }

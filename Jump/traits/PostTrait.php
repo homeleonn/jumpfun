@@ -19,12 +19,20 @@ trait PostTrait{
 		$this->options = $options;
 	}
 	
-	public function mergePostMeta($post){
+	public function mergePostMeta($post, $mod = false){
 		$meta = $this->db->getAll('Select meta_key, meta_value from postmeta where post_id = ?i', $post['id']);
 		if(!$meta) return $post;
-		$post['meta_data'] = $this->metaFormatting($meta);
+		foreach($meta as $m){
+			if($mod && $m['meta_key'] == '_jmp_post_img'){
+				$m['meta_value'] = UPLOADS . $this->db->getOne('select src from media where id = ' . $m['meta_value']);
+			}
+			$post[$m['meta_key']] = $m['meta_value'];
+			if(mb_substr($m['meta_key'], 0, 1) == '_') continue;
+			$post['meta_data'][$m['meta_key']] = $m['meta_value'];
+		}
 		return $post;
 	}
+	
 	
 	public function metaFormatting($meta){
 		$newMeta = [];

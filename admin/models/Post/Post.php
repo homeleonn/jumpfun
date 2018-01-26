@@ -85,7 +85,7 @@ class Post extends Model{
 				$templateList .=  "<option value=\"{$templateFile}\"{$selected}>{$matches[1]}</option>";
 			}
 		}
-		return !$templateList ? false : '<select style="width: 100%;" name="template"><option value="0">(Базовый)</option>' . $templateList . '</select>';
+		return !$templateList ? false : '<select style="width: 100%;" name="_jmp_post_template"><option value="0">(Базовый)</option>' . $templateList . '</select>';
 	}
 	
 	/**
@@ -244,22 +244,17 @@ class Post extends Model{
 		return $this->addTermHelper($name, $term, $whisper, $slug, $description, $parent );
 	}
 	
-	public function add($title, $url, $content, $parent, $posType, $template, $extraFields, $terms){
+	public function add($title, $url, $content, $parent, $posType, $extraFields){
 		$this->db->query('INSERT INTO posts (title, url, content, parent, post_type) VALUES (?s, ?s, ?s, ?i, ?s)', $title, $url, $content, $parent, $posType);
 		
 		$postId = $this->db->insertId();
 		
-		$meta = '';
-		// build post template
-		if($template){
-			$meta .= "({$postId}, '_jmp_post_template', '{$template}'),";
-		}
-		
 		// build post extra fields
+		$meta = '';
 		if(!empty($extraFields)){
-			$extraFields = clearArrayKeysAndValues($extraFields);
+			$extraFields = $this->clearArrayKeysAndValues($extraFields);
 			foreach($extraFields as $k => $f){
-				$meta .= "({$postId}, {$key}, {$value}),";
+				$meta .= "({$postId}, {$k}, {$f}),";
 			}
 		}
 		
@@ -268,7 +263,7 @@ class Post extends Model{
 			$this->db->query('INSERT INTO postmeta (post_id, meta_key, meta_value) VALUES ' . substr($meta, 0, -1));
 		
 		// Добавляем новые термины
-		$this->editTerms($postId, $terms);
+		$this->editTerms($postId, isset($this->request->post['terms']) ? $this->request->post['terms'] : []);
 		
 		Msg::json(array('id' => $postId), 10);
 	}
@@ -386,21 +381,19 @@ class Post extends Model{
 		
 	}
 	
-	public function edit($title, $url, $content, $parent, $modified, $template, $extraFields, $id){//var_dump($_POST);exit;
-		// Обновлям запись
+	// Редактируем 
+	public function edit($title, $url, $content, $parent, $modified, $id, $extraFields){//var_dump($_POST,  func_get_args());exit;
+		// запись
 		$this->db->query('UPDATE posts SET title = ?s, url = ?s, content = ?s, parent = ?i, modified = ?s where id = ?i', $title, $url, $content, $parent, $modified, $id);
-		
-		if($template) 
-			$extraFields['_jmp_post_template'] = $template;
-		
-		$this->updateMeta($id, $extraFields);
-		
+		// метаданные
+		$this->editMeta($id, $extraFields);
+		// термины
 		$this->editTerms($this->request->post['id'], isset($this->request->post['terms']) ? $this->request->post['terms'] : []);
 		
-		Msg::json(1);
+		return true;
 	}
 	
-	private function updateMeta($postId, $extraFields){
+	private function editMeta($postId, $extraFields){
 		$postMeta = $this->db->getAll('Select meta_key, meta_value from postmeta where post_id = ?i', $postId);
 		if($postMeta){
 			$postMeta = $this->metaFormatting($postMeta);
@@ -447,13 +440,16 @@ class Post extends Model{
 				$this->db->query('INSERT INTO postmeta (post_id, meta_key, meta_value) VALUES ' . substr($insert, 0, -1));
 			}
 		}
-		//echo(json_encode(DI::getD('db')->getStats()));exit;
 	}
 	
 	// Добавляем новые термины или удаляем ненужные
 	public function editTerms($postId, $terms){
 		// -Безопасность- Проверим пришедшие термины на валидность. Невалидные отбросим.
-		if(empty($terms)) return;
+		// Удалить все
+		if(empty($terms)){
+			$this->db->query('Delete from term_relationships where object_id = ?i', $postId);
+			return;
+		}
 		$terms = $this->checkTermExists($terms);
 		
 		// Проверяем термины и пишем или удаляем

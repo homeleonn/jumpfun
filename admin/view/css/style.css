@@ -93,8 +93,16 @@
 	display: block !important;
 }
 
+.bl-nl {
+	display: inline-block;
+}
+
 .none{
 	display: none;
+}
+
+.none-impt{
+	display: none !important;
 }
 
 .inline{
@@ -148,7 +156,10 @@ div.sep {
 .product:after,
 .product #desc:after,
 .clearfix:after,
-div.sep:after {
+.media-thumbs:after,
+div.sep:after,
+.clear
+{
 	content: " ";
 	display: table;
 	clear: both;
@@ -178,7 +189,8 @@ div.sep:after {
 	text-align: center;
 	border: 1px #00ac00 solid;
 	border-radius: 4px;
-	min-width: 250px;
+	min-width: 150px;
+	max-width: 250px;
 	background: transparent;
 	cursor: pointer;
 	transition: .5s;
@@ -411,6 +423,7 @@ header #icon-menu{
 	width: 250px;
 	float: left;
 	position: fixed;
+	margin-right: 10px;
 }
 
 #menu a{

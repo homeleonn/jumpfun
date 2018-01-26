@@ -18,7 +18,7 @@ spl_autoload_register(function($class){//var_dump($class);
 	
 	if(!file_exists($classFile)){
 		$backtrace = debug_backtrace();
-		throw new Exception("Class '{$class}' is not found in {$backtrace[1]['file']} on line {$backtrace[1]['line']}. Exception ");
+		throw new Exception("Class '{$class}' is not found in {$backtrace[2]['file']} on line {$backtrace[2]['line']}. Exception ");
 	}else{
 		require_once $classFile;
 	}

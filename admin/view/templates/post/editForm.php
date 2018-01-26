@@ -4,8 +4,8 @@
 <?=doAction('admin_post_options_form');?>
 <a href="<?=SITE_URL?>admin/<?=$options['type']?>/add/" class="action-tool plus" title="Добавить"><span class="icon-plus">Добавить новую</span></a>
 <h2><?=$options['edit']?></h2>
-<form method="POST" id="edit-<?=$options['type']?>" class="post-from-admin" name="" autocomplete="off">
-	<div id="center">
+<form method="POST" id="edit-<?=$options['type']?>" class="post-from-admin" name="" autocomplete="off" enctype="multipart/form-data">
+	<div id="center" class="col-md-8">
 		<input type="hidden" name="id" value="<?=$data['id']?>">
 		<input type="hidden" name="url" value="<?=$data['url']?>">
 		<div class="block1">
@@ -29,13 +29,14 @@
 		<?php include $this->getFile('sidebar/extraFields');?>
 		
 	</div>
-	<div id="sidebar-right">
+	<div id="sidebar-right" class="col-md-4">
 		<br><br>Добавлено: <?=$data['created']?>
 		<br>Последнее редактирование: <?=$data['modified']?>
 		<br><br><input type="button" id="item-factory" value="Редактировать">
 		
 		<?php include $this->getFile('sidebar/categoriesAndTags');?>
 		<?php include $this->getFile('sidebar/listForParents');?>
+		<?php addPostImgForm(isset($data['_jmp_post_img']) ? $data['_jmp_post_img'] : false);?>
 	</div>
 </form>
 

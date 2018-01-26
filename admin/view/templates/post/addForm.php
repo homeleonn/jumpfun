@@ -5,7 +5,7 @@
 ?>
 <?=doAction('admin_post_options_form');?>
 <h2><?=$options['add']?></h2>
-<form method="POST" id="add-<?=$options['type']?>" class="post-from-admin" name="" autocomplete="off">
+<form method="POST" id="add-<?=$options['type']?>" class="post-from-admin" name="" autocomplete="off" enctype="multipart/form-data">
 	<div id="center">
 		<input type="hidden" name="id">
 		<div class="block1">
@@ -28,6 +28,7 @@
 
 		<?php include $this->getFile('sidebar/categoriesAndTags');?>
 		<?php include $this->getFile('sidebar/listForParents');?>
+		<?php addPostImgForm();?>
 	</div>
 	
 	<div class="sep"></div>

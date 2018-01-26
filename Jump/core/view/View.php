@@ -26,7 +26,7 @@ class View
         $this->theme = $theme;
     }
 
-    public function render($template, $data = []){//var_dump(get_defined_vars());exit;
+    public function render($template, $data = [], $withBlocks = true){//var_dump(get_defined_vars());exit;
 		$contentFile = '';
 		$this->path = $this->getPath($template);
 		if(ENV != 'admin'){
@@ -71,11 +71,13 @@ class View
 			//var_dump('File ' . $contentFile . ' not exists!');
 			$contentFile = $this->path . 'index.php';
 		}
-		include $this->path . 'header.php';
+		if($withBlocks)
+			include $this->path . 'header.php';
 		$this->cacheStart();
 		include $contentFile;
 		$this->cacheStop();
-		include $this->path . 'footer.php';
+		if($withBlocks)
+			include $this->path . 'footer.php';
 		$this->rendered = true;
 	}
 	

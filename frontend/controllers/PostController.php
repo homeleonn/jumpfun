@@ -58,7 +58,7 @@ class PostController extends Controller{
 		// Set post type and type options
 		$this->config->setOption('postType', $post['post_type']);
 		$this->setOptions();
-		
+		$post = $this->model->mergePostMeta($post, true);
 		// If this post is the front
 		if($post['id'] == $this->config->front_page){
 			if(SITE_URL != FULL_URL_WITHOUT_PARAMS) $this->request->location(SITE_URL, 301);
@@ -73,10 +73,7 @@ class PostController extends Controller{
 		else{
 			if(!empty($hierarchy))
 				$this->checkHierarchy($post['url'], $post['parent'], $hierarchy);
-			$post = $this->model->mergePostMeta($post);
 		}
-			
-		
 		
 		$this->addBreadCrumbs($post);
 		if(!isset($post['__model'])) $post['__model'] = $this->model;

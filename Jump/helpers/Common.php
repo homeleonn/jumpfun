@@ -176,4 +176,9 @@ class Common{
 		return $html;
 	}	
 	
+	
+	public static function prefix($string, $prefix, $delim = '.'){
+		return str_replace($delim, $prefix . $delim, $string);
+	}
+	
 }

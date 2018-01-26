@@ -13,6 +13,8 @@ use frontend\models\Post\Options;
 class PostController extends AdminController{
 	use PostControllerTrait;
 	
+	private $imgUploader;
+	
 	public function __construct($di, $model){
 		parent::__construct($di, $model);
 		$this->setOptions();
@@ -37,29 +39,36 @@ class PostController extends AdminController{
 		return $this->model->addForm();
 	}
 	
-	public function actionAdd(){//var_dump($this->request->post);exit;
+	public function actionAdd(){//var_dump($this->request->post, $_FILES);exit;
 		if($this->request->post['title'] == '') Msg::json('Заголовок не должен быть пуст!', 0);
-		list($title, $url, $content, $parent, $modified, $template, $extraFields, $terms) = $this->postProcessing($this->request->post['title']);
+		list($title, $url, $content, $parent, $modified, $extraFields) = $this->postProcessing($this->request->post['title']);
 		$url 		= $this->model->checkUrl($url, $parent);
 		$posType	= $this->options['type'];
-		$data = $this->model->add($title, $url, $content, $parent, $posType, $template, $extraFields, $terms);
-		return $data;
+		$result = $this->model->add($title, $url, $content, $parent, $posType, $extraFields);
+		return $result;
 	}	
 	
-	public function actionEditForm($id){//var_dump($id);exit;
+	public function actionEditForm($id){
 		$data = $this->model->editForm($id);
+		if(isset($data['_jmp_post_img'])){
+			$data['_jmp_post_img'] = $this->db->getRow('Select * from media where id = ?i', (int)$data['_jmp_post_img']);
+			if(!$data['_jmp_post_img']){
+				$this->db->query('Delete from postmeta where post_id = ?i and meta_key = ?s', $id, '_jmp_post_img');
+			}
+		}
+			
 		$data['__model'] = $this->model;
-		//var_dump($data, array_pop($data['selfTerms']));exit;
 		return $data;
 	}
 	
 	public function actionEdit(){//var_dump($this->request->post);//exit;
 		if($this->request->post['title'] == '') exit;
 		$id = (int)$this->request->post['id'];
-		list($title, $url, $content, $parent, $modified, $template, $extraFields) = $this->postProcessing($this->request->post['url']);
+		list($title, $url, $content, $parent, $modified, $extraFields) = $this->postProcessing($this->request->post['url']);
 		if($this->model->checkUrlExists($url, $parent, $id)) Msg::json('Введенный адрес уже существует!', 0);
 		
-		return $this->model->edit($title, $url, $content, $parent, $modified, $template, $extraFields, $id);
+		$result = $this->model->edit($title, $url, $content, $parent, $modified, $id, $extraFields);
+		Msg::json(1);
 	}
 	
 	private function postProcessing($urlStringForTranslit){
@@ -71,11 +80,22 @@ class PostController extends AdminController{
 		$url 		= Transliteration::run($urlStringForTranslit);
 		$content 	= $this->textSanitize($this->request->post['content']); 
 		$modified 	= MyDate::getDateTime();
-		$template	= isset($this->request->post['template']) ? $this->request->post['template'] : 0;
-		$terms 		= isset($this->request->post['terms'])  ? $this->request->post['terms'] : [];
-		$extra_fileds = isset($this->request->post['extra_fileds']) ? $this->request->post['extra_fileds'] : [];
+		$extraFields = isset($this->request->post['extra_fileds']) ? $this->request->post['extra_fileds'] : [];
 		
-		return [$title, $url, $content, $parent, $modified, $template, $extra_fileds, $terms];
+		
+		//fill extra fields
+		$extraFieldKeys = [
+			'_jmp_post_template', 
+			'_jmp_post_img',
+		];
+		foreach($extraFieldKeys as $key){
+			if(isset($this->request->post[$key]) && $this->request->post[$key]){
+				$extraFields[$key] = $this->request->post[$key];
+			}
+		}
+		
+		return [$title, $url, $content, $parent, $modified, $extraFields];
+		
 	}
 	
 	public function actionDel($id, $type){
