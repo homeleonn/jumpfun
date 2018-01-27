@@ -6,7 +6,7 @@ $term = $data['term'];
 ?>
 <h2><?=$options['taxonomy'][$term['taxonomy']]['edit']?></h2>
 <form method="POST" id="edit-term-<?=$options['type']?>" class="post-from-admin" name="" autocomplete="off">
-	<div id="center">
+	<div id="center" class="col-md-8">
 		<input type="hidden" name="id" value="<?=$term['id']?>">
 		<div class="block1">
 			<div>Имя</div>
@@ -23,7 +23,7 @@ $term = $data['term'];
 			<div><textarea class="nonEditor" name="description" id="description" value="" style="width: 100%;height: 600px;"><?=$term['description']?></textarea></div>
 		</div>
 	</div>
-	<div id="sidebar-right">
+	<div id="sidebar-right" class="col-md-4">
 		<br><br><input type="submit" id="item-factory" value="Редактировать">
 		<?php include $this->getFile('sidebar/listForParents');?>
 	</div>

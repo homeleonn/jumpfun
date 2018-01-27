@@ -187,7 +187,7 @@ div.sep:after,
 .btn {
 	padding: 10px;
 	text-align: center;
-	border: 1px #00ac00 solid;
+	border: 1px lightgreen solid;
 	border-radius: 4px;
 	min-width: 150px;
 	max-width: 250px;
@@ -198,7 +198,7 @@ div.sep:after,
 }
 
 .btn:hover {
-	background: #00ac00;
+	background: lightgreen;
 }
 
 .btn2 {

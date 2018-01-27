@@ -7,6 +7,7 @@
 <script src="<?=SITE_URL?>admin/view/js/upload.js"></script>
 <script src="<?=SITE_URL?>admin/view/js/add.js"></script>
 <script src="<?=SITE_URL?>admin/view/js/translit.js"></script>
+<script src="<?=SITE_URL?>admin/view/js/comments.js"></script>
 <script src="<?=SITE_URL?>Jump/components/js/tinymce/jquery.tinymce.min.js"></script>
 <script src="<?=SITE_URL?>Jump/components/js/tinymce/tinymce.min.js"></script>
 <script>

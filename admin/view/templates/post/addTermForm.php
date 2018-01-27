@@ -6,7 +6,7 @@ if(isset($_GET['msg']))
 ?>
 <h2><?=$options['taxonomy'][$data['term']]['add']?></h2>
 <form method="POST" id="add-term" class="post-from-admin" name="" autocomplete="off">
-	<div id="center">
+	<div id="center" class="col-md-8">
 		<input type="hidden" name="term" value="<?=$data['term']?>">
 		<div class="block1">
 			<div>Имя</div>
@@ -23,7 +23,7 @@ if(isset($_GET['msg']))
 			<div><textarea class="nonEditor" name="description" id="description" value="1" style="width: 100%;height: 200px;"></textarea></div>
 		</div>
 	</div>
-	<div id="sidebar-right">
+	<div id="sidebar-right" class="col-md-4">
 		<!--<input type="button" id="item-factory" value="Добавить">-->
 		<input type="submit" id="" value="Добавить">
 		<?php include $this->getFile('sidebar/listForParents');?>

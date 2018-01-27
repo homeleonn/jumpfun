@@ -6,7 +6,7 @@
 <?=doAction('admin_post_options_form');?>
 <h2><?=$options['add']?></h2>
 <form method="POST" id="add-<?=$options['type']?>" class="post-from-admin" name="" autocomplete="off" enctype="multipart/form-data">
-	<div id="center">
+	<div id="center" class="col-md-8">
 		<input type="hidden" name="id">
 		<div class="block1">
 			<div>Заголовок</div>
@@ -18,17 +18,19 @@
 		</div>
 		<?php include $this->getFile('sidebar/extraFields');?>
 		<?=doAction('add_extra_rows', $options['type']);?>
+		<?php include $this->getFile('sidebar/comments');?>
 	</div>
 	
 	<!-- Block for add post categories -->
 	<!-- Block for add post tags -->
-	<div id="sidebar-right">
+	<div id="sidebar-right" class="col-md-4">
 		<input type="button" id="item-factory" value="Добавить">
 		<input type="submit" id="" value="Добавить">
 
 		<?php include $this->getFile('sidebar/categoriesAndTags');?>
 		<?php include $this->getFile('sidebar/listForParents');?>
-		<?php addPostImgForm();?>
+		<?php include $this->getFile('sidebar/discussion');?>
+		<?php include $this->getFile('sidebar/image');?>
 	</div>
 	
 	<div class="sep"></div>

@@ -1,6 +1,6 @@
-<div class="extra-fields none">
-	<div class="title">Произвольные поля</div>
-	<div class="content">
+<div class="extra-fields none side-block">
+	<div class="block-title">Произвольные поля</div>
+	<div class="block-content">
 		<div class="new_extra_fields">
 			<div class="row fields_caption none" style="background: lightgray; padding: 8px; margin: 10px 0;">
 				<div class="col-md-4 center">Имя</div>

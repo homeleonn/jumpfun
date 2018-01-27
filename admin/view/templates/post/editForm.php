@@ -24,10 +24,8 @@
 			<div>Текст</div>
 			<div id="editors"><textarea class="visual" name="content" id="content" value="1" style="width: 100%;height: 600px;display: none; visibility:hidden;"><?=htmlspecialchars($data['content'])?></textarea></div>
 		</div>
-		
-		
 		<?php include $this->getFile('sidebar/extraFields');?>
-		
+		<?php include $this->getFile('sidebar/comments');?>
 	</div>
 	<div id="sidebar-right" class="col-md-4">
 		<br><br>Добавлено: <?=$data['created']?>
@@ -36,7 +34,8 @@
 		
 		<?php include $this->getFile('sidebar/categoriesAndTags');?>
 		<?php include $this->getFile('sidebar/listForParents');?>
-		<?php addPostImgForm(isset($data['_jmp_post_img']) ? $data['_jmp_post_img'] : false);?>
+		<?php include $this->getFile('sidebar/discussion');?>
+		<?php include $this->getFile('sidebar/image');?>
 	</div>
 </form>
 

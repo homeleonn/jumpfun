@@ -48,6 +48,9 @@ class Uploader{
 				$newSrc  = $this->destDir . $newName;
 			}while(is_file($newSrc));
 			
+			if(!is_dir($dir = dirname($newSrc))){
+				mkdir($dir, 0755, true);
+			}
 			move_uploaded_file($src, $newSrc);
 			chmod($newSrc, $rights);
 			return [

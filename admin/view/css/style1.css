@@ -405,3 +405,9 @@ table.admin td{
 	cursor: pointer;
 }
 
+/*post capture options*/
+#post-options-box > label{
+	display: inline-block; 
+	margin-right: 10px;
+}
+

@@ -68,18 +68,3 @@ class MediaController extends Controller{
 		exit;
 	}
 }
-		// post image
-		// if(isset($_FILES['_jmp_post_img'])){
-			// if(isset($this->request->post['old_img']) && $this->request->post['old_img'] == ''){
-				// $postImg = $this->db->getOne('Select meta_value where post_id = ?i and meta_name = ?s', $this->request->post['id'], '_jmp_post_img');
-				// unlink(UPLOADS_DIR . 'img/' . $postImg);
-			// }elseif(!isset($this->request->post['old_img']) || $this->request->post['old_img'] != $_FILES['_jmp_post_img']['name']){
-				// $this->imgUploader = new ImgUploader($_FILES['_jmp_post_img'], UPLOADS_DIR . 'img/');
-				// if(($imgName = $this->imgUploader->prepareImg()) === false){
-					// exit('Ошибка при загрузке изображения!');
-				// }elseif($imgName === true){
-					// $this->imgUploader = NULL;
-				// }else
-					// $extraFields['_jmp_post_img'] = $imgName;
-			// }
-		// }

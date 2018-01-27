@@ -156,13 +156,20 @@ function getExtraField($index, $name, $value){
 
 addAction('admin_post_options_form', 'my_admin_post_options_form');
 function my_admin_post_options_form(){
-	echo '<div>
-		<label style="display: inline-block; margin-right: 10px;"><input type="checkbox" onchange="if(!this.checked) $(\'.extra-fields\').addClass(\'none\'); else $(\'.extra-fields\').removeClass(\'none\')"> Произвольные поля</label>
-		<label style="display: inline-block; margin-right: 10px;"><input type="checkbox" checked onchange="if(!this.checked) $(\'#post-properties\').addClass(\'none\'); else $(\'#post-properties\').removeClass(\'none\')"> Свойстыва страницы</label>
-		<label style="display: inline-block; margin-right: 10px;"><input type="checkbox" checked onchange="if(!this.checked) $(\'#post-images\').addClass(\'none\'); else $(\'#post-images\').removeClass(\'none\')">Изображение страницы</label>
-	</div>';
+	$boxes = [
+		['for' => '#post-properties', 	'text' => 'Свойства страницы', 'checked' => 'checked',],
+		['for' => '#post-images', 		'text' => 'Изображение страницы', 'checked' => 'checked',],
+		['for' => '.extra-fields', 		'text' => 'Произвольные поля', 'checked' => '',],
+		['for' => '#post-discussion', 	'text' => 'Обсуждение', 'checked' => 'checked',],
+		['for' => '#post-comments', 	'text' => 'Комментарии', 'checked' => 'checked',],
+	];
+	
+	echo '<div id="post-options-box">';
+	foreach($boxes as $box){
+		echo '<label><input type="checkbox" data-for="',$box['for'],'" ',$box['checked'],'> ',$box['text'],'</label>', "\n";
+	}
+	echo '<div>';
 }
-
 
 function addPostImgForm($img = false){
 	$src = $id = $none = $del = '';

@@ -257,3 +257,13 @@ function Shower(cl)
 		});
 	});
 }
+
+/*post capture options*/
+
+$('#post-options-box > label > input').change(function(){
+	var forBlock = $(this).data('for');
+	if(!this.checked) 
+		$(forBlock).addClass('none'); 
+	else 
+		$(forBlock).removeClass('none')
+});

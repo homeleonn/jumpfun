@@ -41,10 +41,10 @@ class PostController extends AdminController{
 	
 	public function actionAdd(){//var_dump($this->request->post, $_FILES);exit;
 		if($this->request->post['title'] == '') Msg::json('Заголовок не должен быть пуст!', 0);
-		list($title, $url, $content, $parent, $modified, $extraFields) = $this->postProcessing($this->request->post['title']);
+		list($title, $url, $content, $parent, $modified, $commentStatus, $extraFields) = $this->postProcessing($this->request->post['title']);
 		$url 		= $this->model->checkUrl($url, $parent);
 		$posType	= $this->options['type'];
-		$result = $this->model->add($title, $url, $content, $parent, $posType, $extraFields);
+		$result = $this->model->add($title, $url, $content, $parent, $posType, $commentStatus, $extraFields);
 		return $result;
 	}	
 	
@@ -64,10 +64,10 @@ class PostController extends AdminController{
 	public function actionEdit(){//var_dump($this->request->post);//exit;
 		if($this->request->post['title'] == '') exit;
 		$id = (int)$this->request->post['id'];
-		list($title, $url, $content, $parent, $modified, $extraFields) = $this->postProcessing($this->request->post['url']);
+		list($title, $url, $content, $parent, $modified, $commentStatus, $extraFields) = $this->postProcessing($this->request->post['url']);
 		if($this->model->checkUrlExists($url, $parent, $id)) Msg::json('Введенный адрес уже существует!', 0);
 		
-		$result = $this->model->edit($title, $url, $content, $parent, $modified, $id, $extraFields);
+		$result = $this->model->edit($title, $url, $content, $parent, $modified, $id, $commentStatus, $extraFields);
 		Msg::json(1);
 	}
 	
@@ -80,6 +80,7 @@ class PostController extends AdminController{
 		$url 		= Transliteration::run($urlStringForTranslit);
 		$content 	= $this->textSanitize($this->request->post['content']); 
 		$modified 	= MyDate::getDateTime();
+		$commentStatus 	= isset($this->request->post['discussion']) ? 'open' : 'closed';
 		$extraFields = isset($this->request->post['extra_fileds']) ? $this->request->post['extra_fileds'] : [];
 		
 		
@@ -94,7 +95,7 @@ class PostController extends AdminController{
 			}
 		}
 		
-		return [$title, $url, $content, $parent, $modified, $extraFields];
+		return [$title, $url, $content, $parent, $modified, $commentStatus, $extraFields];
 		
 	}
 	
