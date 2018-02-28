@@ -26,7 +26,7 @@ class View
         $this->theme = $theme;
     }
 
-    public function render($template, $data = [], $withBlocks = true){//var_dump(get_defined_vars());exit;
+    public function render($template, $data = [], $withBlocks = true){//	d(get_defined_vars());
 		$contentFile = '';
 		$this->path = $this->getPath($template);
 		if(ENV != 'admin'){
@@ -44,33 +44,30 @@ class View
 				$this->senderModel = $__model;
 				unset($__model);
 			}
-			if(isset($_jmp_post_template) && $_jmp_post_template){
+			if(isset($_jmp_post_template) && $_jmp_post_template)
 				$contentFile = $_jmp_post_template;
-			}elseif(isset($title))
-				$contentFile = 'page-' . $title . '.php';	
+			else
+				$contentFile = 'templates/' . $template . '.php';	
+			// elseif(isset($url))
+				// $contentFile = 'page-' . $title . '.php';	
 			$contentFile = $this->path . $contentFile;	
 		}else{
 			$options = $this->di->get('config')->getCurrentPageOptions();
-			if(!file_exists($contentFile)){
+			if(!is_file($contentFile)){
 				$templateFile 	= $this->theme->template($template);
 				$contentFile = $this->path . 'templates/' . $templateFile . '.php';
 			}
 		}
 		
-		// if(!file_exists($contentFile)){
-			// $templateFile 	= $this->theme->template($template);
-			// $contentFile = $this->path . 'templates/' . $templateFile . '.php';
-		// }
-		
-		if(!file_exists($contentFile)){
+		//dd($contentFile, $template);
+		if(!is_file($contentFile)){
 			$contentFile = $this->path . $this->is() . '.php';
-			//var_dump($contentFile);
 		}
 		
-		if(!file_exists($contentFile)){
-			//var_dump('File ' . $contentFile . ' not exists!');
+		if(!is_file($contentFile)){
 			$contentFile = $this->path . 'index.php';
 		}
+		
 		if($withBlocks)
 			include $this->path . 'header.php';
 		$this->cacheStart();
@@ -87,7 +84,11 @@ class View
 	
 	public function getPath($template){
 		$this->template = explode('/', $template)[0] . '/';
-		return $this->theme->path();
+		return $this->path();
+	}
+	
+	public function path(){
+		return ROOT . (ENV == 'frontend' ? 'content/themes/default/' : 'admin/view/'); 
 	}
 	
 	public function getFile($filename){

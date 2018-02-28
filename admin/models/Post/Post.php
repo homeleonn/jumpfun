@@ -244,8 +244,8 @@ class Post extends Model{
 		return $this->addTermHelper($name, $term, $whisper, $slug, $description, $parent );
 	}
 	
-	public function add($title, $url, $content, $parent, $posType, $commentStatus, $extraFields){
-		$this->db->query('INSERT INTO posts (title, url, content, parent, post_type, comment_status) VALUES (?s, ?s, ?s, ?i, ?s)', $title, $url, $content, $parent, $posType, $commentStatus);
+	public function add($post, $extraFields){
+		$this->save($post);
 		
 		$postId = $this->db->insertId();
 		
@@ -382,15 +382,38 @@ class Post extends Model{
 	}
 	
 	// Редактируем 
-	public function edit($title, $url, $content, $parent, $modified, $id, $commentStatus, $extraFields){//var_dump($_POST,  func_get_args());exit;
+	public function edit($post, $extraFields){//var_dump($_POST,  func_get_args());exit;
 		// запись
-		$this->db->query('UPDATE posts SET title = ?s, url = ?s, content = ?s, parent = ?i, modified = ?s, comment_status = ?s where id = ?i', $title, $url, $content, $parent, $modified, $commentStatus, $id);
+		$this->save($post, true);
+		
 		// метаданные
-		$this->editMeta($id, $extraFields);
+		$this->editMeta($post['id'], $extraFields);
 		// термины
-		$this->editTerms($this->request->post['id'], isset($this->request->post['terms']) ? $this->request->post['terms'] : []);
+		$this->editTerms($post['id'], isset($this->request->post['terms']) ? $this->request->post['terms'] : []);
 		
 		return true;
+	}
+	
+	private function save($post, $update = false){
+		$set = '';
+		$condition = '';
+		
+		if($update){
+			$sql = 'UPDATE posts SET ';
+			$condition = ' where id = ?i';
+		}else{
+			$sql = 'INSERT INTO posts SET ';
+			unset($post['id']);
+		}
+		
+		foreach($post as $k => $p){
+			if($k == 'id') continue;
+			$set .= $k . ' = ?s, ';
+		}
+		
+		//var_dump($sql . substr($set, 0, -2) . $condition, $post);
+		$this->db->query($sql . substr($set, 0, -2) . $condition, $post);
+		
 	}
 	
 	private function editMeta($postId, $extraFields){

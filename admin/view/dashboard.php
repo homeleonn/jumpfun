@@ -25,6 +25,7 @@ function getSections($type, $pageTypes){
 				}
 			}
 		}
+		$sections['Комментарии||comment'] = 'comments';
 		$sections['Настройки||cog'] = ['Меню' => 'menu'];
 	}else{
 		$sections = [
@@ -44,6 +45,7 @@ function getSections($type, $pageTypes){
 				'Стиль' => 'educator/terms/?term=style',
 				'Возрастная категория' => 'educator/terms/?term=age',
 			],
+			'Комментарии||comment' => '',
 			'Настройки||cog' => [
 				'Меню' => 'menu',
 			],

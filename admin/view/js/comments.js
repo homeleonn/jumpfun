@@ -14,9 +14,9 @@ $(function(){
 		$cancel.click(close);
 		
 		$add.click(function(){
-			
-			close();
-			alert('added');
+			$.post(root + 'user/comments/add/' + $('#post_id').val() + '/', {comment: $commentText.val()}, function(){
+				close();
+			});
 		});
 		
 		function close(){

@@ -59,6 +59,7 @@ class PostController extends Controller{
 		$this->config->setOption('postType', $post['post_type']);
 		$this->setOptions();
 		$post = $this->model->mergePostMeta($post, true);
+		
 		// If this post is the front
 		if($post['id'] == $this->config->front_page){
 			if(SITE_URL != FULL_URL_WITHOUT_PARAMS) $this->request->location(SITE_URL, 301);
@@ -190,7 +191,7 @@ class PostController extends Controller{
 		return $hierarchy;
 	}
 	
-	public function actionList($taxonomy = null, $taxonomySlug = null, $page = 1){//var_dump(func_get_args());exit;
+	public function actionList($taxonomy = null, $taxonomySlug = null, $page = 1){//$this->model->all();//dd();
 		$this->model->setLimit($this->page = $page, $this->options['rewrite']['paged']);
 		$list = $this->options;
 		$listMark = '__list';

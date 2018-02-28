@@ -4,6 +4,7 @@ define('JUMP', __DIR__);
 require_once JUMP . '/config/constants.php';
 require_once 'autoload.php';
 
+
 use Jump\Jump;
 use Jump\helpers\Common;
 use Jump\DI\DI;
@@ -18,7 +19,8 @@ try{
 	foreach($services as $service){
 		(new $service($di))->init();
 	}
-	
+	//var_dump(Closure);
+	//Responce::notFound(11.9+24.2+10.1+21.9+39.75+10.4+28.8);
 	
 	require_once THEME_DIR . 'functions.php';
 	

@@ -17,6 +17,7 @@ class Controller{
 		$this->di = $di;
 		$this->initVars($di);
 		$model = $this->defineModel($model);
+		
 		// gets model dependencies
 		if(!isset($this->config->getOption('frontend_deps')['models'][$model])){
 			$modelArguments = [];

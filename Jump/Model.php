@@ -12,4 +12,8 @@ abstract class Model{
 		$this->db 		= $di->get('db');
 		$this->request 	= $di->get('request');
 	}
+	
+	public function all(){
+		dd($this->db->getAll($this->select . ' 1=1'));
+	}
 }

@@ -40,20 +40,20 @@ class PostController extends AdminController{
 	}
 	
 	public function actionAdd(){//var_dump($this->request->post, $_FILES);exit;
-		if($this->request->post['title'] == '') Msg::json('Заголовок не должен быть пуст!', 0);
-		list($title, $url, $content, $parent, $modified, $commentStatus, $extraFields) = $this->postProcessing($this->request->post['title']);
-		$url 		= $this->model->checkUrl($url, $parent);
-		$posType	= $this->options['type'];
-		$result = $this->model->add($title, $url, $content, $parent, $posType, $commentStatus, $extraFields);
+		list($post, $extraFields) = $this->postProcessing($this->request->post['title']);
+		$post['url'] = $this->model->checkUrl($post['url'], $post['parent']);
+		$post['post_type'] = $this->options['type'];
+		$result = $this->model->add($post, $extraFields);
 		return $result;
 	}	
 	
 	public function actionEditForm($id){
+		$key = '_jmp_post_img';
 		$data = $this->model->editForm($id);
-		if(isset($data['_jmp_post_img'])){
-			$data['_jmp_post_img'] = $this->db->getRow('Select * from media where id = ?i', (int)$data['_jmp_post_img']);
-			if(!$data['_jmp_post_img']){
-				$this->db->query('Delete from postmeta where post_id = ?i and meta_key = ?s', $id, '_jmp_post_img');
+		if(isset($data[$key])){
+			$data[$key] = $this->db->getRow('Select * from media where id = ?i', (int)$data[$key]);
+			if(!$data[$key]){
+				$this->db->query('Delete from postmeta where post_id = ?i and meta_key = ?s', $id, $key);
 			}
 		}
 			
@@ -62,27 +62,28 @@ class PostController extends AdminController{
 	}
 	
 	public function actionEdit(){//var_dump($this->request->post);//exit;
-		if($this->request->post['title'] == '') exit;
-		$id = (int)$this->request->post['id'];
-		list($title, $url, $content, $parent, $modified, $commentStatus, $extraFields) = $this->postProcessing($this->request->post['url']);
-		if($this->model->checkUrlExists($url, $parent, $id)) Msg::json('Введенный адрес уже существует!', 0);
-		
-		$result = $this->model->edit($title, $url, $content, $parent, $modified, $id, $commentStatus, $extraFields);
+		list($post, $extraFields) = $this->postProcessing($this->request->post['url']);
+		if($this->model->checkUrlExists($post['url'], $post['parent'], $post['id'])) Msg::json('Введенный адрес уже существует!', 0);
+		$result = $this->model->edit($post, $extraFields);
 		Msg::json(1);
 	}
 	
+	
+	
 	private function postProcessing($urlStringForTranslit){
-		$parent = isset($this->request->post['parent']) ? (int)$this->request->post['parent'] : 0;
-		if(!$this->model->checkExistsPostById($parent))
+		if($this->request->post['title'] == '') Msg::json('Заголовок не должен быть пуст!', 0);
+		$post = [
+			'parent' 		=> isset($this->request->post['parent']) ? (int)$this->request->post['parent'] : 0,
+			'title' 		=> $this->textSanitize($this->request->post['title'], 'title'),
+			'url' 			=> Transliteration::run($urlStringForTranslit),
+			'content' 		=> $this->textSanitize($this->request->post['content']),
+			'modified' 		=> MyDate::getDateTime(),
+			'comment_status' => isset($this->request->post['discussion']) ? 'open' : 'closed',
+			'id' 			=> isset($this->request->post['id']) ? (int)$this->request->post['id'] : 0,
+		];
+		if(!$this->model->checkExistsPostById($post['parent']))
 			Msg::json('Данного родителя не существует', 0);
-		
-		$title 		= $this->textSanitize($this->request->post['title'], 'title'); 
-		$url 		= Transliteration::run($urlStringForTranslit);
-		$content 	= $this->textSanitize($this->request->post['content']); 
-		$modified 	= MyDate::getDateTime();
-		$commentStatus 	= isset($this->request->post['discussion']) ? 'open' : 'closed';
 		$extraFields = isset($this->request->post['extra_fileds']) ? $this->request->post['extra_fileds'] : [];
-		
 		
 		//fill extra fields
 		$extraFieldKeys = [
@@ -95,8 +96,7 @@ class PostController extends AdminController{
 			}
 		}
 		
-		return [$title, $url, $content, $parent, $modified, $commentStatus, $extraFields];
-		
+		return [$post, $extraFields];
 	}
 	
 	public function actionDel($id, $type){

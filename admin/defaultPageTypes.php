@@ -1,5 +1,6 @@
 <?php
 use Jump\helpers\Common;
+use Jump\helpers\Session;
 $this->di->get('config')->addPageType([
 		'type' => 'post',
 		'title' => 'Записи',
@@ -80,6 +81,34 @@ function applyFilter(){
 	return call_user_func_array('apply', array_merge(['filters'], func_get_args()));
 }
 
+
+function vd(){
+	$trace = debug_backtrace()[1];
+	echo '<small style="color: green;"><pre>',$trace['file'],':',$trace['line'],':</pre></small>';
+	call_user_func_array('var_dump', func_get_args()[0]);
+}
+
+function d(){
+	vd(func_get_args());
+}
+
+function dd(){
+	vd(func_get_args());
+	exit;
+}
+
+function session(){
+	$args = func_get_args();
+	if(empty($args)){
+		return Session::get();
+	}elseif(is_string($args[0]) && !isset($args[1])){
+		return Session::get($args[0]);
+	}else{
+		call_user_func_array(['Session', 'set'], $args);
+	}
+}
+
+
 //addFilter('postTypeLink', 'jumpPostTypeLink');
 function jumpPostTypeLink($link, $post, $terms, $postTermId){
 	$structures = [
@@ -131,6 +160,8 @@ addAction('add_extra_rows', 'my_add_extra_rows');
 function my_add_extra_rows($postType){
 	if($postType != 'post') return;
 }
+
+
 
 
 

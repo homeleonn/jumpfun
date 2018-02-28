@@ -6,7 +6,7 @@
 <h2><?=$options['edit']?></h2>
 <form method="POST" id="edit-<?=$options['type']?>" class="post-from-admin" name="" autocomplete="off" enctype="multipart/form-data">
 	<div id="center" class="col-md-8">
-		<input type="hidden" name="id" value="<?=$data['id']?>">
+		<input type="hidden" name="id" id="post_id" value="<?=$data['id']?>">
 		<input type="hidden" name="url" value="<?=$data['url']?>">
 		<div class="block1">
 			<div>Заголовок</div>

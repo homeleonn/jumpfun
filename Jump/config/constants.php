@@ -1,8 +1,11 @@
 <?php
+session_start();
 ini_set('xdebug.var_display_max_depth', 50);
 ini_set('xdebug.var_display_max_children', 256);
 ini_set('xdebug.var_display_max_data', 1024);
 ini_set('date.timezone', 'Europe/Kiev');
+ini_set('xdebug.overload_var_dump', '1');
+
 define('DS', DIRECTORY_SEPARATOR);
 
 define('ROOT_URI', str_replace($_SERVER['DOCUMENT_ROOT'], '', str_replace('\\', '/', ROOT)) ?: '/');

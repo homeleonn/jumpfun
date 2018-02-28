@@ -33,7 +33,7 @@ class Post extends Model{
 	private $page;
 	private $start;
 	private $allItemsCount;
-	private $select = 'Select * from posts where ';
+	public $select = 'Select * from posts where ';
 	private $relationship = 'posts p, terms t, term_taxonomy tt, term_relationships tr where t.id = tt.term_id and tt.term_taxonomy_id = tr.term_taxonomy_id and p.id = tr.object_id ';
 	
 	private $relationships = 'posts p LEFT JOIN term_relationships tr ON(p.id = tr.object_id) LEFT JOIN term_taxonomy tt ON(tt.term_taxonomy_id = tr.term_taxonomy_id) LEFT JOIN terms t ON(t.id = tt.term_id)';

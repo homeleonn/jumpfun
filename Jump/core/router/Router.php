@@ -6,6 +6,7 @@ use Jump\core\request\Request;
 use Jump\DI\DI;
 use Jump\helpers\HelperDI;
 
+
 class Router{
 	private $di;
 	private $request;
@@ -24,12 +25,17 @@ class Router{
 	}
 	
 	public function run(){
-		$controller = '\\' . ENV . '\controllers\\' . ucfirst($this->controller) . 'Controller';
+		$controllerName = '\\' . ENV . '\controllers\\' . ucfirst($this->controller) . 'Controller';
 		$action = 'action' . ucfirst($this->action);
+		$controller = new $controllerName($this->di, $this->controller);
+		
+		if(!method_exists($controller, $action))
+			throw new \Exception("class '{$controllerName}' does not have a method '{$action}'");
+		
 		if(!$this->alternate)
-			return call_user_func_array([new $controller($this->di, $this->controller), $action], $this->params);
+			return call_user_func_array([$controller, $action], $this->params);
 		else
-			return call_user_func([new $controller($this->di, $this->controller), $action], $this->params);
+			return call_user_func([$controller, $action], $this->params);
 	}
 	
 	public function searchController(){
