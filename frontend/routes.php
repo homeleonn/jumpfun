@@ -12,7 +12,8 @@ return [
 	['('.URL_PATTERN_SLASH.')', 'post|single|$1'],
 	['user', 'user|index', 'GET'],
 	['user/login', 'user|login', 'GET'],
-	['user/login', 'user|entry', 'POST'],
+	['user/auth', 'user|auth', 'POST'],
+	['user/exit', 'user|exit', 'GET'],
 	['user/comments/add/(\d+)', 'user|addComment|$1', 'POST'],
 	['user/comments/add/product/(\d+)', 'user|addComment|$1|product', 'POST'],
 	

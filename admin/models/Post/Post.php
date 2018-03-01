@@ -48,6 +48,10 @@ class Post extends Model{
 		return !$postsTable ? '' : '<table class="mytable"><tr align="center"><td>title/url</td>'.($this->options['taxonomy'] ? '<td width="15%">Метки</td>' : '').'<td width="1%">Дата публикации</td></tr>' . $postsTable . '</table>';
 	}
 	
+	public function getComments($postId){
+		return $this->db->getAll('Select * from comments where comment_post_id = ' . $postId . ' order by comment_date DESC');
+	}
+	
 	public function termList($term){
 		$terms = $this->getTermList($term);
 		$termsHierarchy = $this->hierarchyItems($terms);

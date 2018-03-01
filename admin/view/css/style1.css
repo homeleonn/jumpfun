@@ -411,3 +411,23 @@ table.admin td{
 	margin-right: 10px;
 }
 
+
+/*COMMENT LIST*/
+
+#post-comments table{
+	display: block;
+	border-radius: 5px;
+	border: 1px lightgray solid;
+	margin-bottom: 10px;
+}
+
+#post-comments table td{
+	padding: 3px;
+	border: 1px lightgray solid;
+}
+
+#post-comments table tr:first-child{
+	font-size: 12px;
+}
+/*COMMENT LIST-*/
+

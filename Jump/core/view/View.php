@@ -26,7 +26,7 @@ class View
         $this->theme = $theme;
     }
 
-    public function render($template, $data = [], $withBlocks = true){//	d(get_defined_vars());
+    public function render($template, $data = [], $withBlocks = true){//dd(get_defined_vars());
 		$contentFile = '';
 		$this->path = $this->getPath($template);
 		if(ENV != 'admin'){
@@ -35,7 +35,7 @@ class View
 			if(is_array($data)){
 				extract($data);
 				unset($data);
-			}//var_dump(get_defined_vars());exit;
+			}//dd(get_defined_vars(), $this->di->get('config')->getCurrentPageOptions());
 			if(isset($__list)){
 				$this->children = $__list;
 				unset($__list);
@@ -169,5 +169,9 @@ class View
 	
 	private function getSingleLink($url, $slug){
 		//return str_replace()
+	}
+	
+	public function get($path){
+		return $this->path() . $path . '.php';
 	}
 }

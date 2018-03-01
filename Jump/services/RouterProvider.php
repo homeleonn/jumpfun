@@ -9,7 +9,7 @@ class RouterProvider extends AbstractProvider{
 	
 	public function init(){
 		$routes  = include ROOT . ENV . '/routes.php';
-		$router  = new Router($this->di, $routes);
+		$router  = new Router($routes);
 		
 		$this->di->set($this->serviceName, $router);
 		

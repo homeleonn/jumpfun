@@ -1,5 +1,5 @@
 <?php  
-//var_dump(get_defined_vars());exit;
+//dd(get_defined_vars());
 ?>
 <?=doAction('admin_post_options_form');?>
 <a href="<?=SITE_URL?>admin/<?=$options['type']?>/add/" class="action-tool plus" title="Добавить"><span class="icon-plus">Добавить новую</span></a>
@@ -28,8 +28,8 @@
 		<?php include $this->getFile('sidebar/comments');?>
 	</div>
 	<div id="sidebar-right" class="col-md-4">
-		<br><br>Добавлено: <?=$data['created']?>
-		<br>Последнее редактирование: <?=$data['modified']?>
+		<br><br><span class="icon-calendar"></span> Добавлено: <?=$data['created']?>
+		<br><span class="icon-pencil"></span> Последнее редактирование: <?=$data['modified']?>
 		<br><br><input type="button" id="item-factory" value="Редактировать">
 		
 		<?php include $this->getFile('sidebar/categoriesAndTags');?>

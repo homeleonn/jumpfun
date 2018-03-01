@@ -186,4 +186,8 @@ class Post extends Model{
 	public function getPostsByTaxonomyAndPostType($taxonomy, $postType){
 		return $this->db->getAll('Select DISTINCT p.* from ' . $this->relationship . ' and tt.taxonomy = ?s and p.post_type = ?s', $taxonomy, $postType);
 	}
+	
+	public function getComments($postId){
+		return $this->db->getAll('Select * from comments where comment_post_id = ' . $postId . ' order by comment_date DESC');
+	}
 }

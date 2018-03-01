@@ -10,10 +10,10 @@ class HelperDI
     /**
      * @return \Jump\DI\DI
      */
-    public static function get($dependencyName)
+    public static function get($dependencyName = NULL)
     {
-        global $di;
-
-        return $di->get($dependencyName);
+		global $di;
+		
+		return is_null($dependencyName) ? $di : $di->get($dependencyName);
     }
 }

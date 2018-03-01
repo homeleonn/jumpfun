@@ -2205,3 +2205,65 @@ img.shower{
 	cursor: pointer;
 }
 /*SHOWER-*/
+
+
+/*LOGIN*/
+#loginform{
+	width: 300px;
+	margin: 0 auto;
+	text-align: center;
+}
+
+#loginform input{
+	width: 100%;
+	margin: 3px auto 10px;
+	color: black;
+}
+
+#loginform input[type="submit"]{
+	width: 50%;
+	display: block;
+}
+/*LOGIN-*/
+
+/*COMMENT LIST*/
+
+#post-comments table{
+	display: block;
+	border-radius: 5px;
+	border: 1px lightgray solid;
+	margin-bottom: 10px;
+}
+
+#post-comments table td{
+	padding: 3px;
+	border: 1px lightgray solid;
+}
+
+#post-comments table tr:first-child{
+	font-size: 12px;
+}
+/*COMMENT LIST-*/
+
+.side-block{
+	margin: 20px 0;
+	border: 1px lightgreen solid;
+	background: #595959;
+}
+
+.side-block > .block-title,
+.side-block > .block-content{
+	padding: 5px;
+}
+
+.side-block > .block-title{
+	padding: 10px;
+	background: indigo;
+	font-weight: bold;
+	border-bottom: 1px lightgreen solid;
+}
+
+.side-block > .block-content > div{
+	margin: 10px 0;
+}
+

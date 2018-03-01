@@ -13,8 +13,8 @@ trait PostControllerTrait{
 	private $page = 1;
 	private $perPage = 2;
 	
-	public function __construct($di, $model){
-		parent::__construct($di, $model);
+	public function __construct(){
+		parent::__construct();
 		$this->options = $this->config->getCurrentPageOptions();
 		$this->model->setOptions($this->options);
 	}

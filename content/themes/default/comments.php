@@ -1,17 +1,17 @@
+<?php if($comment_status == 'open'):?>
 <div id="post-comments" class="side-block">
 	<div class="block-title">Комментарии</div>
-	<div class="block-content clearfix">
+	<div class="block-content clearfix" style="width: 70%; margin: 0 auto;">
 		<?php
-		if($data['comments']): 
-			$commentCount = count($data['comments']);
-			foreach($data['comments'] as $comment):
+		if($comments): 
+			$commentCount = count($comments);
+			foreach($comments as $comment):
 		?>
-		<table border="1">
+		<table border="1" width="100%" style="width: 100%;">
 			<tr>
 				<td><?=$comment['comment_author']?></td>
 				<td width="100%"><?=$comment['comment_date']?></td>
 				<td><span class="icon-comment"></span></td>
-				<td><span class="icon-cancel"></span></td>
 				<td>№<?=$commentCount--?></td>
 			</tr>
 			<tr>
@@ -27,3 +27,4 @@
 		</div>
 	</div>
 </div>
+<?php endif;?>

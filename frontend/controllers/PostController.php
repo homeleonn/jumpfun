@@ -11,12 +11,8 @@ use frontend\models\Post\Options;
 class PostController extends Controller{
 	use \Jump\traits\PostControllerTrait;
 	
-	/**
-	 *  @param $di dependency injection container
-	 *  @param object $model base model for this controller
-	 */
-	public function __construct($di, $model){
-		parent::__construct($di, $model);
+	public function __construct(){
+		parent::__construct();
 		$this->setOptions();
 	}
 	
@@ -42,7 +38,7 @@ class PostController extends Controller{
 		
 		//The validation of each section of the hierarchy
 		if($url && count($hierarchy) > 1){
-			if(in_array('', $hierarchy)) $this->request->get404();
+			if(in_array('', $hierarchy)) $this->request->notFound();
 			// foreach($hierarchy as $url) 
 				// if(!preg_match('~^'.URL_PATTERN.'$~u', $url)) $this->request->location(NULL, 404);
 			$id = NULL;
@@ -78,6 +74,8 @@ class PostController extends Controller{
 		
 		$this->addBreadCrumbs($post);
 		if(!isset($post['__model'])) $post['__model'] = $this->model;
+		if($post['comment_status'] == 'open')
+			$post['comments'] = $this->model->getComments($post['id']);
 		return $post;
 	}
 	

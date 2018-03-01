@@ -196,7 +196,7 @@ function Slider(element){
 		
 		
 		
-		$('form:first').submit(function(e){
+		$('#orderform').submit(function(e){
 			e.preventDefault();
 			
 			var title = 'Оформление заказа';

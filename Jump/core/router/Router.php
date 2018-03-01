@@ -8,7 +8,6 @@ use Jump\helpers\HelperDI;
 
 
 class Router{
-	private $di;
 	private $request;
 	
 	public $routes = [];
@@ -18,16 +17,15 @@ class Router{
 	private $params = [];
 	private $alternate = false;
 	
-	public function __construct(DI $di, $routes = NULL){
-		$this->di = $di;
-		$this->request = $this->di->get('request');
+	public function __construct($routes = NULL){
+		$this->request = HelperDI::get('request');
 		$this->fillRoutes($routes);
 	}
 	
 	public function run(){
 		$controllerName = '\\' . ENV . '\controllers\\' . ucfirst($this->controller) . 'Controller';
 		$action = 'action' . ucfirst($this->action);
-		$controller = new $controllerName($this->di, $this->controller);
+		$controller = new $controllerName();
 		
 		if(!method_exists($controller, $action))
 			throw new \Exception("class '{$controllerName}' does not have a method '{$action}'");
@@ -114,6 +112,7 @@ class Router{
 	
 	private function replaceUriIfAdmin($uri){
 		if(strpos($uri, 'admin/') === 0) {
+			if(!isAdmin()) $this->request->notfound();
 			if($uri == 'admin/') $uri = '/';
 			else{
 				$replaceCount = 1;
@@ -122,11 +121,4 @@ class Router{
 		}
 		return $uri;
 	}
-	
-	public static function add1($pattern, $controller){
-		$Router = DI::getD('router');
-		$Router->add($pattern, $controller);
-		var_dump($Router->routes);
-	}
-	
 }

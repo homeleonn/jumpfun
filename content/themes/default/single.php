@@ -4,4 +4,11 @@
 	</div>
 	<?php if(isset($terms)) echo $terms;?>
 	<div style="padding: 10px;"><?=$content?></div>
+	<div class="sep"></div>
+	<?php include $this->get('comments');?>
+	<?php 
+		if(isAdmin()){
+			echo '<a href="'.SITE_URL.'admin/'.$post_type.'/edit/'.$id.'/" title="Редактировать"><span class="icon-pencil"></span></a>';
+		}
+	?>
 </div>

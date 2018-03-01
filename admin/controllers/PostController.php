@@ -15,8 +15,8 @@ class PostController extends AdminController{
 	
 	private $imgUploader;
 	
-	public function __construct($di, $model){
-		parent::__construct($di, $model);
+	public function __construct(){
+		parent::__construct();
 		$this->setOptions();
 	}
 	
@@ -48,17 +48,22 @@ class PostController extends AdminController{
 	}	
 	
 	public function actionEditForm($id){
-		$key = '_jmp_post_img';
-		$data = $this->model->editForm($id);
-		if(isset($data[$key])){
-			$data[$key] = $this->db->getRow('Select * from media where id = ?i', (int)$data[$key]);
-			if(!$data[$key]){
-				$this->db->query('Delete from postmeta where post_id = ?i and meta_key = ?s', $id, $key);
+		$key 		= '_jmp_post_img';
+		$post 		= $this->model->editForm($id);
+		if(!$post) return 0;
+		$post[$key] = $this->getPostImg($post, $key);
+		$post['comments'] = $this->model->getComments($id);
+		$post['__model'] = $this->model;
+		return $post;
+	}
+	
+	private function getPostImg($key){
+		if(isset($post[$key])){
+			return $this->db->getRow('Select * from media where id = ?i', (int)$post[$key]);
+			if(!$post[$key]){
+				$this->db->query('Delete from postmeta where post_id = ?i and meta_key = ?s', $post['id'], $key);
 			}
 		}
-			
-		$data['__model'] = $this->model;
-		return $data;
 	}
 	
 	public function actionEdit(){//var_dump($this->request->post);//exit;

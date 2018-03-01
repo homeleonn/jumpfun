@@ -5,6 +5,7 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="<?=THEME?>css/bootstrap.css" />
+	<link rel="stylesheet" type="text/css" href="<?=THEME?>css/fontello.css" />
 	<link rel="stylesheet" type="text/css" href="<?=THEME?>css/style1.css" />
 	<link rel="stylesheet" type="text/css" href="<?=THEME?>css/new.css" />
 	<!--<link href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,700italic,400,800,700,600" rel="stylesheet" type="text/css">-->
@@ -28,6 +29,7 @@
 					<li><img src="<?=THEME?>img/mail1.png" /> 15diva@mail.ru</li>
 					<li><img src="<?=THEME?>img/phone1.png" /> +38 (050) 333-48-08</li>
 				</ul>
+				<div><a href="<?=SITE_URL?>user/<?=(!isAuthorized() ? 'login/' : '')?>"><span class="icon-user" style="font-size:35px; margin-right: 20px;float: right;"></span></a></div>
 			</div>
 			<div id="call-top" class="b i small1">
 				Закажите бесплатный звонок для уточнения информации: <input type="text" id="call" placeholder="Ваш номер телефона"> <input type="button" id="head-call" value="Заказать звонок">

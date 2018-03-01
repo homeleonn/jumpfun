@@ -11,27 +11,48 @@ use frontend\models\Login;
 class UserController extends Controller{
 	
 	public function actionIndex(){
-		// Session::set([
-			// 'id' => 1,
-			// 'user' => [
-				// 'id' 	=> 1,
-				// 'name' 	=> 'admin',
-				// 'accesslevel' 	=> 1
-			// ]
-		// ]);
-		//dd(session('user.name'));
-		//$user = $this->model->get();
+		if(!isAuthorized()){
+			$this->request->location(SITE_URL . 'user/login/');
+		}
 		$user['title'] = 'Панель пользователя ' . session('user.name');
 		return $user;
 	}
 	
 	public function actionAuth(){
-		var_dump(__METHOD__);
+		if(!isset($_POST['email']) || !isset($_POST['pass'])) exit;
+		
+		$user = $this->db->getRow("Select * from users where email = ?s and pass = ?s", $_POST['email'], md5(md5($_POST['pass'])));
+		if($user){
+			Session::set([
+				'id' => $user['id'],
+				'user' => [
+					'id' 	=> $user['id'],
+					'name' 	=> $user['login'],
+					'accesslevel' 	=> 1
+				]
+			]);
+			
+			$this->request->location(SITE_URL . 'user/');
+		}
+		
+		sleep(2);
+		$this->request->location(SITE_URL . 'user/login/');
 	}
 	
 	public function actionLogin(){
+		// Session::push('user', ['accesslevel' => 1]);
+		if(isAuthorized()){
+			$this->request->location(SITE_URL . 'user/');
+		}
 		$data['title'] = 'Авторизация';
 		return $data;
+	}
+	
+	public function actionExit(){
+		if(isAuthorized()){
+			session_destroy();
+			$this->request->location(SITE_URL);
+		}
 	}
 	
 	public function actionAddComment($postId, $product = false){

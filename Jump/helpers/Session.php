@@ -59,6 +59,10 @@ class Session
 		}
 	}
 	
+	public static function push($key, $value){
+		if(isset($_SESSION[$key])) $_SESSION[$key] = array_merge($_SESSION[$key], $value);
+	}
+	
 	public static function unset($key = NULL){
 		if($key == NULL) $_SESSION = [];
 		if(isset($_SESSION[$key])) unset($_SESSION[$key]);

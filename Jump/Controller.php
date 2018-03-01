@@ -2,7 +2,7 @@
 
 namespace Jump;
 
-use Jump\DI\DI;
+use Jump\helpers\HelperDI;
 
 class Controller{
 	protected $di;
@@ -13,9 +13,11 @@ class Controller{
     protected $request;
     protected $load;
 	
-	public function __construct(DI $di, $model){
-		$this->di = $di;
-		$this->initVars($di);
+	public function __construct(){
+		$model = mb_strtolower(preg_replace('~.*\\\\(.*)Controller$~', '$1', get_called_class()));
+		//dd($model, get_called_class());
+		$this->di = HelperDI::get();
+		$this->initVars($this->di);
 		$model = $this->defineModel($model);
 		
 		// gets model dependencies
@@ -25,11 +27,11 @@ class Controller{
 		}else{
 			$modelDependencies = $this->config->getOption('frontend_deps')['models'][$model];
 			// create model dependencies
-			$modelArguments = $this->createModelArguments($di, $model, $modelDependencies);
+			$modelArguments = $this->createModelArguments($this->di, $model, $modelDependencies);
 		}
 		
 		// create model with created dependencies
-		$this->model = (new \ReflectionClass($model))->newInstanceArgs(array_merge([$di], $modelArguments));
+		$this->model = (new \ReflectionClass($model))->newInstanceArgs(array_merge([$this->di], $modelArguments));
 		$this->di->set('model', $this->model);
 	}
 	

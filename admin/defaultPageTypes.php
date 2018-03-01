@@ -108,6 +108,14 @@ function session(){
 	}
 }
 
+function isAdmin(){
+	return (int)session('user.accesslevel');
+}
+
+function isAuthorized(){
+	return session('id');
+}
+
 
 //addFilter('postTypeLink', 'jumpPostTypeLink');
 function jumpPostTypeLink($link, $post, $terms, $postTermId){
