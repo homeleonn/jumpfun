@@ -416,8 +416,6 @@ table.admin td{
 
 #post-comments table{
 	display: block;
-	border-radius: 5px;
-	border: 1px lightgray solid;
 	margin-bottom: 10px;
 }
 

@@ -5,6 +5,12 @@ $(function(){
 		var $add 	= $('#admin-add-comment');
 		var $commentText = $('#comment-text');
 		
+		function close(){
+			$show.removeClass('none');
+			$("#admin-comments-block").addClass('none');
+			$commentText.val('');
+		}
+		
 		$show.click(function(){
 			if($(this).hasClass('none')) return;
 			$(this).addClass('none');
@@ -19,11 +25,13 @@ $(function(){
 			});
 		});
 		
-		function close(){
-			$show.removeClass('none');
-			$("#admin-comments-block").addClass('none');
-			$commentText.val('');
-		}
+		
+		$('body').on('click', '#comment-delete', function(){
+			var self = this;
+			$.post(root + 'admin/delComment/' + $(this).data('id') + '/', function(data){
+				if(data.response == 1) $(self).closest('table').remove();
+			}, 'json');
+		});
 		
 		
 	})(window.jQuery);

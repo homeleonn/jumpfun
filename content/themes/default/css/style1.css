@@ -673,6 +673,18 @@ header h1{
 	padding: 10px;
 }
 
+.btn {
+	padding: 10px;
+	text-align: center;
+	border: 1px lightgreen solid;
+	border-radius: 4px;
+	min-width: 150px;
+	max-width: 250px;
+	background: transparent;
+	cursor: pointer;
+	transition: .5s;
+	font-weight: bold;
+}
 
 
 .btn-tr{
@@ -2230,13 +2242,11 @@ img.shower{
 
 #post-comments table{
 	display: block;
-	border-radius: 5px;
-	border: 1px lightgray solid;
 	margin-bottom: 10px;
 }
 
 #post-comments table td{
-	padding: 3px;
+	padding: 5px;
 	border: 1px lightgray solid;
 }
 
@@ -2248,7 +2258,7 @@ img.shower{
 .side-block{
 	margin: 20px 0;
 	border: 1px lightgreen solid;
-	background: #595959;
+	~background: #595959;
 }
 
 .side-block > .block-title,
@@ -2258,9 +2268,13 @@ img.shower{
 
 .side-block > .block-title{
 	padding: 10px;
-	background: indigo;
+	~background: indigo;
 	font-weight: bold;
 	border-bottom: 1px lightgreen solid;
+}
+
+textarea, input[type="text"]{
+	color: black;
 }
 
 .side-block > .block-content > div{

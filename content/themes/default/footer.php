@@ -145,7 +145,7 @@
 	
 	
 	<script>
-	
+		var root = "<?=SITE_URL?>";
 		
 		$('#change-color').click(function(){
 			$(this).children().toggleClass('block');

@@ -23,12 +23,13 @@ class UserController extends Controller{
 		
 		$user = $this->db->getRow("Select * from users where email = ?s and pass = ?s", $_POST['email'], md5(md5($_POST['pass'])));
 		if($user){
+			$accesslevel = $this->db->getRow("Select * from usermeta where user_id = {$user['id']} and meta_key = 'accesslevel'");
 			Session::set([
 				'id' => $user['id'],
 				'user' => [
 					'id' 	=> $user['id'],
 					'name' 	=> $user['login'],
-					'accesslevel' 	=> 1
+					'accesslevel' => isset($accesslevel) ? $accesslevel : 0
 				]
 			]);
 			
@@ -57,10 +58,12 @@ class UserController extends Controller{
 	
 	public function actionAddComment($postId, $product = false){
 		// check exists
-		$postCommentStatus = $this->db->getOne('Select comment_status from '.($product ? 'products' : 'posts').' where id = ' . $postId);
-		if(!$postCommentStatus || $postCommentStatus == 'closed') Msg::jsonCode(0);
+		if(!isAuthorized()) exit;
 		
-		$user 		= $this->model->get();
+		$postCommentStatus = $this->db->getOne('Select comment_status from '.($product ? 'products' : 'posts').' where id = ' . $postId);
+		if($postCommentStatus != 'open') Msg::jsonCode(0);
+		
+		$user 		= $this->model->get(session('id'));
 		$comment 	= htmlspecialchars($_POST['comment']);
 		$ip 		= Common::ipCollect();
 		$agent 		= $_SERVER['HTTP_USER_AGENT'];
@@ -68,6 +71,4 @@ class UserController extends Controller{
 		$this->db->query("INSERT INTO comments (comment_post_id, comment_author_id, comment_author, comment_author_email, comment_author_url, comment_author_ip, comment_author_agent, comment_content) values ({$postId}, {$user['id']}, '{$user['login']}', '{$user['email']}', '{$user['user_url']}', '{$ip}', '{$agent}', '{$comment}')");
 		Msg::jsonCode(1);
 	}
-	
-	
 }

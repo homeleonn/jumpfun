@@ -6,12 +6,12 @@
 			$commentCount = count($data['comments']);
 			foreach($data['comments'] as $comment):
 		?>
-		<table border="1">
+		<table>
 			<tr>
 				<td><?=$comment['comment_author']?></td>
 				<td width="100%"><?=$comment['comment_date']?></td>
 				<td><span class="icon-comment"></span></td>
-				<td><span class="icon-cancel"></span></td>
+				<td><span class="icon-cancel" id="comment-delete" data-id="<?=$comment['comment_id']?>"></span></td>
 				<td>№<?=$commentCount--?></td>
 			</tr>
 			<tr>

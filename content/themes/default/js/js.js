@@ -470,3 +470,14 @@ function Shower(cl)
 		});
 	});
 }
+
+
+$(function(){
+	$('#comments-block-form').submit(function(e){
+		e.preventDefault();
+		$.post(root + 'user/comments/add/' + $(this.elements.post_id).val() + '/', {comment: $(this.elements.content).val()}, function(){
+			//close();
+		});
+		
+	});
+});
