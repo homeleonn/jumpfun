@@ -475,9 +475,28 @@ function Shower(cl)
 $(function(){
 	$('#comments-block-form').submit(function(e){
 		e.preventDefault();
-		$.post(root + 'user/comments/add/' + $(this.elements.post_id).val() + '/', {comment: $(this.elements.content).val()}, function(){
-			//close();
-		});
+		var self = this;
+		var comment = $(this.elements.content).val().replace(/\s+/g, ' ');
+		if(comment == '' || comment == ' '){
+			alert('Введите сообщение!');
+			return;
+		}
+		var comment_count = $('#comment-count').text();
+		$.post(root + 'user/comments/add/' + $(this.elements.post_id).val() + '/', {comment: comment, comment_count: comment_count}, function(data){
+			if(data.code){
+				console.log(comment_count);
+				$('#post-comments .block-content').prepend(data.msg);
+				$('#comment-count').text((+comment_count+1));
+				$('#comment-text').val('');
+			}
+				
+			console.log(data);
+		}, 'json');
 		
+	});
+	
+	$('table .icon-comment').click(function(){
+		$('#comment-text').val($(this).closest('table').find('.address').text() + ', ').focus();
+		window.scrollTo(0, $('#comment-text').offset().top - 300);
 	});
 });

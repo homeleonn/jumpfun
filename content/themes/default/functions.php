@@ -51,3 +51,20 @@ $di->get('config')->addPageType([
 			],
 		]
 ]);
+function themeHTMLCommentTable($comment, $commentCount = NULL){
+	ob_start();
+	?>
+	<table>
+		<tr>
+			<td class="address"><?=$comment['comment_author']?></td>
+			<td width="100%"><?=$comment['comment_date']?></td>
+			<td><span class="icon-comment" title="Ответить"></span></td>
+			<td><?=$commentCount ? '№' . $commentCount : ''?></td>
+		</tr>
+		<tr>
+			<td colspan="5"><?=$comment['comment_content']?></td>
+		</tr>
+	</table>
+	<?php
+	return ob_get_clean();
+}

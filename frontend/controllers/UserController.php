@@ -67,8 +67,13 @@ class UserController extends Controller{
 		$comment 	= htmlspecialchars($_POST['comment']);
 		$ip 		= Common::ipCollect();
 		$agent 		= $_SERVER['HTTP_USER_AGENT'];
+		$date 		= date('Y-m-d H:i:s');
 		
-		$this->db->query("INSERT INTO comments (comment_post_id, comment_author_id, comment_author, comment_author_email, comment_author_url, comment_author_ip, comment_author_agent, comment_content) values ({$postId}, {$user['id']}, '{$user['login']}', '{$user['email']}', '{$user['user_url']}', '{$ip}', '{$agent}', '{$comment}')");
-		Msg::jsonCode(1);
+		//$this->db->query("INSERT INTO comments (comment_post_id, comment_author_id, comment_author, comment_author_email, comment_author_url, comment_author_ip, comment_author_agent, comment_content) values ({$postId}, {$user['id']}, '{$user['login']}', '{$user['email']}', '{$user['user_url']}', '{$ip}', '{$agent}', '{$comment}')");
+		Msg::json(themeHTMLCommentTable([
+			'comment_author' 	=> $user['login'],
+			'comment_date' 		=> $date,
+			'comment_content' 	=> $comment,
+		], ((int)$_POST['comment_count']) + 1));
 	}
 }

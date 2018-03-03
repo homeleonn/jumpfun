@@ -1,24 +1,12 @@
 <?php if($comment_status == 'open'):?>
 <div id="post-comments" class="side-block">
-	<div class="block-title">Комментарии</div>
+	<div class="block-title">Комментарии (<span id="comment-count"><?=$comments ? ($commentCount = count($comments)):0?></span>)</div>
 	<div class="block-content clearfix" style="width: 70%; margin: 0 auto;">
 		<?php
 		if($comments): 
-			$commentCount = count($comments);
 			foreach($comments as $comment):
-		?>
-		<table>
-			<tr>
-				<td><?=$comment['comment_author']?></td>
-				<td width="100%"><?=$comment['comment_date']?></td>
-				<td><span class="icon-comment"></span></td>
-				<td>№<?=$commentCount--?></td>
-			</tr>
-			<tr>
-				<td colspan="5"><?=$comment['comment_content']?></td>
-			</tr>
-		</table>
-		<?php endforeach;endif; ?>
+				echo themeHTMLCommentTable($comment, $commentCount--);
+			endforeach;endif; ?>
 		<form id="comments-block-form">
 			<input type="hidden" name="post_id" value="<?=$id?>">
 			<?php if(isAuthorized()): ?>

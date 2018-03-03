@@ -15,7 +15,7 @@ class UserController extends Controller{
 	}
 	
 	public function actionDelComment($commentId){
-		//$this->db->query('Delete from comments where comment_id = ?i', $commentId);
+		$this->db->query('Delete from comments where comment_id = ?i', $commentId);
 		Msg::jsonCode(1);
 	}
 }

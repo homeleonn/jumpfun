@@ -2240,6 +2240,10 @@ img.shower{
 
 /*COMMENT LIST*/
 
+[class *= "icon-"]{
+	cursor: pointer;
+}
+
 #post-comments table{
 	display: block;
 	margin-bottom: 10px;

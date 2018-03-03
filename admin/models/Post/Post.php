@@ -162,7 +162,7 @@ class Post extends Model{
 			}
 			
 			if(isset($item['children'])){
-				$urlHierarchy .= isset($item['url']) ? $item['url'] : $item['slug'] . '/';
+				$urlHierarchy .= (isset($item['url']) ? $item['url'] : $item['slug']) . '/';
 				$html .= $this->hierarchy($item['children'], $type, $parent, $level + 1, $urlHierarchy);
 			}
 			
