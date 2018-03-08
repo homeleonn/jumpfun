@@ -477,26 +477,47 @@ $(function(){
 		e.preventDefault();
 		var self = this;
 		var comment = $(this.elements.content).val().replace(/\s+/g, ' ');
-		if(comment == '' || comment == ' '){
-			alert('Введите сообщение!');
-			return;
-		}
+		var login = $(this.elements.login).val().replace(/\s+/g, ' ');
+		if(comment == '' || comment == ' ')	{alert('Введите сообщение!');return;}
+		if(login == '' || login == ' ')		{alert('Введите ваше имя!');return;}
+
 		var comment_count = $('#comment-count').text();
-		$.post(root + 'user/comments/add/' + $(this.elements.post_id).val() + '/', {comment: comment, comment_count: comment_count}, function(data){
-			if(data.code){
-				console.log(comment_count);
-				$('#post-comments .block-content').prepend(data.msg);
-				$('#comment-count').text((+comment_count+1));
-				$('#comment-text').val('');
+		$.post(root + 'user/comments/add/' + $(this.elements.post_id).val() + '/', {
+			login: login,
+			comment: comment,
+			comment_parent: $(this.elements.parent).val(),
+			comment_count: comment_count,
+			captcha_code: $(this.elements.captcha_code).val(),
+		}, function(data){
+			if (typeof data.error !== 'undefined') {
+				alert(data.error);
+				return;
 			}
+			if(data.comment_parent){
+				var $parent = $('[data-id="'+data.comment_parent+'"]');
+				var $sub = $parent.find('td.sub-comments');
 				
+				if($sub.find('td.sub-comments').length){
+					$sub.append(data.comment);
+				}else{
+					$parent.append('<tr><td colspan="3" class="sub-comments">' + data.comment + '</td></tr>');
+				}
+				
+			}else{
+				$('#post-comments .block-content').prepend(data.comment);
+			}
+			$('#comment-count').text((+comment_count+1));
+			$('#comment-text, #comment-login, #captcha-code').val('');
+			$('#comment-parent').val('0');
 			console.log(data);
 		}, 'json');
 		
 	});
 	
-	$('table .icon-comment').click(function(){
-		$('#comment-text').val($(this).closest('table').find('.address').text() + ', ').focus();
+	$('table .icon-comment, table .comment-author').click(function(){
+		var item = $(this).closest('table');
+		$('#comment-text').val(item.data('author') + ', ' + $('#comment-text').val()).focus();
+		$('#comment-parent').val(item.hasClass('general') ? item.data('id') : item.closest('table.general').data('id'));
 		window.scrollTo(0, $('#comment-text').offset().top - 300);
 	});
 });

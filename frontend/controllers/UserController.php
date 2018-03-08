@@ -56,24 +56,41 @@ class UserController extends Controller{
 		}
 	}
 	
-	public function actionAddComment($postId, $product = false){
+	public function actionAddComment($postId, $product = false){//dd($_POST);
 		// check exists
-		if(!isAuthorized()) exit;
+		//if(!isAuthorized()) exit;
+		
+		if(!(new \Jump\core\captcha\Captcha)->validation()){
+			Msg::set(['error' => 'Неверно введены защитные символы']);
+		}
 		
 		$postCommentStatus = $this->db->getOne('Select comment_status from '.($product ? 'products' : 'posts').' where id = ' . $postId);
 		if($postCommentStatus != 'open') Msg::jsonCode(0);
 		
-		$user 		= $this->model->get(session('id'));
+		$login = htmlspecialchars($_POST['login']);
+		if(isAuthorized())
+			$user = $this->model->get(session('id'));
+		else
+			$user = [
+				'id' 		=> '',
+				'login' 	=> $login,
+				'email' 	=> '',
+				'user_url' 	=> '',
+			];
 		$comment 	= htmlspecialchars($_POST['comment']);
 		$ip 		= Common::ipCollect();
 		$agent 		= $_SERVER['HTTP_USER_AGENT'];
 		$date 		= date('Y-m-d H:i:s');
+		$comment_parent = (int)$_POST['comment_parent'];
 		
-		//$this->db->query("INSERT INTO comments (comment_post_id, comment_author_id, comment_author, comment_author_email, comment_author_url, comment_author_ip, comment_author_agent, comment_content) values ({$postId}, {$user['id']}, '{$user['login']}', '{$user['email']}', '{$user['user_url']}', '{$ip}', '{$agent}', '{$comment}')");
-		Msg::json(themeHTMLCommentTable([
+		$this->db->query("INSERT INTO comments (comment_post_id, comment_author_id, comment_author, comment_author_email, comment_author_url, comment_author_ip, comment_author_agent, comment_content, comment_parent) values ('{$postId}', '{$user['id']}', '{$user['login']}', '{$user['email']}', '{$user['user_url']}', '{$ip}', '{$agent}', '{$comment}', '{$comment_parent}')");
+		Msg::set(['comment' => themeHTMLCommentTable([
+			'comment_id' 		=> $this->db->insertId(),
 			'comment_author' 	=> $user['login'],
 			'comment_date' 		=> $date,
 			'comment_content' 	=> $comment,
-		], ((int)$_POST['comment_count']) + 1));
+			'comment_parent' 	=> $comment_parent,
+			'comment_count' 	=> (int)$_POST['comment_count'] + 1,
+		]), 'comment_parent' => $comment_parent]);
 	}
 }

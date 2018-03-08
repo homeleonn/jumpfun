@@ -188,6 +188,17 @@ class Post extends Model{
 	}
 	
 	public function getComments($postId){
-		return $this->db->getAll('Select * from comments where comment_post_id = ' . $postId . ' order by comment_date DESC');
+		$generalComments = $this->db->getAll('Select * from comments where comment_post_id = ' . $postId . ' AND comment_parent = 0 order by comment_date DESC LIMIT 20');
+		if(!$generalComments) return false;
+		
+		$ids = Common::getKeys($generalComments, 'comment_id');
+		
+		$subComments = $this->db->getAll('Select * from comments where comment_post_id = ' . $postId . ' AND comment_parent IN(\''.implode("','", $ids).'\') order by comment_date DESC');
+		
+		$commentsCount = $this->db->getOne('Select COUNT(*) as count from comments where comment_post_id = ' . $postId);
+		
+		if($subComments)
+			$subComments = Common::itemsOnKeys($subComments, ['comment_parent']);
+		return [$generalComments, $subComments, $commentsCount];
 	}
 }

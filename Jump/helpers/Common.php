@@ -109,6 +109,14 @@ class Common{
 		return $uniqueItems;
 	}
 	
+	public static function getKeys($array, $key){
+		$k = [];
+		foreach($array as $a){
+			$k[] = $a[$key];
+		}
+		return $k;
+	}
+	
 	
 	
 	public static function arrayInCode($array, $arrayName = 'array', $level = 0){

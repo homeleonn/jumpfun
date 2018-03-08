@@ -30,6 +30,8 @@ class View
 		$contentFile = '';
 		$this->path = $this->getPath($template);
 		if(ENV != 'admin'){
+			global $post;
+			$post = $data;
 			$this->theme->data = $data;
 		
 			if(is_array($data)){

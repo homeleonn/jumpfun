@@ -75,7 +75,11 @@ class PostController extends Controller{
 		$this->addBreadCrumbs($post);
 		if(!isset($post['__model'])) $post['__model'] = $this->model;
 		if($post['comment_status'] == 'open')
-			$post['comments'] = $this->model->getComments($post['id']);
+			list(
+				$post['comments']['general'], 
+				$post['comments']['sub'],
+				$post['comments']['count'],
+			) = $this->model->getComments($post['id']);
 		return $post;
 	}
 	
@@ -353,5 +357,10 @@ class PostController extends Controller{
 	private function stats(){
 		global $start;
 		return $this->di->get('db')->getStats();
+	}
+	
+	public function actionGetCaptcha(){
+		(new \Jump\core\captcha\Captcha)->set();
+		exit;
 	}
 }

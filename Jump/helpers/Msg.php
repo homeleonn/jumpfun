@@ -21,4 +21,7 @@ class Msg
 		exit(json_encode($data));
 	}
 	
+	public static function set($data){
+		exit(json_encode($data));
+	}
 }

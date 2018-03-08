@@ -85,7 +85,7 @@ function applyFilter(){
 function vd(){
 	$trace = debug_backtrace()[1];
 	echo '<small style="color: green;"><pre>',$trace['file'],':',$trace['line'],':</pre></small>';
-	call_user_func_array('var_dump', func_get_args()[0]);
+	call_user_func_array('var_dump', func_get_args()[0] ?: [NULL]);
 }
 
 function d(){
@@ -163,6 +163,22 @@ function getTermsByTaxonomies(){
 function jmpHead(){
 	doAction('jhead');
 }
+
+addAction('jhead', function(){
+	global $post;
+	$meta = ['description', 'keywords'];
+	
+	foreach($meta as $m){
+		if(isset($post[$m]))
+			echo meta($m, $post[$m]);
+	}
+});
+
+function meta($name, $content){
+	return '<meta name="'. $name .'" content="'. $content .'">' . "\n";
+}
+
+
 
 addAction('add_extra_rows', 'my_add_extra_rows');
 function my_add_extra_rows($postType){

@@ -51,19 +51,30 @@ $di->get('config')->addPageType([
 			],
 		]
 ]);
-function themeHTMLCommentTable($comment, $commentCount = NULL){
+function themeHTMLCommentTable($comment, $subComments = NULL, $level = 1){
 	ob_start();
 	?>
-	<table>
+	<table <?=!$level ? 'class="general"' : ''?> data-id="<?=$comment['comment_id']?>" data-author="<?=$comment['comment_author']?>">
 		<tr>
-			<td class="address"><?=$comment['comment_author']?></td>
+			<td class="comment-author icon-"><?=$comment['comment_author']?></td>
 			<td width="100%"><?=$comment['comment_date']?></td>
 			<td><span class="icon-comment" title="Ответить"></span></td>
-			<td><?=$commentCount ? '№' . $commentCount : ''?></td>
 		</tr>
 		<tr>
-			<td colspan="5"><?=$comment['comment_content']?></td>
+			<td colspan="3"><?=$comment['comment_content']?></td>
 		</tr>
+		<?php if($subComments): $subCommentsCount = count($subComments); ?>
+		<tr>
+			<td colspan="3" class="sub-comments">
+				<div style="">Ответы (<?=$subCommentsCount?>)</div>
+				<?php
+					foreach(array_reverse($subComments) as $subComment){
+						echo themeHTMLCommentTable($subComment);
+					}
+				?>
+			</td>
+		</tr>
+		<?php endif; ?>
 	</table>
 	<?php
 	return ob_get_clean();

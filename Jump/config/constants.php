@@ -40,4 +40,4 @@ define('S', '|'); //sumbol separator for args parse
 
 define('TEMPLATE', '/^[ \t\/*#@]*Template:(.*)$/mi');
 
-//var_dump($_SERVER, ROOT_URI, FULL_URI, URI, SITE_URL, FULL_URL_WITHOUT_PARAMS, FULL_URL);exit;
+//var_dump($_SERVER, $_SESSION, ROOT_URI, FULL_URI, URI, SITE_URL, FULL_URL_WITHOUT_PARAMS, FULL_URL);exit;

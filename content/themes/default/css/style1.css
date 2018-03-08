@@ -2247,16 +2247,58 @@ img.shower{
 #post-comments table{
 	display: block;
 	margin-bottom: 10px;
+	border: 1px lightgray solid;
 }
 
 #post-comments table td{
 	padding: 5px;
-	border: 1px lightgray solid;
+	~border: 1px lightgray solid;
 }
 
 #post-comments table tr:first-child{
 	font-size: 12px;
 }
+
+#post-comments table tr:first-child td:nth-child(1){
+	font-weight: bold;
+	font-size: 15px;
+	text-decoration: underline;
+	
+}
+
+#post-comments table tr:first-child td:nth-child(2){
+	text-align: right;
+}
+
+#post-comments .block-content > table > tr:nth-child(2) > td,
+#post-comments .block-content > table >  tbody > tr:nth-child(2) > td
+{
+	border-bottom: 1px lightgray solid;
+}
+
+#post-comments .sub-comments table,
+#post-comments .sub-comments > div{
+	margin-left: 30px;
+}
+
+#post-comments .sub-comments table{
+	border: none;
+	border-bottom: 1px lightgray solid;
+}
+
+#post-comments .sub-comments table:last-child{
+	border: none;
+}
+
+#post-comments .sub-comments > div{
+	margin-bottom: 10px;
+	font-weight: bold;
+	background: indigo;
+	padding: 2px 5px;
+	border-radius: 20px;
+}
+
+sub-comments
 /*COMMENT LIST-*/
 
 .side-block{
@@ -2285,3 +2327,8 @@ textarea, input[type="text"]{
 	margin: 10px 0;
 }
 
+
+.rotate1{
+	transition: 1s;
+    transform: rotate(360deg);
+}
