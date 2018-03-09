@@ -199,6 +199,6 @@ class Post extends Model{
 		
 		if($subComments)
 			$subComments = Common::itemsOnKeys($subComments, ['comment_parent']);
-		return [$generalComments, $subComments, $commentsCount];
+		return ['general' => $generalComments, 'sub' => $subComments, 'count' => $commentsCount];
 	}
 }

@@ -417,15 +417,59 @@ table.admin td{
 #post-comments table{
 	display: block;
 	margin-bottom: 10px;
+	border: 1px lightgray solid;
 }
 
 #post-comments table td{
-	padding: 3px;
-	border: 1px lightgray solid;
+	padding: 5px;
+	~border: 1px lightgray solid;
 }
 
 #post-comments table tr:first-child{
 	font-size: 12px;
+}
+
+#post-comments table tr:first-child td:nth-child(1){
+	font-weight: bold;
+	font-size: 15px;
+	text-decoration: underline;
+	
+}
+
+#post-comments table tr:first-child td:nth-child(2){
+	text-align: right;
+}
+
+#post-comments .block-content{
+	
+	width: 100%;
+}
+#post-comments .block-content > table > tr:nth-child(2) > td,
+#post-comments .block-content > table >  tbody > tr:nth-child(2) > td
+{
+	border-bottom: 1px lightgray solid;
+}
+
+#post-comments .sub-comments table,
+#post-comments .sub-comments > div{
+	margin-left: 30px;
+}
+
+#post-comments .sub-comments table{
+	border: none;
+	border-bottom: 1px lightgray solid;
+}
+
+#post-comments .sub-comments table:last-child{
+	border: none;
+}
+
+#post-comments .sub-comments > div{
+	margin-bottom: 10px;
+	font-weight: bold;
+	background: lightgreen;
+	padding: 2px 5px;
+	border-radius: 20px;
 }
 /*COMMENT LIST-*/
 

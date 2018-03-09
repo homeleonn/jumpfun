@@ -507,9 +507,9 @@ $(function(){
 				$('#post-comments .block-content').prepend(data.comment);
 			}
 			$('#comment-count').text((+comment_count+1));
-			$('#comment-text, #comment-login, #captcha-code').val('');
+			$('#comment-text, #captcha-code').val('');
 			$('#comment-parent').val('0');
-			console.log(data);
+			captchaReload();
 		}, 'json');
 		
 	});
@@ -520,4 +520,18 @@ $(function(){
 		$('#comment-parent').val(item.hasClass('general') ? item.data('id') : item.closest('table.general').data('id'));
 		window.scrollTo(0, $('#comment-text').offset().top - 300);
 	});
+	
+	$('.captcha-reload').on('click', function(){
+		captchaReload();
+	});
 });
+
+function captchaReload(){
+	if(typeof captcha1 != 'undefined' && captcha1) return false;
+	captcha1 = true; 
+	$('#captcha').addClass('rotate1').attr('src', root+'get-captcha-for-comment/?async&'+Math.random())
+	setTimeout(function(){ 
+		$('#captcha').removeClass('rotate1');
+		captcha1 = false; 
+	}, 1000)
+}

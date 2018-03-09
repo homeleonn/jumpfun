@@ -6,6 +6,7 @@ use Jump\Model;
 use Jump\helpers\Msg;
 use Jump\helpers\MyDate;
 use Jump\helpers\Common;
+use Jump\helpers\HelperDI;
 use Jump\traits\PostTrait;
 use Jump\DI\DI;
 use Jump\core\cache\Cache;
@@ -49,7 +50,8 @@ class Post extends Model{
 	}
 	
 	public function getComments($postId){
-		return $this->db->getAll('Select * from comments where comment_post_id = ' . $postId . ' order by comment_date DESC');
+		return (new \frontend\models\post\Post(HelperDI::get(), new \frontend\models\Post\Taxonomy(HelperDI::get())))->getComments($postId);
+		//return $this->db->getAll('Select * from comments where comment_post_id = ' . $postId . ' order by comment_date DESC');
 	}
 	
 	public function termList($term){

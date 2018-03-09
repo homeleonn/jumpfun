@@ -9,8 +9,8 @@ class Captcha{
 	}
 	
 	public function set(){
-		// if(isset($_GET['async']))
-			// sleep(1);
+		if(isset($_GET['async']))
+			sleep(1);
 		header('Content-Type: image/png'); // даем браузеру понять, что это картинка (png)
 
 		$chars = array();

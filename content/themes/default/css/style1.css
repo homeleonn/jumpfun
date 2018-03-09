@@ -2270,6 +2270,10 @@ img.shower{
 	text-align: right;
 }
 
+#post-comments .block-content{
+	
+	width: 100%;
+}
 #post-comments .block-content > table > tr:nth-child(2) > td,
 #post-comments .block-content > table >  tbody > tr:nth-child(2) > td
 {
@@ -2298,7 +2302,6 @@ img.shower{
 	border-radius: 20px;
 }
 
-sub-comments
 /*COMMENT LIST-*/
 
 .side-block{
@@ -2331,4 +2334,8 @@ textarea, input[type="text"]{
 .rotate1{
 	transition: 1s;
     transform: rotate(360deg);
+}
+
+.pointer{
+	cursor: pointer;
 }

@@ -75,11 +75,7 @@ class PostController extends Controller{
 		$this->addBreadCrumbs($post);
 		if(!isset($post['__model'])) $post['__model'] = $this->model;
 		if($post['comment_status'] == 'open')
-			list(
-				$post['comments']['general'], 
-				$post['comments']['sub'],
-				$post['comments']['count'],
-			) = $this->model->getComments($post['id']);
+		$post['comments'] = $this->model->getComments($post['id']);
 		return $post;
 	}
 	
