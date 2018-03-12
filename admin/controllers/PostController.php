@@ -48,16 +48,16 @@ class PostController extends AdminController{
 	}	
 	
 	public function actionEditForm($id){
-		$key 		= '_jmp_post_img';
-		$post 		= $this->model->editForm($id);
+		$post = $this->model->editForm($id);
 		if(!$post) return 0;
+		$key = '_jmp_post_img';
 		$post[$key] = $this->getPostImg($post, $key);
 		$post['comments'] = $this->model->getComments($id);
 		$post['__model'] = $this->model;
 		return $post;
 	}
 	
-	private function getPostImg($key){
+	private function getPostImg($post, $key){
 		if(isset($post[$key])){
 			return $this->db->getRow('Select * from media where id = ?i', (int)$post[$key]);
 			if(!$post[$key]){
@@ -178,5 +178,36 @@ class PostController extends AdminController{
 		return isset($this->options['taxonomy']) ? in_array($term, array_keys($this->options['taxonomy'])) : false;
 	}
 	
+	public function actionCommentsList(){
+		$comments 			= $this->db->getAll('Select * from comments limit 20');
+		$ids 				= Common::getKeys($comments, 'comment_post_id', true);
+		$posts 				= $this->db->getAll('Select id, title, url, post_type, parent from posts where id IN('.implode(',', $ids).')');
+		$postsOnTypes 		= Common::itemsOnKeys($posts, ['post_type']);
+		$currentPostTypes 	= array_keys($postsOnTypes);
+		$pageTypes 			= $this->config->getOption('jump_pageTypes');
+		
+		$taxonomies = [];
+		foreach($currentPostTypes as $cpt){
+			$taxonomies = array_merge($taxonomies, array_keys($pageTypes[$cpt]['taxonomy']));
+		}
+		$taxonomies = $this->model->taxonomy->getByTaxonomies($taxonomies);
+		
+		list($termsOnId, $termsOnParent) = Common::itemsOnKeys($taxonomies, ['id', 'parent']);
+		$termsByPostIds = $this->model->getTermsByPostsId($ids);
+		
+		
+		$postsOnId = [];
+		foreach($posts as $item){
+			$termsByPostId = isset($termsByPostIds[$item['id']]) ? $termsByPostIds[$item['id']] : NULL;
+			$permalink 	 = SITE_URL . trim($pageTypes[$item['post_type']]['rewrite']['slug'], '/') . '/' . $item['url'] . '/';
+			$item['url'] = applyFilter('postTypeLink', $permalink, $termsOnId, $termsOnParent, $termsByPostId);
+			$postsOnId[$item['id']] = $item;
+		}
+		
+		$this->view->render('comments/list', ['comments' => $comments, 'posts_on_id' => $postsOnId]);
+	}
 	
+	public function postsLinkCreate($posts){
+		dd();
+	}
 }

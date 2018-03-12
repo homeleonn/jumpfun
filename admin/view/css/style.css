@@ -369,10 +369,16 @@ table.mytable td{
 	text-align: center;
 }
 
+
 table.mytable td:first-child{
 	text-align: left;
 	~width: 60%;
 	padding: 15px 10px;
+}
+
+
+table.mytable.comment-list td:first-child{
+	padding: 5px;
 }
 
 table.mytable tr:first-child{

@@ -417,26 +417,24 @@ table.admin td{
 #post-comments table{
 	display: block;
 	margin-bottom: 10px;
-	border: 1px lightgray solid;
 }
 
 #post-comments table td{
 	padding: 5px;
-	~border: 1px lightgray solid;
 }
 
-#post-comments table tr:first-child{
+#post-comments table tr:nth-child(2){
 	font-size: 12px;
 }
 
-#post-comments table tr:first-child td:nth-child(1){
+#post-comments table tr:nth-child(2) td:nth-child(1){
 	font-weight: bold;
 	font-size: 15px;
 	text-decoration: underline;
 	
 }
 
-#post-comments table tr:first-child td:nth-child(2){
+#post-comments table tr:nth-child(2) td:nth-child(2){
 	text-align: right;
 }
 
@@ -444,20 +442,15 @@ table.admin td{
 	
 	width: 100%;
 }
-#post-comments .block-content > table > tr:nth-child(2) > td,
-#post-comments .block-content > table >  tbody > tr:nth-child(2) > td
-{
-	border-bottom: 1px lightgray solid;
-}
 
 #post-comments .sub-comments table,
 #post-comments .sub-comments > div{
 	margin-left: 30px;
+	margin-right: -30px;
 }
 
 #post-comments .sub-comments table{
 	border: none;
-	border-bottom: 1px lightgray solid;
 }
 
 #post-comments .sub-comments table:last-child{
@@ -471,5 +464,30 @@ table.admin td{
 	padding: 2px 5px;
 	border-radius: 20px;
 }
+
+.avatar{
+	width: 50px;
+	height: 50px;
+	background-image:url(../img/avatar.jpg);
+	background-size:50px 50px;
+}
+
+.reply{
+	text-transform: uppercase;
+	margin: 5px 0;
+}
+
+.reply:hover{
+	color: lightblue;
+}
 /*COMMENT LIST-*/
 
+
+.fl-left{
+	float: left;
+}
+
+.comment-list .avatar{
+	float: left;
+	margin: 0 5px 0 0;
+}

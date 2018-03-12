@@ -116,6 +116,10 @@ function isAuthorized(){
 	return session('id');
 }
 
+function inAdmin(){
+	return ENV == 'admin';
+}
+
 
 //addFilter('postTypeLink', 'jumpPostTypeLink');
 function jumpPostTypeLink($link, $post, $terms, $postTermId){
@@ -135,7 +139,7 @@ function jumpPostTypeLink($link, $post, $terms, $postTermId){
 
 
 addFilter('postTypeLink', 'myPostTypeLink');
-function myPostTypeLink($link, $termsOnId, $termsOnParent, $postTerms){//var_dump(func_get_args());exit;
+function myPostTypeLink($link, $termsOnId, $termsOnParent, $postTerms){//dd(func_get_args());
 	$replaceFormat = '/%.*%/';
 	if(!preg_match($replaceFormat, $link)) return $link;
 	if(!$postTerms){

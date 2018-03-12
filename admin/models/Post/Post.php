@@ -50,7 +50,7 @@ class Post extends Model{
 	}
 	
 	public function getComments($postId){
-		return (new \frontend\models\post\Post(HelperDI::get(), new \frontend\models\Post\Taxonomy(HelperDI::get())))->getComments($postId);
+		return (new \frontend\models\Post\Post(HelperDI::get(), new \frontend\models\Post\Taxonomy(HelperDI::get())))->getComments($postId);
 		//return $this->db->getAll('Select * from comments where comment_post_id = ' . $postId . ' order by comment_date DESC');
 	}
 	
@@ -133,7 +133,7 @@ class Post extends Model{
 		return $itemsToParents[0];
 	}
 	
-	private function getTermsByPostsId($ids){//var_dump($ids);
+	public function getTermsByPostsId($ids){//var_dump($ids);
 		$ids = is_array($ids) ? implode(',', $ids) : $ids;
 		if(!$terms = $this->db->getAll('Select t.*, tt.*, tr.object_id from terms t, term_taxonomy tt, term_relationships tr where t.id = tt.term_id and tr.term_taxonomy_id = tt.term_taxonomy_id and object_id IN('.$ids.') order by t.id ASC')) return false;
 		foreach($terms as $t){
@@ -328,7 +328,7 @@ class Post extends Model{
 	public function editForm($id){
 		if(!$post = $this->db->getRow('Select * from posts where id = ?i', $id)) return 0;
 		$post = $this->mergePostMeta($post);
-		//var_dump($post);exit;
+		//dd($post);
 		if($this->options['hierarchical']){
 			$posts = $this->getAllPosts($this->options['type'], ['id', 'parent', 'title', 'url']);
 			$post['urlHierarchy'] = $this->getUrlHierarchy($posts, $post['id']);

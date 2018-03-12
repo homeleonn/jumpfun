@@ -497,10 +497,11 @@ $(function(){
 				var $parent = $('[data-id="'+data.comment_parent+'"]');
 				var $sub = $parent.find('td.sub-comments');
 				
-				if($sub.find('td.sub-comments').length){
-					$sub.append(data.comment);
+				if($sub.length){
+					//$sub.append(data.comment);
+					$(data.comment).insertBefore($('#comments-block-form'))
 				}else{
-					$parent.append('<tr><td colspan="3" class="sub-comments">' + data.comment + '</td></tr>');
+					$parent.append('<tr><td colspan="3" class="sub-comments"><div style="">Ответы (1)</div>' + data.comment + '</td></tr>');
 				}
 				
 			}else{
@@ -516,7 +517,9 @@ $(function(){
 	
 	$('table .icon-comment, table .comment-author').click(function(){
 		var item = $(this).closest('table');
-		$('#comment-text').val(item.data('author') + ', ' + $('#comment-text').val()).focus();
+		//console.log($(item));
+		$(item).after($('#comments-block-form'));
+		$('#comment-text').val((!item.hasClass('general') ? '+' : '')+item.data('author') + ', ' + $('#comment-text').val()).focus();
 		$('#comment-parent').val(item.hasClass('general') ? item.data('id') : item.closest('table.general').data('id'));
 		window.scrollTo(0, $('#comment-text').offset().top - 300);
 	});

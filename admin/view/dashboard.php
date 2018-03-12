@@ -26,6 +26,7 @@ function getSections($type, $pageTypes){
 			}
 		}
 		$sections['Комментарии||comment'] = 'comments';
+		$sections['Пользователи||user'] = 'users';
 		$sections['Настройки||cog'] = ['Меню' => 'menu'];
 	}else{
 		$sections = [
@@ -46,6 +47,7 @@ function getSections($type, $pageTypes){
 				'Возрастная категория' => 'educator/terms/?term=age',
 			],
 			'Комментарии||comment' => '',
+			'Пользователи||user' => '',
 			'Настройки||cog' => [
 				'Меню' => 'menu',
 			],

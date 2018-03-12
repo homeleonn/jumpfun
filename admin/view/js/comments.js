@@ -28,8 +28,9 @@ $(function(){
 		
 		$('body').on('click', '#comment-delete', function(){
 			var self = this;
-			$.post(root + 'admin/delComment/' + $(this).data('id') + '/', function(data){
-				if(data.response == 1) $(self).closest('table').remove();
+			var item = $(this).closest('table');
+			$.post(root + 'admin/delComment/' + $(item).data('id') + '/', function(data){
+				if(data.response == 1) item.remove();
 			}, 'json');
 		});
 		

@@ -60,7 +60,7 @@ class UserController extends Controller{
 		// check exists
 		//if(!isAuthorized()) exit;
 		
-		if(!(new \Jump\core\captcha\Captcha)->validation()){
+		if(!isAdmin() && !(new \Jump\core\captcha\Captcha)->validation()){
 			Msg::set(['error' => 'Неверно введены защитные символы']);
 		}
 		

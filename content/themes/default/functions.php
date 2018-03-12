@@ -54,14 +54,22 @@ $di->get('config')->addPageType([
 function themeHTMLCommentTable($comment, $subComments = NULL, $level = 1){
 	ob_start();
 	?>
-	<table <?=!$level ? 'class="general"' : ''?> data-id="<?=$comment['comment_id']?>" data-author="<?=$comment['comment_author']?>">
+	<table <?=!$level ? 'class="general"' : ''?> data-id="<?=$comment['comment_id']?>" data-author="<?=$comment['comment_author']?>"  data-parent="<?=$comment['comment_parent']?>">
+		<tr>
+			<td rowspan="3"><div class="avatar"></div></td>
+		</tr>
 		<tr>
 			<td class="comment-author icon-"><?=$comment['comment_author']?></td>
-			<td width="100%"><?=$comment['comment_date']?></td>
+			<td width="100%"><?=substr($comment['comment_date'], 0, -3)?></td>
+			<?php if(isAdmin() && inAdmin()):?>
+			<td><span class="icon-cancel" id="comment-delete" title="Удалить"></span></td>
+			<?php endif;?>
 			<td><span class="icon-comment" title="Ответить"></span></td>
 		</tr>
 		<tr>
-			<td colspan="3"><?=$comment['comment_content']?></td>
+			<td colspan="3" class="msg">
+				<?=$comment['comment_content']?>
+			</td>
 		</tr>
 		<?php if($subComments): $subCommentsCount = count($subComments); ?>
 		<tr>

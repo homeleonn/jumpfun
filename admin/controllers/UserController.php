@@ -6,16 +6,12 @@ use Jump\Controller;
 use Jump\helpers\Msg;
 
 class UserController extends Controller{
-	public function actionIndex(){
-		dd(123);
-	}
-	
 	public function actionList(){
-		\Responce::notFound();
+		dd($this->db->getAll('Select * from users limit 20'));
 	}
 	
 	public function actionDelComment($commentId){
-		$this->db->query('Delete from comments where comment_id = ?i', $commentId);
+		$this->db->query('Delete from comments where comment_id = ?i OR comment_parent = ?i', $commentId, $commentId);
 		Msg::jsonCode(1);
 	}
 }

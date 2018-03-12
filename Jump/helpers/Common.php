@@ -109,10 +109,15 @@ class Common{
 		return $uniqueItems;
 	}
 	
-	public static function getKeys($array, $key){
+	public static function getKeys($array, $key, $distinct = false){
 		$k = [];
 		foreach($array as $a){
-			$k[] = $a[$key];
+			if($distinct){
+				if(!isset($k[$a[$key]]))
+					$k[$a[$key]] = $a[$key];
+			}
+			else
+				$k[] = $a[$key];
 		}
 		return $k;
 	}
