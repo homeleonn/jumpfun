@@ -487,13 +487,24 @@ table.admin td{
 	float: left;
 }
 
-.comment-list .avatar{
+.comment-list .avatar,
+.user-list .avatar
+{
 	float: left;
 	margin: 0 5px 0 0;
 }
 
-.comment-content-cell{
+.user-list{
+	
+}
+
+.comment-content-cell
+{
 	position: relative;
+}
+
+.comment-content-cell
+{
 	vertical-align: top;
 }
 
@@ -501,14 +512,23 @@ table.admin td{
 	padding-bottom: 15px;
 }
 
-.comment-content-cell .options{
+.comment-content-cell .options
+{
 	display: none;
 	position: absolute;
 	bottom: 5px;
 	font-size: 12px;
 }
 
-.comment-cell:hover .options{
+.user-cell .options
+{
+	display: none;
+	font-size: 12px;
+}
+
+.comment-cell:hover .options,
+.user-cell:hover .options
+{
 	display: block;
 }
 

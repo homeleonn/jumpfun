@@ -31,7 +31,7 @@ class Controller{
 		}
 		
 		// create model with created dependencies
-		$this->model = (new \ReflectionClass($model))->newInstanceArgs(array_merge([$this->di], $modelArguments));
+		$this->model = (new \ReflectionClass($model))->newInstanceArgs($modelArguments);
 		$this->di->set('model', $this->model);
 	}
 	

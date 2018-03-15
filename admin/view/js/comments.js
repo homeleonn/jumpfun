@@ -40,6 +40,27 @@ $(function(){
 			console.log(data);
 		});
 		
+		$('.comment-content-cell .edit').click(function(){
+			var cell = $(this).closest('.comment-content-cell');
+			var content = cell.children('.content');
+			content.addClass('none');
+			$('#comments-block-form-edit').prependTo($(this).closest('.comment-content-cell')).removeClass('none').children('textarea').val(content.text());
+		});
+		
+		$('#comments-block-form-edit').submit(function(e){
+			e.preventDefault();
+			var item = $(this).closest('tr');
+			console.log($(this).serializeArray(), [{'name':'2'}, {'content':'3'}]);
+			$.post(root + 'admin/comment-edit/' + item.data('id') + '/', $(this).serializeArray(), function(data){
+				if(data.response){
+					$('#comments-block-form-edit').addClass('none');
+					item.find('.comment-content-cell > .content').removeClass('none').text(data.content);
+				}
+				console.log(data, item.find('.comment-content-cell > .content'));
+			}, 'json');
+			
+		});
+		
 		
 	})(window.jQuery);
 });

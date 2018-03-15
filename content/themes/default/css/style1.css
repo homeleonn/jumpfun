@@ -401,6 +401,10 @@ nav a{
 	display: block;
 }
 
+nav .submenu{
+	display: none;
+}
+
 
 
 #main-logo{
@@ -579,6 +583,8 @@ header h1{
 
 
 /*MENU1*/
+
+
 
 .menu1{
 	max-width: 1200px;

@@ -32,5 +32,8 @@ contents.forEach(function(item){
 
 </script>
 
+
+<script src="<?=SITE_URL?>admin/view/js/jquery.nestable.js"></script>
+<script src="<?=SITE_URL?>admin/view/js/edit-menu.js"></script>
 </body>
 </html>

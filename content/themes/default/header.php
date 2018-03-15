@@ -44,8 +44,8 @@
 					<a href="https://www.instagram.com/15diva/" target="_blank" class="logo-insta" title="Инстаграм"></a>
 				</div>
 				<nav>
-					<?php //wp_nav_menu( 'main' );?>
-					<nav>
+					<?php getMenu() ?>
+					<!--<nav>
 						<ul id="menu-main" class="menu">
 							<li><a href="<?=SITE_URL?>">Главная</a></li>
 							<li><a href="<?=SITE_URL?>javascript/">JavaScript</a></li>
@@ -55,7 +55,7 @@
 							<li><a href="<?=SITE_URL?>category/news/">Новости</a></li>
 							<li><a href="<?=SITE_URL?>eli-c2/">Ели</a></li>
 						</ul>			
-					</nav>
+					</nav>-->
 					<div id="hide-nav"><img src="<?=THEME?>img/hide-nav.png"></div>
 				</nav>
 			</div>

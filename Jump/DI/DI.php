@@ -3,7 +3,7 @@
 namespace Jump\DI;
 
 class DI{
-	private $container = [];
+	public $container = [];
 	private static $_instance;
 	
 	private function __construct(){}

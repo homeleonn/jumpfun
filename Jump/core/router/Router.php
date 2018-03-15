@@ -30,6 +30,18 @@ class Router{
 		if(!method_exists($controller, $action))
 			throw new \Exception("class '{$controllerName}' does not have a method '{$action}'");
 		
+		// $params = [];
+		// foreach(array_slice((new \ReflectionMethod($controller, $action))->getParameters(), count($this->params)) as $param){
+			// if($param->getClass() && $paramNamespace = $param->getClass()->name){
+				// foreach(HelperDI::get()->container as $service){
+					// if(is_object($service) && $paramNamespace == get_class($service))
+						// $params[] = $service;
+				// }
+			// }
+		// }
+		// if(!empty($params))
+			// $this->params = array_merge($this->params, $params);
+		
 		if(!$this->alternate)
 			return call_user_func_array([$controller, $action], $this->params);
 		else

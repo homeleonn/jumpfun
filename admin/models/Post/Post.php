@@ -22,8 +22,8 @@ class Post extends Model{
 	private $select = 'Select * from posts where ';
 	private $relationship = 'posts p, terms t, term_taxonomy tt, term_relationships tr where t.id = tt.term_id and tt.term_taxonomy_id = tr.term_taxonomy_id and p.id = tr.object_id ';
 	
-	public function __construct(DI $di, Taxonomy $taxonomy){
-		parent::__construct($di);
+	public function __construct(Taxonomy $taxonomy){
+		parent::__construct();
 		$this->taxonomy = $taxonomy;
 	}
 	

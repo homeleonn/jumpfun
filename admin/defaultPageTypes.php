@@ -259,3 +259,55 @@ function addPostImgForm($img = false){
 	
 	<?php
 }
+
+
+function getMenu(){
+	global $di;
+	$db = $di->get('db');
+	$cats = $db->getAll('Select * from menu where menu_id = 1 ORDER BY sort, parent');
+	if(!$cats) return;
+	$newCats = array(
+		'cats' => array(),
+		'subCats' => array()
+	);
+	
+	/*формируем из все категорий - главные категории и подкатегории*/
+	foreach($cats as $cat){
+		if($cat['parent'] == -1)
+			$newCats['cats'][] = $cat;
+		else
+			$newCats['subCats'][$cat['parent']][] = $cat;
+	}
+	
+	/*Очищаем изначальные категории, которые были в перемешку*/
+	unset($cats);
+	
+	/*Начинаем выводить меню, первым пунктом статично поставим главную страницу*/
+	echo '
+	<nav>
+		<div class="menu-toggle" onclick="$(this).next().toggleClass(\'show\')"><div></div><div></div><div></div></div>
+		<ul class="menu"><li><a href="',SITE_URL,'">Главная</a></li>';
+	
+	/*Пройдемся по всем главнм категориям*/
+	foreach($newCats['cats'] as $cat){
+		$issetSubMenu = isset($newCats['subCats'][$cat['object_id']]);
+		
+		/*Проходим по подкатегориям, сохраняя их для вывода*/
+		if($issetSubMenu){
+			$subCatsView = '';
+			foreach($newCats['subCats'][$cat['object_id']] as $subCat){
+				$currentSubCatUrl = SITE_URL . "{$subCat['url']}/";
+				$subCatsView .= "<li><a href=\"{$currentSubCatUrl}\">{$subCat['name']}</a></li>";
+			}
+		}
+		
+		?>
+		<li class="top-menu">
+			<?php echo "<a href=\"".($issetSubMenu ? 'javascript:void(0);' : SITE_URL."{$cat['url']}/")."\">{$cat['name']}</a>";?>
+			<?php if(!$issetSubMenu) {echo '</li>'; continue;}?>
+			<ul class="submenu"><?=$subCatsView?></ul>
+		</li>
+		<?php
+	}
+	echo '</ul></nav>';
+}
