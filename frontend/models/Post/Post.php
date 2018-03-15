@@ -12,38 +12,56 @@ class Post extends Model{
 	use \Jump\helpers\CurrentWork;
 	use \Jump\traits\PostTrait;
 	
-	private $id;
-	private $url;
-	private $title;
-	private $content;
-	private $tags;
-	private $post_type;
-	private $parent;
-	private $autor;
-	private $status;
-	private $comment_status;
-	private $comment_count;
-	private $visits;
-	private $created;
-	private $modified;
+	// private $id;
+	// private $url;
+	// private $title;
+	// private $content;
+	// private $tags;
+	// private $post_type;
+	// private $parent;
+	// private $autor;
+	// private $status;
+	// private $comment_status;
+	// private $comment_count;
+	// private $visits;
+	// private $created;
+	// private $modified;
 	
 	//private $options;
-	private $filters;
-	private $limit;
-	private $page;
-	private $start;
-	private $allItemsCount;
-	public $select = 'Select * from posts where ';
-	private $relationship = 'posts p, terms t, term_taxonomy tt, term_relationships tr where t.id = tt.term_id and tt.term_taxonomy_id = tr.term_taxonomy_id and p.id = tr.object_id ';
+	// private $filters;
+	// private $limit;
+	// private $page;
+	// private $start;
+	// private $allItemsCount;
+	// public $select = 'Select * from posts where ';
+	// private $relationship = 'posts p, terms t, term_taxonomy tt, term_relationships tr where t.id = tt.term_id and tt.term_taxonomy_id = tr.term_taxonomy_id and p.id = tr.object_id ';
 	
-	private $relationships = 'posts p LEFT JOIN term_relationships tr ON(p.id = tr.object_id) LEFT JOIN term_taxonomy tt ON(tt.term_taxonomy_id = tr.term_taxonomy_id) LEFT JOIN terms t ON(t.id = tt.term_id)';
+	// private $relationships = 'posts p LEFT JOIN term_relationships tr ON(p.id = tr.object_id) LEFT JOIN term_taxonomy tt ON(tt.term_taxonomy_id = tr.term_taxonomy_id) LEFT JOIN terms t ON(t.id = tt.term_id)';
 	
-	public function __construct(DI $di, Taxonomy $taxonomy){
-		parent::__construct($di);
-		$this->taxonomy = $taxonomy;
+	// public function __construct(DI $di, Taxonomy $taxonomy){
+		// parent::__construct($di);
+		// dd($this->find(1));
+		// $this->taxonomy = $taxonomy;
+	// }
+	
+	// public function __construct(){
+		// parent::__construct();
+	// }
+	
+	public function terms(){
+		return $this->belongsToMany('frontend\models\Post\Term');
+	}
+	
+	public function taxonomies(){
+		return $this->belongsToMany('frontend\models\Post\Taxonomy1');
+	}
+	
+	public function relationships(){
+		$this->belongsToMany('');
 	}
 	
 	public function single($url, $id = NULL){
+		dd($this->find(70)->terms);
 		return $id ? $this->getPostById($id) : $this->getPostByUrl($url);
 	}
 	

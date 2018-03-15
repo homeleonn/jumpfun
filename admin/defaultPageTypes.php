@@ -1,6 +1,11 @@
 <?php
 use Jump\helpers\Common;
 use Jump\helpers\Session;
+
+//use frontend\models\Post\Post;
+//dd((new Post)->taxonomy);
+
+
 $this->di->get('config')->addPageType([
 		'type' => 'post',
 		'title' => 'Записи',
@@ -136,7 +141,6 @@ function jumpPostTypeLink($link, $post, $terms, $postTermId){
 	$link = str_replace($structures['from'], $structures['to'], $link);
 	return $link;
 }
-
 
 addFilter('postTypeLink', 'myPostTypeLink');
 function myPostTypeLink($link, $termsOnId, $termsOnParent, $postTerms){//dd(func_get_args());

@@ -34,7 +34,28 @@ $(function(){
 			}, 'json');
 		});
 		
+		$('.comment-content-cell .remove').click(function(){
+			var item = $(this).closest('tr');
+			var data = commentDel(item.data('id'), item, 'callbackTest');
+			console.log(data);
+		});
+		
 		
 	})(window.jQuery);
 });
+
+function commentDel(commentId, item, callback){
+	$.post(root + 'admin/delComment/' + commentId + '/', function(data){
+		window[callback](data);
+		item.remove();
+	}, 'json');
+}
+
+function callbackTest(data){
+	try{
+		data.children.forEach(function(comment){
+			$('.comment-cell[data-id='+comment.comment_id+']').remove();
+		});
+	}catch(e){}
+}
 

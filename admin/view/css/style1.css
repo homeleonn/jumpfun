@@ -491,3 +491,27 @@ table.admin td{
 	float: left;
 	margin: 0 5px 0 0;
 }
+
+.comment-content-cell{
+	position: relative;
+	vertical-align: top;
+}
+
+.comment-content-cell .content{
+	padding-bottom: 15px;
+}
+
+.comment-content-cell .options{
+	display: none;
+	position: absolute;
+	bottom: 5px;
+	font-size: 12px;
+}
+
+.comment-cell:hover .options{
+	display: block;
+}
+
+.pointer{
+	cursor: pointer;
+}
