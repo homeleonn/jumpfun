@@ -12,7 +12,7 @@ class Taxonomy{
 		$this->db = $db;
 	}
 	
-	public function getAll($where, $args){//var_dump(array_merge([$this->select . $where], [$args]));exit;
+	public function getAll($where, $args){
 		static $cache;
 		if(!isset($cache[$where])) 
 			$cache[$where] = call_user_func_array([$this->db, 'getAll'], array_merge([$this->select . $where], [$args]));

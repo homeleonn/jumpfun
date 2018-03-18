@@ -262,9 +262,12 @@ function addPostImgForm($img = false){
 
 
 function getMenu(){
+	$cacheFileName = 'menu/menu';
+	if(Common::getCache($cacheFileName, -1)) return;
+	
 	global $di;
 	$db = $di->get('db');
-	$cats = $db->getAll('Select * from menu where menu_id = 1 ORDER BY sort, parent');
+	$cats = $db->getAll('Select * from menu where menu_id = '.Common::getOption('menu_active_id').' ORDER BY sort, parent');
 	if(!$cats) return;
 	$newCats = array(
 		'cats' => array(),
@@ -283,11 +286,11 @@ function getMenu(){
 	unset($cats);
 	
 	/*Начинаем выводить меню, первым пунктом статично поставим главную страницу*/
-	echo '
+	?>
 	<nav>
-		<div class="menu-toggle" onclick="$(this).next().toggleClass(\'show\')"><div></div><div></div><div></div></div>
-		<ul class="menu"><li><a href="',SITE_URL,'">Главная</a></li>';
-	
+		<div class="menu-toggle" onclick="$(this).next().toggleClass('show')"><div></div><div></div><div></div></div>
+		<ul class="menu"><li><a href="<?=SITE_URL?>">Главная</a></li>
+	<?php
 	/*Пройдемся по всем главнм категориям*/
 	foreach($newCats['cats'] as $cat){
 		$issetSubMenu = isset($newCats['subCats'][$cat['object_id']]);
@@ -310,4 +313,31 @@ function getMenu(){
 		<?php
 	}
 	echo '</ul></nav>';
+	
+	echo Common::setCache($cacheFileName);
+}
+
+
+function route($needRoute){
+	global $di;
+	$findRoute = false;
+	foreach($di->get('router')->routes as $route)
+		if(isset($route[$needRoute])){
+			$findRout = ROOT_URI . $route[$needRoute]['controller'];
+			break;
+		}
+		
+	if(!$findRoute)
+		throw new Exception('Route not found');
+	dd($findRoute);
+	return $findRoute;
+}
+
+function uri($path){
+	return ROOT_URI . (inAdmin() ? 'admin/' : '') . $path . '/';
+}
+
+function redirect($path){
+	global $di;
+	$di->get('request')->location(ROOT_URI . ($path ? $path . '/' : ''));
 }

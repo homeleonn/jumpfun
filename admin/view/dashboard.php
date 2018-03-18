@@ -25,9 +25,15 @@ function getSections($type, $pageTypes){
 				}
 			}
 		}
-		$sections['Комментарии||comment'] = 'comments';
-		$sections['Пользователи||user'] = 'users';
-		$sections['Настройки||cog'] = ['Меню' => 'menu'];
+		$sections = array_merge($sections, 
+			['Комментарии||comment' => 'comments'],
+			['Пользователи||user' => 'users'],
+			['Настройки||cog' => [
+					'Общие' => 'settings',
+					'Меню' => 'menu',
+				]
+			]
+		);
 	}else{
 		$sections = [
 			'Главная панель||gauge' => '',

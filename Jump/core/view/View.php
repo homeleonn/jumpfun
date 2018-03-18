@@ -155,9 +155,10 @@ class View
 	 *  
 	 */
 	public function is($template = NULL){
+		if($this->templateFile) return $this->templateFile;
 		$baseTemplate = 'index';
 		if($template){
-			$validTemplates = ['list', 'single'];
+			$validTemplates = ['list', 'single', 'front'];
 			if(!in_array($template, $validTemplates))
 				$template = $baseTemplate;
 			$this->templateFile = $template;

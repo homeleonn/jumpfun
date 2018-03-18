@@ -30,26 +30,34 @@ class MediaController extends Controller{
 		$thumbSrcList = [];
 		$insert = [];
 		$i = 0;
+		
 		while(isset($files['name'][$i])){
 			if(($result = $uploader->img($files['tmp_name'][$i], $files['name'][$i])) !== false){
 				$src = $upDir . $result['new_name'];
+				
 				$thumbSrcList[] = [
 					'thumb' => $urlDir . $uploader->thumbCut($result['new_src'], $result['mime'], $result['w'], $result['h'], $thumbW, $thumbH),
 					'orig' => $urlDir . $result['new_name']
 				];
+				
 				$filesData = array_map([$this->db, 'escapeString'], [$files['name'][$i], $files['type'][$i]]);
 				$insert[] = "('{$src}', {$filesData[0]}, {$filesData[1]})";
 			}
+			
 			$i++;
+			
 			if($i > 50) break;
 		}
+		
 		if(!empty($insert)){
 			$i = 0;
 			$this->db->query('LOCK TABLE media WRITE');
+			
 			foreach($insert as $ins){
 				$this->model->insert($ins);
 				$thumbSrcList[$i++]['id'] = $this->db->insertId();
 			}
+			
 			$this->db->query('UNLOCK TABLES');
 			Msg::json(['thumbSrcList' => $thumbSrcList]);
 		}
@@ -58,6 +66,7 @@ class MediaController extends Controller{
 	
 	public function actionDel($id){
 		$media = $this->db->getRow('Select * from media where id = ?i', (int)$id);
+		
 		if($media){
 			$src = UPLOADS_DIR . $media['src'];
 			array_map('unlink', [$src, Common::prefix($src, '-150x150')]);

@@ -117,4 +117,8 @@ class Request{
 	public function notFound(){
 		$this->location(NULL, 404);
 	}
+	
+	public function refresh(){
+		$this->location($_SERVER['REQUEST_URI']);
+	}
 }

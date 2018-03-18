@@ -81,16 +81,12 @@ class Router{
 		return false;
 	}
 	
-	private function fillRoutes($routes)
-	{
-		if(is_array($routes) && !empty($routes))
-		{
-			foreach($routes as $route)
-			{
-				if(!is_array($route))
-				{
+	private function fillRoutes($routes){
+		if(is_array($routes) && !empty($routes)){
+			foreach($routes as $route){
+				if(!is_array($route)) 
 					throw new \Exception('Invalid route');
-				}
+				
 				call_user_func_array([$this, 'add'], $route);
 			}
 		}

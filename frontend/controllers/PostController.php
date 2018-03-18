@@ -11,6 +11,9 @@ use frontend\models\Post\Options;
 class PostController extends Controller{
 	use \Jump\traits\PostControllerTrait;
 	
+	private $isFront = false;
+	private $img = '_jmp_post_img';
+	
 	public function __construct(){
 		parent::__construct();
 		$this->setOptions();
@@ -22,8 +25,23 @@ class PostController extends Controller{
 	}
 	
 	public function actionIndex(){
-		return $this->actionSingle(NULL, $this->config->front_page);
+		$frontPage = $this->config->front_page;
+		if(is_numeric($frontPage))
+			return $this->actionSingle(NULL, $frontPage);
+		else{
+			return $this->last();
+		}
 	}
+	
+	public function last(){
+		//dd($this->view->is('front'));
+		$this->view->is('front');
+		$this->isFront = true;
+		$this->config->setOption('postType', 'post');
+		$this->setOptions();
+		return $this->actionList();
+	}
+	
 	
 	/**
 	 *  @param string $url (.*)
@@ -33,7 +51,7 @@ class PostController extends Controller{
 	 */
 	public function actionSingle($url, $id = NULL){//var_dump(func_get_args());exit;
 		
-		// get all args, but mey be come 'foo/bar/baz/zab/'
+		// get all args, but may be come 'foo/bar/baz/zab/'
 		$hierarchy = explode('/', $url);
 		
 		//The validation of each section of the hierarchy
@@ -68,7 +86,7 @@ class PostController extends Controller{
 		}
 		// If type of this post is hierarchical structure, check hierarchy
 		else{
-			if(!empty($hierarchy))
+			//if(!empty($hierarchy))
 				$this->checkHierarchy($post['url'], $post['parent'], $hierarchy);
 		}
 		
@@ -119,7 +137,7 @@ class PostController extends Controller{
 		return $post;
 	}
 	
-	private function checkHierarchy($url, $parent, $hierarchy){
+	private function checkHierarchy($url, $parent, $hierarchy){//dd(func_get_args());
 		if(!$parent){
 			if($hierarchy)
 				$this->request->location(NULL, 404);
@@ -127,7 +145,8 @@ class PostController extends Controller{
 		}else{
 			if(!$hierarchy){
 				// взять все страницы, создать иерархию и перенаправить
-				$this->request->location(SITE_URL . $this->getParentHierarchy($this->model->getPostsByPostType('page') , $parent, 'url') . '/' . $url . '/', 301);
+				//dd($this->model->getPostsByPostType('page') , $parent, 'url');
+				$this->request->location(SITE_URL . $this->getParentHierarchy($parent, $this->model->getPostsByPostType('page'),  'url') . '/' . $url . '/', 301);
 			}else{
 				$parents = $this->db->getAll('Select id, title, url, parent from posts where url IN(\''.implode("','", $hierarchy).'\') order by parent DESC');
 				if(count($parents) < count($hierarchy)){
@@ -137,18 +156,20 @@ class PostController extends Controller{
 					$tempParent = $parent;
 					$i = 0;
 					$addBreadCrumbs = [];
+					
 					foreach($parents as $parent){
 						if($parent['id'] != $tempParent || $parent['url'] != $h[$i]){
 							$this->request->location(NULL, 404);
 						}
+						
 						$tempParent = $parent['parent'];
 						$addBreadCrumbs[$h[$i]] = $parent['title'];
 						$i++;
 					}
+					
 					foreach(array_reverse($addBreadCrumbs) as $link => $title){
 						$this->config->addBreadCrumbs($link, $title);
 					}
-					
 				}
 			}
 		}
@@ -185,7 +206,7 @@ class PostController extends Controller{
 		if(!isset($items[$parentId])) return false;
 		$hierarchy = $items[$parentId][$compare] . '|';
 		if(isset($items[$parentId]['parent']) && $items[$parentId]['parent']) 
-			$hierarchy .= $this->setHierarchy($items, $items[$parentId]['parent']);
+			$hierarchy .= $this->setHierarchy($items, $items[$parentId]['parent'], $compare);
 		return $hierarchy;
 	}
 	
@@ -197,14 +218,20 @@ class PostController extends Controller{
 		$hierarchy = explode('/', $taxonomySlug);
 		
 		// Если не пришла таксономия и у данного типа поста есть архив -  выдаем просто весь архив
-		if(!$taxonomy && $this->options['has_archive']){
-			if(!$list[$listMark] = $this->model->getPostsByPostType(Options::get('type'))) return 0;
-			$terms = $this->model->taxonomy->getAllByObjectsIds(array_keys(Common::itemsOnKeys($list[$listMark], ['id'])));
-			$termsByPostId = Common::itemsOnKeys($terms, ['object_id']);
-			$terms1 = $this->model->taxonomy->getByTaxonomies();
+		if(!$taxonomy){
+			//if($this->options['has_archive']){
+				if(!$list[$listMark] = $this->model->getPostsByPostType(Options::get('type'))) return 0;
+				$terms = $this->model->taxonomy->getAllByObjectsIds(array_keys(Common::itemsOnKeys($list[$listMark], ['id'])));
+				$termsByPostId = Common::itemsOnKeys($terms, ['object_id']);
+				$terms1 = $this->model->taxonomy->getByTaxonomies();
+			// }else{
+				// dd(1);
+			// }
+			//dd($list[$listMark], $terms1, $termsByPostId);
+			
 		}else{
 			// taxonomy validation
-			if(!Common::checkValidation($hierarchy, '/^' . URL_PATTERN . '$/')){
+			if(!$this->isFront && !Common::checkValidation($hierarchy, '/^' . URL_PATTERN . '$/')){
 				exit('404-5 - taxonomy validation failed by URL_PATTERN');
 			}
 			
@@ -222,11 +249,12 @@ class PostController extends Controller{
 			// 1.1
 			$terms1 = $this->model->taxonomy->getByTaxonomies();
 			$terms  = $this->model->taxonomy->filter($terms1, 'taxonomy', $taxonomy);
-			//$terms2 = $this->model->taxonomy->getAll('tt.taxonomy = ?s', $taxonomy);
+			
 			// 1.2
 			$lastChild = $hierarchy[count($hierarchy) - 1];
 			$findTerm = false;
 			// get current selected term to know whence build hierarchy
+			
 			foreach($terms as $term){
 				if($term['slug'] == $lastChild){
 					$currentTerm = $term;
@@ -235,9 +263,10 @@ class PostController extends Controller{
 				}
 			}
 			if(!$findTerm) exit('404-3');
+			
 			// 1.3
 			list($termsOnIds, $termsOnParents) = Common::itemsOnKeys($terms, ['id', 'parent']);
-			$builtedTermsParentHierarchy = substr(str_replace('|', '/', Common::builtHierarchyDown($termsOnIds, $currentTerm, 'slug') . '|' .$lastChild), 1);//var_dump($termsOnIds, $termsOnParents, $builtedTermsParentHierarchy );
+			$builtedTermsParentHierarchy = substr(str_replace('|', '/', Common::builtHierarchyDown($termsOnIds, $currentTerm, 'slug') . '|' .$lastChild), 1);
 			
 			if(implode('/', $hierarchy) != $builtedTermsParentHierarchy) 
 				exit('location: ' . $builtedTermsParentHierarchy);
@@ -247,6 +276,7 @@ class PostController extends Controller{
 			$toShow = isset($termsOnParents[$currentTerm['id']]) ? $termsOnParents[$currentTerm['id']] : NULL;
 			$i = 0;
 			$termsTaxonomyIds[] = $currentTerm['term_taxonomy_id'];
+			
 			while(isset($toShow[$i])){
 				$termsTaxonomyIds[] = $toShow[$i]['term_taxonomy_id'];
 				if(isset($termsOnParents[$toShow[$i]['id']])){
@@ -254,19 +284,20 @@ class PostController extends Controller{
 				}
 				$i++;
 			}
-			if(!$list[$listMark] = $this->model->getPostsBysTermsTaxonomyIds($termsTaxonomyIds)) return $this->options;
+			
+			if(!$list[$listMark] = $this->model->getPostsBysTermsTaxonomyIds($termsTaxonomyIds)) 
+				return $this->options;
+			
 			$terms = $this->model->taxonomy->getAllByObjectsIds(array_keys(Common::itemsOnKeys($list[$listMark], ['id'])));
-			//var_dump($getAllByObjectsIds);exit;
+			
 			$termsByPostId = Common::itemsOnKeys($terms, ['object_id']);
 			// 4
 				// 4.1 взять первый термин данного поста
 				// 4.2 взять все термины по таксе выбранного термина из пункта 4.1
 				// 4.3 составить иерархию с помощью хелпера common
 		}
-		//var_dump($terms, $termsByPostId);exit;
-		list($termsOnId, $termsOnParent) = Common::itemsOnKeys($terms1, ['id', 'parent']);
 		
-		//var_dump($termsOnId, $termsOnParent, $termsByPostId);exit;
+		list($termsOnId, $termsOnParent) = Common::itemsOnKeys($terms1, ['id', 'parent']);
 		foreach($list[$listMark] as &$post){
 			if(!isset($termsByPostId[$post['id']])) $termsByPostId[$post['id']] = false;
 			$this->postPermalink($post, $termsOnId, $termsOnParent, isset($termsByPostId[$post['id']])?$termsByPostId[$post['id']]:false);
@@ -297,10 +328,49 @@ class PostController extends Controller{
 		
 		list($termsOnId, $termsOnParent) = Common::itemsOnKeys($archiveTerms, ['id', 'parent']);
 		$postTerms = $this->postTermsLink($termsOnId, $termsOnParent, $archiveTerms);
+		
+		$list[$listMark] = $this->fillMeta($list[$listMark]);
+		
 		$list['filters'] = Common::archiveTermsHTML(array_reverse($postTerms), Options::getArchiveSlug());
 		$list['__model'] = $this->model;
 		$this->view->is('list');
 		return $list;
+	}
+	
+	private function fillMeta($posts){
+		$postsOnId = Common::itemsOnKeys($posts, ['id']);
+		//dd($posts, $postsOnId);
+		$ids = array_keys($postsOnId);
+		//dd($ids);
+		
+		$meta = $this->db->getAll('Select post_id, meta_key, meta_value from postmeta where post_id IN('.implode(',', $ids).')');
+		$comments = $this->db->getAll('Select comment_post_id from comments where comment_post_id IN('.implode(',', $ids).')');
+		
+		$commnetsOnId = $comments ? Common::itemsOnKeys($comments, ['comment_post_id']) : [];
+		if($meta){
+			$posts = $mediaIds = [];
+			foreach($meta as $m){
+				if($m['meta_key'] == $this->img)
+					$mediaIds[$m['post_id']] = $m['meta_value'];
+				$postsOnId[$m['post_id']][0][$m['meta_key']] = $m['meta_value'];
+			}
+			
+			if(!empty($mediaIds)){
+				$media = $this->db->getAll('Select * from media where id IN ('.implode(',', $mediaIds).')');
+				$mediaOnId = Common::itemsOnKeys($media, ['id']);
+				foreach($mediaIds as $postId => $mediaId){
+					$postsOnId[$postId][0][$this->img] = $mediaOnId[$mediaId][0]['src'];
+				}
+			}
+			
+			
+			foreach($postsOnId as $post){
+				$post = $post[0];
+				$post['comment_count'] = isset($commnetsOnId[$post['id']]) ? count($commnetsOnId[$post['id']]) : 0;
+				$posts[] = $post;
+			}
+		}
+		return $posts;
 	}
 	
 	

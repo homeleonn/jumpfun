@@ -4,6 +4,7 @@ namespace admin\controllers;
 
 use Jump\Controller;
 use Jump\helpers\Msg;
+use Jump\helpers\Common;
 
 class MenuController extends Controller{
 	public function actionIndex(){
@@ -14,7 +15,7 @@ class MenuController extends Controller{
 			if(!$newMenu){
 				$error .= 'Введите название меню';
 				setCookie('error', $error);
-				redirect('self');
+				$this->request->refresh();
 			}
 			
 			if(!$this->add($newMenu)){
@@ -23,7 +24,7 @@ class MenuController extends Controller{
 				setCookie('menu', 'Меню успешно создано');
 			}
 			
-			redirect('self');
+			$this->request->refresh();
 		}elseif(isset($_POST['del_menu_id'])){
 			$this->del();
 		}
@@ -32,16 +33,13 @@ class MenuController extends Controller{
 		//$data['pages'] 		= Page::getAllPages();
 		$data['menus'] 		= $this->menus();
 		$data['menuItems'] 	= $this->menuItems($data['menus']['id']);
-		//var_dump($data);exit;
-		//view('menu/menu', $data);
-		//dd($data);
 		return $data;
 	}
 	
 	public function actionEdit(){
 		$menu = json_decode($_POST['menu']);
 		if(empty($menu)) return;
-		
+		//dd($menu, $_POST['menu']);
 		$queryFull = 'INSERT INTO menu (menu_id, object_id, name, origname, url, type, parent, `sort`) VALUES ';
 		$queryItems = ''; 
 		$sort = $subSort = 0;
@@ -58,12 +56,17 @@ class MenuController extends Controller{
 		$queryFull .= substr($queryItems, 0, -1);
 		$this->db->query('Delete from menu where menu_id = ' . $_POST['menu_id']);
 		$this->db->query($queryFull);
+		unlink(UPLOADS_DIR . 'cache/menu/menu.html');
 	}
 	
 	public function del(){
 		$id = (int)$_POST['del_menu_id'];
-		$menu = $this->db->getAll('Select * from options where name = "menu"', 'row');
-		$menus = unserialize($menu['value']);
+		//$menu = $this->db->getAll('Select * from options where name = "menu"', 'row');
+		//$menu = $this->db->getAll('Select * from options where name = "menu"', 'row');
+		//Common::getOption('menu', 'a:2:{i:0;a:2:{s:2:"id";i:1;s:4:"name";s:5:"first";}i:1;a:2:{s:2:"id";i:2;s:4:"name";s:1:"1";}}');
+		
+		//$menus = unserialize($menu['value']);
+		$menus = unserialize(Common::getOption('menu'));
 		
 		//var_dump($menu, $menus);exit;
 		
@@ -96,32 +99,37 @@ class MenuController extends Controller{
 	}
 	
 	public function actionActivate(){
-		exit($this->db->query('UPDATE options SET value = "' . ((int)$_POST['id']) . '" where name = "menu_active_id"'));
+		//exit($this->db->query('UPDATE options SET value = "' . ((int)$_POST['id']) . '" where name = "menu_active_id"'));
+		Common::setOption('menu_active_id', (int)$_POST['id']);
 	}
 	
 	public function actionSelect(){
 		if(!isset($_POST['id']) || !is_numeric($_POST['id'])) exit;
-		exit(json_encode($this->db->getAll('Select * from menu where menu_id = ' . $_POST['id'], 'assoc')));
+		exit(json_encode($this->db->getAll('Select * from menu where menu_id = ' . $_POST['id'])));
 	}
 	
 	
 	private function menus(){
 		//$menu = $this->db->getAll('Select name, value from options where name = "menu" OR name = "menu_active_id" LIMIT 2');
-		$menu = [
-			['name' => 'menu', 'value' => 'a:2:{i:0;a:2:{s:2:"id";i:1;s:4:"name";s:5:"first";}i:1;a:2:{s:2:"id";i:2;s:4:"name";s:1:"1";}}'],
-			['name' => 'menu_active_id', 'value' => '1'],
-		];
+		// $menu = [
+			// ['name' => 'menu', 'value' => 'a:2:{i:0;a:2:{s:2:"id";i:1;s:4:"name";s:5:"first";}i:1;a:2:{s:2:"id";i:2;s:4:"name";s:1:"1";}}'],
+			// ['name' => 'menu_active_id', 'value' => '1'],
+		// ];
 		
-		if(!$menu) return false;
+		// if(!$menu) return false;
 		
-		if($menu[0]['name'] == 'menu'){
-			$menu['list'] = unserialize($menu[0]['value']);
-			$menu['id']   = $menu[1]['value'];
-		}else{
-			$menu['list'] = unserialize($menu[1]['value']);
-			$menu['id']   = $menu[0]['value'];
-		}
+		// if($menu[0]['name'] == 'menu'){
+			// $menu['list'] = unserialize($menu[0]['value']);
+			// $menu['id']   = $menu[1]['value'];
+		// }else{
+			// $menu['list'] = unserialize($menu[1]['value']);
+			// $menu['id']   = $menu[0]['value'];
+		// }
 		
+		$menu['list'] = unserialize(Common::getOption('menu'));
+		$menu['id']   = Common::getOption('menu_active_id');
+		
+		//dd($menu);
 		return $menu;
 	}
 	
@@ -147,10 +155,11 @@ class MenuController extends Controller{
 			$empty = empty($menus);
 			$menus[] = $menu;
 			$newMenu = serialize($menus);
-			if($empty)
-				$this->db->query('INSERT INTO options (name, value, autoload) VALUES (\'menu\', \''.$newMenu.'\', "no")');
-			else
-				$this->db->query('Update options set value = \''.$newMenu.'\' where name = "menu" LIMIT 1');
+			Common::setOption('menu', $newMenu);
+			// if($empty)
+				// $this->db->query('INSERT INTO options (name, value, autoload) VALUES (\'menu\', \''.$newMenu.'\', "no")');
+			// else
+				// $this->db->query('Update options set value = \''.$newMenu.'\' where name = "menu" LIMIT 1');
 		}
 		
 		return !$isset;

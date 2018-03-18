@@ -50,7 +50,7 @@ class Post extends Model{
 	}
 	
 	public function getComments($postId){
-		return (new \frontend\models\Post\Post(HelperDI::get(), new \frontend\models\Post\Taxonomy(HelperDI::get())))->getComments($postId);
+		return (new \frontend\models\Post\Post(new \frontend\models\Post\Taxonomy(HelperDI::get())))->getComments($postId);
 		//return $this->db->getAll('Select * from comments where comment_post_id = ' . $postId . ' order by comment_date DESC');
 	}
 	
@@ -67,8 +67,7 @@ class Post extends Model{
 		$data = [];
 		if($this->options['hierarchical']){
 			$posts = $this->getAllPosts($this->options['type'], ['id', 'parent', 'title', 'url']);
-			$itemsToParents = $this->hierarchyItems($posts);
-			$data['listForParents'] = $this->htmlSelectForParentHierarchy($this->hierarchy($itemsToParents));
+			$data['listForParents'] = $this->listForParents($posts);
 			$data['templates'] 		= $this->htmlSelectForTemplateList();
 		}elseif($this->options['taxonomy']){
 			$data['terms'] = $this->getTermList(array_keys($this->options['taxonomy']));
@@ -78,8 +77,19 @@ class Post extends Model{
 		return $data;
 	}
 	
+	public function listForParents($posts = NULL, $parent = NULL){
+		if(!$posts){
+			if(!isset($this->options))
+				$this->options = HelperDi::get('config')->getPageOptionsByType('page');
+			$posts = $this->getAllPosts($this->options['type'], ['id', 'parent', 'title', 'url']);
+		}
+			
+		$itemsToParents = $this->hierarchyItems($posts);
+		return $this->htmlSelectForParentHierarchy($this->hierarchy($itemsToParents, 'select', $parent));
+	}
+	
 	private function htmlSelectForParentHierarchy($hierarchyList){
-		return '<select style="width: 100%;"name="parent"><option value="0">(нет родительской)</option>' . $hierarchyList . '</select>';
+		return '<select style="width: 100%;" name="parent"><option value="0">(нет родительской)</option>' . $hierarchyList . '</select>';
 	}
 	
 	private function htmlSelectForTemplateList($postTeplate = NULL){

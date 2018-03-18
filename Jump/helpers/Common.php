@@ -208,4 +208,59 @@ class Common{
 		
 		return $ip;
 	}
+	
+	public static function getOption($value){
+		return HelperDI::get('config')->getOption($value);
+	}
+	
+	public static function setOption($key, $value){
+		$optionsFileName = JUMP . '/config/options.php';
+		$options = file_get_contents($optionsFileName);
+		
+		$optionPattern = '~(\''.$key.'\'\s*=>\s*)\'(.*)\'~';
+		$optionReplace = '$1\''.$value.'\'';
+		$newOption = "\t'{$key}' => '{$value}',\r\n]";
+		
+		$newOptions = preg_match($optionPattern, $options) ? preg_replace($optionPattern, $optionReplace, $options) :
+															 preg_replace('~]~', $newOption, $options);
+		
+		$config = HelperDI::get('config');
+		$config->setOption($key, $value);
+		file_put_contents($optionsFileName, $newOptions);
+	}
+	
+	public static function getCache($cacheFileName, $delay = 86400, $outNow = true){
+		//if(!cacheIsEnable()) return false;
+		$cacheFileName = UPLOADS_DIR . 'cache/' . $cacheFileName . '.html';
+		
+		if(file_exists($cacheFileName))
+		{
+			if($delay == -1 || (filemtime($cacheFileName) > time() - $delay)){
+				if(!$data = file_get_contents($cacheFileName)) return false;
+				if($outNow) echo $data;
+				else 	  return $data;
+				return true;
+			}
+		}
+		ob_start();
+		return false;
+	}
+
+	public static function setCache($cacheFileName, $data = false){
+		if(!$data) $data = ob_get_clean();
+		//if(!cacheIsEnable()) return $data;
+		$cacheFileName = UPLOADS_DIR . 'cache/' . $cacheFileName . '.html';
+		
+		if(!is_dir($dir = dirname($cacheFileName))){
+			mkdir($dir, 0755, true);
+		}
+		
+		file_put_contents($cacheFileName, $data, LOCK_EX);
+		return $data;
+	}
+	
+	
+	public static function className($namespace){
+		return end(explode('\\', $namespace));
+	}
 }

@@ -371,7 +371,7 @@ nav{
 	top: 60px;
 }
 
-nav ul{
+nav > ul{
 	display: block;
 	position: absolute;
 	right: 0;
@@ -403,7 +403,18 @@ nav a{
 
 nav .submenu{
 	display: none;
+	position: absolute;
 }
+
+nav .top-menu:hover .submenu{
+	display: block;
+}
+
+nav .submenu li{
+	display: block;
+	text-align: left;
+}
+
 
 
 
@@ -2353,4 +2364,9 @@ textarea, input[type="text"]{
 
 .pointer{
 	cursor: pointer;
+}
+
+.front-list .post-meta ul,
+.front-list .post-meta ul li{
+	display: inline
 }
