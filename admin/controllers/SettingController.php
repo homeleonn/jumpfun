@@ -9,6 +9,8 @@ class SettingController extends Controller{
 	public function actionIndex(){
 		global $di;
 		$data['settings']['front_page'] = Common::getOption('front_page');
+		$data['settings']['title'] = Common::getOption('title');
+		$data['settings']['description'] = Common::getOption('description');
 		$post = new \admin\models\Post\Post(new \frontend\models\Post\Taxonomy($di));
 		$parent = is_numeric($data['settings']['front_page']) ? $data['settings']['front_page'] : NULL;
 		$data['settings']['listForParents'] = $post->listForParents(NULL, $parent);

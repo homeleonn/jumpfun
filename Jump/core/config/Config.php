@@ -61,19 +61,20 @@ class Config{
 		$type = $options['type'];
 		$sep  = '/';
 		
-		
 		// Routing
 		$router = HelperDI::get('router');
 		if(ENV != 'admin'){
-			$paged = $options['rewrite']['paged'] ? "({$sep}page/([2-9]|\d{2,}))?" : '';
+			$paged = $options['rewrite']['paged'] ? "{$sep}page/([2-9]|\d{2,})" : '';
 			//$router->add($singleSlug . $sep . '(' . URL_PATTERN . ')', $type . ':single/$1' . $addArgs);
 			if($options['has_archive']){
-				$router->add($options['has_archive'] . $paged, $type . ':list'.S.S.S.'$1');
+				$router->add($options['has_archive'] . $paged, $type . ':list'.S.S.S.'$2');
+				$router->add($options['has_archive'], $type . ':list'.S.S.S);
 			}
 			if(!empty($options['taxonomy'])){
 				if($options['has_archive'] === false) $sep = '';
 				foreach($options['taxonomy'] as $t => $values)
-					$router->add("{$options['has_archive']}{$sep}{$t}/(.*)" . $paged, $type . ":list|{$t}|$1|$3");
+					$router->add("{$options['has_archive']}{$sep}{$t}/(.*)", $type . ":list|{$t}|$1");
+					$router->add("{$options['has_archive']}{$sep}{$t}/(.*)" . $paged, $type . ":list|{$t}|$1|$2");
 			}
 		}else{
 			$router

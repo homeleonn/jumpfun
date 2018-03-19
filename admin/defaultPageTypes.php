@@ -2,8 +2,6 @@
 use Jump\helpers\Common;
 use Jump\helpers\Session;
 
-//use frontend\models\Post\Post;
-//dd((new Post)->taxonomy);
 
 
 $this->di->get('config')->addPageType([
@@ -341,3 +339,14 @@ function redirect($path){
 	global $di;
 	$di->get('request')->location(ROOT_URI . ($path ? $path . '/' : ''));
 }
+
+
+
+
+
+// $s = 'category/news/politics/page/2/';
+// $pattern = '~^category/(.*)/page/([2-9]|\d{2,})/$~u';
+
+// dd($s, $pattern, preg_match($pattern, $s, $matches), $matches);
+
+

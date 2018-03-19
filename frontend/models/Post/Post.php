@@ -29,7 +29,7 @@ class Post extends Model{
 	private $options;
 	private $filters;
 	private $limit;
-	private $page;
+	public $page;
 	private $start;
 	private $allItemsCount;
 	public $select = 'Select * from posts where ';
@@ -65,8 +65,8 @@ class Post extends Model{
 	
 	public function getPostsByPostType($type){
 		$query = $this->select . 'post_type = ?s order by created DESC';
-		return $this->db->getAll($query, $type);
-		//return $this->getAll($query, [$type]);
+		//return $this->db->getAll($query, $type);
+		return $this->getAll($query, [$type]);
 	}
 	
 	private function checkTermExists($taxonomy, $value){
@@ -78,10 +78,14 @@ class Post extends Model{
 	}
 	
 	public function getPostsBysTermsTaxonomyIds($termsTaxonomyIds){
-		//$query = 'Select p.*, t.id as term_id, t.name, t.slug, tt.* from ' . $this->relationship . 'and tt.term_taxonomy_id IN(?a) group by p.id order by p.created DESC, t.name ASC';
 		$query = 'Select distinct p.* from ' . $this->relationship . 'and tt.term_taxonomy_id IN(?a) group by p.id order by p.created DESC';
-		return $this->db->getAll($query, [$termsTaxonomyIds]);
-		//return $this->getAll($query, [$termsTaxonomyIds]);
+		$countCache = $this->db->getAll(str_replace('distinct p.*', 'count(distinct p.id) as count', $query), [$termsTaxonomyIds]);
+		$count = 0;
+		if($countCache){
+			foreach($countCache as $c)
+				$count += $c['count'];
+		}
+		return $this->getAll($query, [$termsTaxonomyIds], true, $count);
 	}
 	
 	public function getMeta($postId){
@@ -96,15 +100,17 @@ class Post extends Model{
 		return $metaNew;
 	}
 	
-	private function checkInLimit($query, $params){
-		$this->allItemsCount = (int)call_user_func_array([$this->db, 'getOne'], array_merge([str_replace('Select *', 'Select COUNT(*) as count', $query)], $params));
+	private function checkInLimit($query, $params, $count){
+		$this->allItemsCount = $count ?: (int)call_user_func_array([$this->db, 'getOne'], array_merge([str_replace('Select *', 'Select COUNT(*) as count', $query)], $params));
+		
 		if($this->allItemsCount && $this->allItemsCount <= $this->start){
 			$this->request->location(preg_replace('~page/\d+/?~', '', FULL_URL));
 		}
 	}
 	
-	private function getAll($query, $params){
-		$this->checkInLimit($query, $params);
+	private function getAll($query, $params, $array = false, $count = null){
+		if($array) $params = [$params];
+		$this->checkInLimit($query, $params, $count);
 		$data = call_user_func_array([$this->db, 'getAll'], array_merge([$query . $this->limit], $params));
 		return $data;
 	}

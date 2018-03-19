@@ -30,6 +30,6 @@
 	</div>
 	<?php endif; ?>
 </div>
-<?php if(!isset($rewrite['paged']) && $rewrite['paged']): ?>
+<?php if(isset($rewrite['paged']) && $rewrite['paged']): ?>
 <?=$pagenation;?>
 <?php endif; ?>

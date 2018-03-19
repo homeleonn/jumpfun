@@ -26,8 +26,9 @@ class PostController extends Controller{
 	
 	public function actionIndex(){
 		$frontPage = $this->config->front_page;
-		if(is_numeric($frontPage))
+		if(is_numeric($frontPage)){
 			return $this->actionSingle(NULL, $frontPage);
+		}
 		else{
 			return $this->last();
 		}
@@ -39,7 +40,15 @@ class PostController extends Controller{
 		$this->isFront = true;
 		$this->config->setOption('postType', 'post');
 		$this->setOptions();
-		return $this->actionList();
+		return $this->actionList(NULL, NULL, $this->page);
+	}
+	
+	private function checkFront($url){
+		if(preg_match('~page/(\d+)~', $url, $matches) && $this->config->front_page == 'last'){
+			$this->page = $matches[1];
+			return $this->last();
+		}
+		return false;
 	}
 	
 	
@@ -49,7 +58,10 @@ class PostController extends Controller{
 	 *  
 	 *  @return array post
 	 */
-	public function actionSingle($url, $id = NULL){//var_dump(func_get_args());exit;
+	public function actionSingle($url, $id = NULL){//dd(func_get_args(), $this->config->front_page);
+	
+		if($data = $this->checkFront($url))
+			return $data;
 		
 		// get all args, but may be come 'foo/bar/baz/zab/'
 		$hierarchy = explode('/', $url);
@@ -128,7 +140,7 @@ class PostController extends Controller{
 		
 		// Если правильная ссылка на запись и пришедшая не совпадают - отправляем по правильному адресу
 		if(FULL_URL != $post['url']){
-			exit('$this->request->location('.$post['url'].')');
+			dd('$this->request->location('.$post['url'].')');
 			//$this->request->location($permalink);
 		}
 		
@@ -210,9 +222,14 @@ class PostController extends Controller{
 		return $hierarchy;
 	}
 	
-	public function actionList($taxonomy = null, $taxonomySlug = null, $page = 1){//$this->model->all();//dd();
+	public function actionList($taxonomy = null, $taxonomySlug = null, $page = 1){//dd(func_get_args());
+		//$this->model->setLimit($this->page = $page, $this->perPage);
+		dd($this->options['rewrite']);
 		$this->model->setLimit($this->page = $page, $this->options['rewrite']['paged']);
 		$list = $this->options;
+		if($this->page > 1){
+			$list['title'] .= ' | Страница ' . $this->model->page;
+		}
 		$listMark = '__list';
 		
 		$hierarchy = explode('/', $taxonomySlug);
@@ -222,7 +239,9 @@ class PostController extends Controller{
 			//if($this->options['has_archive']){
 				if(!$list[$listMark] = $this->model->getPostsByPostType(Options::get('type'))) return 0;
 				$terms = $this->model->taxonomy->getAllByObjectsIds(array_keys(Common::itemsOnKeys($list[$listMark], ['id'])));
-				$termsByPostId = Common::itemsOnKeys($terms, ['object_id']);
+				//dd(array_keys(Common::itemsOnKeys($list[$listMark], ['id'])), $list[$listMark], $terms);
+				
+				$termsByPostId = $terms ? Common::itemsOnKeys($terms, ['object_id']) : [];
 				$terms1 = $this->model->taxonomy->getByTaxonomies();
 			// }else{
 				// dd(1);
@@ -334,6 +353,10 @@ class PostController extends Controller{
 		$list['filters'] = Common::archiveTermsHTML(array_reverse($postTerms), Options::getArchiveSlug());
 		$list['__model'] = $this->model;
 		$this->view->is('list');
+		if($this->isFront){
+			$list['title'] = Common::getOption('title');
+			$list['description'] = Common::getOption('description');
+		}
 		return $list;
 	}
 	
@@ -380,7 +403,9 @@ class PostController extends Controller{
 	}
 	
 	private function pagination(){
-		return (new Pagenation())->run($this->page, $this->model->getAllItemsCount(), $this->options['rewrite']['paged']);;
+		//dd($this->page, $this->model->getAllItemsCount(), $this->perPage);
+		return (new Pagenation())->run($this->model->page, $this->model->getAllItemsCount(), $this->options['rewrite']['paged']);
+		//return (new Pagenation())->run($this->model->page, $this->model->getAllItemsCount(), $this->perPage);
 	}
 	
 	private function postTermsLink($termsOnId, $termsOnParent, $termsByPostId, $mergeKey = 'slug'){//var_dump(func_get_args());exit;

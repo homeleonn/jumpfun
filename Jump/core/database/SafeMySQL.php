@@ -489,7 +489,7 @@ class SafeMySQL
 		$array = preg_split('~(\?[nsiuap])~u',$raw,null,PREG_SPLIT_DELIM_CAPTURE);
 		if(isset($args[0]) && is_array($args[0])) $args = $args[0];
 		$anum  = count($args);
-		$pnum  = floor(count($array) / 2);
+		$pnum  = floor(count($array) / 2);//d($pnum, $anum, $args, $raw);
 		if ( $pnum != $anum )
 		{
 			$this->error("Number of args ($anum) doesn't match number of placeholders ($pnum) in [$raw]");
