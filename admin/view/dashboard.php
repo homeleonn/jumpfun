@@ -6,9 +6,9 @@ function getSections($type, $pageTypes){
 		$sections['Медиафайлы||picture'] = 'media';
 		if($pageTypes){
 			foreach($pageTypes as $pt){
-				$key = $pt['title'] . '||' . $pt['icon'];
+				$key = $pt['title_for_admin'] . '||' . $pt['icon'];
 				$sections[$key] = [
-					'Все ' . mb_strtolower($pt['title']) => $pt['type'],
+					'Все ' . mb_strtolower($pt['title_for_admin']) => $pt['type'],
 					'Добавить новую' => $pt['type'] . '/add',
 				];
 				if(!empty($pt['taxonomy'])){
@@ -28,6 +28,7 @@ function getSections($type, $pageTypes){
 		$sections = array_merge($sections, 
 			['Комментарии||comment' => 'comments'],
 			['Пользователи||user' => 'users'],
+			['Плагины||cog' => 'plugins'],
 			['Настройки||cog' => [
 					'Общие' => 'settings',
 					'Меню' => 'menu',

@@ -3,10 +3,34 @@ use Jump\helpers\Common;
 use Jump\helpers\Session;
 
 
+function plugins($run = false){
+	$pluginFolders = glob(ROOT . 'content/plugins/' . '*');
+	
+	if(!$pluginFolders) return false;
+	
+	$plugins = [];
+	foreach($pluginFolders as $folder)
+	{
+		$basename = basename($folder);
+		$mainFile = $folder . '/' . $basename . '.php';
+		
+		if(file_exists($mainFile))
+		{
+			if($run)
+				include $mainFile;
+			else
+				$plugins[] = $mainFile;
+		}
+	}
+	
+	return $plugins;
+}
+
 
 $this->di->get('config')->addPageType([
 		'type' => 'post',
-		'title' => 'Записи',
+		'title' => '',
+		'title_for_admin' => 'Записи',
 		'description' => 'Записи',
 		'add' => 'Добавить запись',
 		'edit' => 'Редактировать запись',
@@ -23,12 +47,13 @@ $this->di->get('config')->addPageType([
 				'hierarchical' => false,
 			],
 		],
-		'rewrite' => ['slug' => '%category%', 'with_front' => true, 'paged' => true],
+		'rewrite' => ['slug' => '%category%', 'with_front' => true, 'paged' => 20],
 ]);
 
 $this->di->get('config')->addPageType([
 		'type' => 'page',
-		'title' => 'Страницы',
+		'title' => '',
+		'title_for_admin' => 'Страницы',
 		'description' => 'Страницы',
 		'add' => 'Добавить страницу',
 		'edit' => 'Редактировать страницу',
@@ -42,6 +67,14 @@ $this->di->get('config')->addPageType([
 
 
 function add($type, $funcName, $userFunc){
+	// if(is_array($userFunc)){
+		// if(isset($userFunc[0]) && isset($userFunc[1])){
+			// if(is_object($userFunc[0]) && method_exists($userFunc[0], $userFunc[1])){
+				// $userFunc[0]->{$userFunc[1]}();
+			// }
+		// }
+		// dd($userFunc);
+	// }
 	$GLOBALS['jump_'.$type][$funcName][] = $userFunc;
 }
 
@@ -170,19 +203,7 @@ function jmpHead(){
 	doAction('jhead');
 }
 
-addAction('jhead', function(){
-	global $post;
-	$meta = ['description', 'keywords'];
-	
-	foreach($meta as $m){
-		if(isset($post[$m]))
-			echo meta($m, $post[$m]);
-	}
-});
 
-function meta($name, $content){
-	return '<meta name="'. $name .'" content="'. $content .'">' . "\n";
-}
 
 
 

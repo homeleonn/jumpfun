@@ -120,7 +120,7 @@ class Router{
 	
 	private function replaceUriIfAdmin($uri){
 		if(strpos($uri, 'admin/') === 0) {
-			if(!isAdmin()) $this->request->notfound();
+			//if(!isAdmin()) $this->request->notfound();
 			if($uri == 'admin/') $uri = '/';
 			else{
 				$replaceCount = 1;

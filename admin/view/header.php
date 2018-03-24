@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Панель администратора</title>
+	<title><?=isset($data['title']) ? $data['title'] . ' | ' : ''?>Панель администратора</title>
 	<link rel="stylesheet" type="text/css" href="<?=ADMIN_THEME;?>css/bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="<?=ADMIN_THEME;?>css/fontello.css">
 	<link rel="stylesheet" type="text/css" href="<?=ADMIN_THEME;?>css/style.css">
@@ -28,7 +28,6 @@
 			<div id="logo"><img src="<?=ADMIN_THEME;?>img/jump.png"></div>
 		</div>
 	</header>
-	<?php 
-		include 'dashboard.php';
-	?>
+	<?php include 'dashboard.php'; ?>
 	<div id="content">
+		<?php doAction('admin_head'); ?>

@@ -27,6 +27,8 @@ class View
     }
 
     public function render($template, $data = [], $withBlocks = true){//dd(get_defined_vars());
+		global $post;
+		$post = $data;
 		$contentFile = '';
 		$this->path = $this->getPath($template);
 		if(ENV != 'admin'){

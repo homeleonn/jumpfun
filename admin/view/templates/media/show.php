@@ -14,7 +14,7 @@
 <div class="row" style="margin-left: 10px;">
 	<div class="media-thumbs">
 	<?php 
-	foreach($data as $media):
+	foreach($data['media'] as $media):
 		$img = explode('.', $media['src']);
 		$img = UPLOADS . $img[0] . '-150x150.' . $img[1];
 		$orig = UPLOADS . $media['src'];

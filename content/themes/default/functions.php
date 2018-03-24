@@ -24,15 +24,15 @@
 
 $di->get('config')->addPageType([
 		'type' => 'educator',
-		'title' => 'Преподаватели',
-		'description' => 'educator1',
+		'title' => 'Преподаватели академии',
+		'title_for_admin' => 'Преподаватели',
+		'description' => 'Наши преподаватели, они помогут вам освоить хореографию.',
 		'add' => 'Добавить педагога',
 		'edit' => 'Редактировать педагога',
 		'delete' => 'Удалить педагога',
 		'common' => 'педагогов',
 		'hierarchical' => false,
 		'has_archive'  => 'educators',
-		//'has_archive'  => 'educators',
 		'rewrite' => ['slug' => 'educators/%style%', 'with_front' => false, 'paged' => 20],
 		'taxonomy' => [
 			'style' => [

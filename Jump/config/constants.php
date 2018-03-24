@@ -39,5 +39,6 @@ define('FILTER_PATTERN', '[^;\-,=][a-zA-Z0-9-,=;]+[^;,=]');
 define('S', '|'); //sumbol separator for args parse
 
 define('TEMPLATE', '/^[ \t\/*#@]*Template:(.*)$/mi');
+define('PLUGIN', '/^[ \t\/*#@]*needle:(.*)$/mi');
 
 //var_dump($_SERVER, $_SESSION, ROOT_URI, FULL_URI, URI, SITE_URL, FULL_URL_WITHOUT_PARAMS, FULL_URL);exit;

@@ -9,12 +9,13 @@ use Jump\helpers\Common;
 
 class MediaController extends Controller{
 	public function actionShow($async = false){
-		$mediaData = $this->model->getAll();
+		$data['media'] = $this->model->getAll();
+		$data['title'] = 'Медиа';
 		
 		if($async === 'async'){
-			$this->view->render('media/show', $mediaData, false);
+			$this->view->render('media/show', $data, false);
 		}else{
-			return $mediaData;
+			return $data;
 		}
 	}
 	

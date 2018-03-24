@@ -31,6 +31,7 @@ class MenuController extends Controller{
 			
 		//$data['categories'] = Catalog::getAllCategories();
 		//$data['pages'] 		= Page::getAllPages();
+		$data['pages'] 		= $this->db->getAll('Select * from posts where post_type = \'page\'');
 		$data['menus'] 		= $this->menus();
 		$data['menuItems'] 	= $this->menuItems($data['menus']['id']);
 		return $data;

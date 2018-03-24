@@ -498,7 +498,8 @@ table.admin td{
 	
 }
 
-.comment-content-cell
+.comment-content-cell,
+.option-cell
 {
 	position: relative;
 }
@@ -512,7 +513,8 @@ table.admin td{
 	padding-bottom: 15px;
 }
 
-.comment-content-cell .options
+.comment-content-cell .options,
+.option-cell .options
 {
 	display: none;
 	position: absolute;
@@ -520,14 +522,16 @@ table.admin td{
 	font-size: 12px;
 }
 
-.user-cell .options
+.user-cell .options,
+.option-cell .options
 {
 	display: none;
 	font-size: 12px;
 }
 
-.comment-cell:hover .options,
-.user-cell:hover .options
+.comment-content-cell:hover .options,
+.user-cell:hover .options,
+.option-cell:hover .options
 {
 	display: block;
 }

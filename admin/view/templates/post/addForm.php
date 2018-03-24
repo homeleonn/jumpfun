@@ -1,7 +1,5 @@
 <?php  
-//var_dump(admin\AdminController::$postType);
-//var_dump(get_defined_vars());exit;
-//var_dump($options, $data);exit;
+//dd(get_defined_vars());
 ?>
 <?=doAction('admin_post_options_form');?>
 <h2><?=$options['add']?></h2>
@@ -19,6 +17,7 @@
 		<?php include $this->getFile('sidebar/extraFields');?>
 		<?=doAction('add_extra_rows', $options['type']);?>
 		<?php include $this->getFile('sidebar/comments');?>
+		<?php doAction('add_post_after');?>
 	</div>
 	
 	<!-- Block for add post categories -->

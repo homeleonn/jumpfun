@@ -26,6 +26,7 @@
 		</div>
 		<?php include $this->getFile('sidebar/extraFields');?>
 		<?php include $this->getFile('sidebar/comments');?>
+		<?php doAction('add_post_after');?>
 	</div>
 	<div id="sidebar-right" class="col-md-4">
 		<br><br><span class="icon-calendar"></span> Добавлено: <?=$data['created']?>

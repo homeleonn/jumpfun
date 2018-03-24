@@ -20,6 +20,9 @@ return [
 	['menu/select', 'menu/select', 'POST'],
 	['menu/activate', 'menu/activate', 'POST'],
 	
+	['plugins', 'plugin', 'GET'],
+	
+	
 	['settings', 'setting', 'GET'],
 	['settings/save', 'setting/save', 'POST'],
 	

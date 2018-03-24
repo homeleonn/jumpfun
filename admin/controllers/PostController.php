@@ -40,7 +40,7 @@ class PostController extends AdminController{
 		return $this->model->addForm();
 	}
 	
-	public function actionAdd(){//var_dump($this->request->post, $_FILES);exit;
+	public function actionAdd(){//dd($this->request->post, $_FILES);exit;
 		list($post, $extraFields) = $this->postProcessing($this->request->post['title']);
 		$post['url'] = $this->model->checkUrl($post['url'], $post['parent']);
 		$post['post_type'] = $this->options['type'];
@@ -96,6 +96,8 @@ class PostController extends AdminController{
 			'_jmp_post_template', 
 			'_jmp_post_img',
 		];
+		$extraFieldKeys = \applyFilter('extra_fields_keys', $extraFieldKeys);
+		
 		foreach($extraFieldKeys as $key){
 			if(isset($this->request->post[$key]) && $this->request->post[$key]){
 				$extraFields[$key] = $this->request->post[$key];

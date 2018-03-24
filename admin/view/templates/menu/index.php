@@ -49,8 +49,8 @@ echo '<script>var menuItems = $.parseJSON(\'' . json_encode($data['menuItems']) 
 		</div>
 		<div>
 			<?php
-				// foreach($pages as $page)
-					// echo '<input type="checkbox" data-name="',$page['name'],'" data-url="',$page['url'],'" data-origname="',$page['name'],'" data-type="Страница" > <a href="',URL, $page['url'],'/">',$page['name'],'</a>', "<br>\n";
+				foreach($data['pages'] as $page)
+					echo '<input type="checkbox" data-name="',$page['title'],'" data-url="',$page['url'],'" data-origname="',$page['title'],'" data-type="Страница" > <a href="',ROOT_URI, $page['url'],'/">',$page['title'],'</a>', "<br>\n";
 			?>
 		</div>
 		<div id="some-link">

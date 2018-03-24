@@ -20,7 +20,9 @@ try{
 		(new $service($di))->init();
 	}
 	
+	plugins(true);
 	require_once THEME_DIR . 'functions.php';
+	
 	
 	$di->set('models', []);
 	

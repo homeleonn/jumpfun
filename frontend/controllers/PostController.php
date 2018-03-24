@@ -141,7 +141,6 @@ class PostController extends Controller{
 		// Если правильная ссылка на запись и пришедшая не совпадают - отправляем по правильному адресу
 		if(FULL_URL != $post['url']){
 			dd('$this->request->location('.$post['url'].')');
-			//$this->request->location($permalink);
 		}
 		
 		// Указываем что выводить данную запись следует шаблоном single
@@ -224,7 +223,7 @@ class PostController extends Controller{
 	
 	public function actionList($taxonomy = null, $taxonomySlug = null, $page = 1){//dd(func_get_args());
 		//$this->model->setLimit($this->page = $page, $this->perPage);
-		dd($this->options['rewrite']);
+		//d($this->options['rewrite']);
 		$this->model->setLimit($this->page = $page, $this->options['rewrite']['paged']);
 		$list = $this->options;
 		if($this->page > 1){
@@ -340,9 +339,12 @@ class PostController extends Controller{
 			$taxonomyName = $taxonomySlug;
 		
 		$taxonomyTitle = $taxonomy ? $this->options['taxonomy'][$taxonomy]['title'] : '';
+		
 		$this->addBreadCrumbs($list, $taxonomyTitle, $taxonomyName, $taxonomyName);
+		
 		$list['pagenation'] = $this->pagination();
 		
+		//dd($list);
 		$archiveTerms = $terms1;
 		
 		list($termsOnId, $termsOnParent) = Common::itemsOnKeys($archiveTerms, ['id', 'parent']);
@@ -423,7 +425,7 @@ class PostController extends Controller{
 	/*** BreadCrumbs ***/
 	/*******************/
 	
-	private function addBreadCrumbs(&$post, $taxonomyTitle = null, $value = null, $type = null){//var_dump(func_get_args());exit;
+	private function addBreadCrumbs(&$post, $taxonomyTitle = null, $value = null, $type = null){//dd(func_get_args());
 		if($this->options['has_archive'] && !Options::front())
 			$this->config->addBreadCrumbs($this->options['has_archive'], $this->options['title']);
 		
@@ -434,15 +436,15 @@ class PostController extends Controller{
 		}elseif(isset($post['id']) && $this->config->front_page != $post['id']){
 			$this->config->addBreadCrumbs($post['url'], $post['title']);
 			//if(isset($this->options['rewrite']['slug']))
-				//$post['title'] .= ' - ' . $this->options['title'];
+			if($this->options['title'])
+				$post['title'] .= ' - ' . $this->options['title'];
 		}
 			
 	}
 	
-	private function addBreadCrumbsHelper($taxonomyTitle, $value, $text, &$postTitle){
+	private function addBreadCrumbsHelper($taxonomyTitle, $value, $text, &$postTitle){//dd(func_get_args());
 		$this->config->addBreadCrumbs($taxonomyTitle, $text . ': ' . $value);
-		$postTitle = $value; //. " - {$text} " . $postTitle;
-		//$postTitle = $value . " - {$text} " . $postTitle;
+		$postTitle = $taxonomyTitle . ': ' . $value . ' | ' . $postTitle;
 	}
 	
 	private function stats(){
