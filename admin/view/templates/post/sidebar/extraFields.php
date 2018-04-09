@@ -1,4 +1,4 @@
-<div class="extra-fields none side-block">
+<div class="extra-fields side-block">
 	<div class="block-title">Произвольные поля</div>
 	<div class="block-content">
 		<div class="new_extra_fields">

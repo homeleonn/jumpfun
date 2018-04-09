@@ -36,12 +36,85 @@ echo '<script>var menuItems = $.parseJSON(\'' . json_encode($data['menuItems']) 
 <link rel="stylesheet" type="text/css" href="<?=ADMIN_THEME;?>css/menu.css">
 <div id="menu-create">
 	<div class="inset">
-		<div class="active" data-id="0">Категории</div>
-		<div data-id="1">Страницы</div>
-		<div data-id="2">Произвольная ссылка</div>
+		<?php
+			$i = 0;
+			//dd($data['types']);
+			foreach($data['types'] as $key => $type){
+				if($key == 'taxonomies'){
+					foreach($type as $tt=>$t){
+						$active = !$i ? 'class="active"' : '';
+						echo '<div ', $active,' data-id="',$i ,'">', $t['title'],'</div>';
+						$i++;
+					}
+				}else{
+					$active = !$i ? 'class="active"' : '';
+					echo '<div ', $active,' data-id="',$i ,'">', $type['title_for_admin'],'</div>';
+					$i++;
+				}
+				
+			}
+		?>
+		<!--<div class="active" data-id="0">Категории</div>
+		<div data-id="1">Страницы</div>-->
+		<div data-id="<?=$i?>">Произвольная ссылка</div>
 	</div>
 	<div class="item-lists">
+	<?php
+			$i = 0;
+			//dd($data['types']);
+			foreach($data['types'] as $key => $type){
+				//d($type['type']);
+				if($key == 'taxonomies'){
+					
+					foreach($type as $tt => $t){
+						$posts = $data['posts_on_types']['taxonomies'][$tt];
+						$active = !$i++ ? 'class="active"' : '';
+						echo '<div ', $active,'>';
+						
+						menuRecursive1($posts, ($t['archive'] ? $t['archive'] . '/' : '') . $tt);
+							
+						echo '</div>';
+					}
+					continue;
+				}
+					$posts = $data['posts_on_types'][$type['type']];
+				$active = !$i++ ? 'class="active"' : '';
+				echo '<div ', $active,'>';
+				if($type['hierarchical']){
+					menuRecursive($posts);
+				}else{
+					foreach($posts as $page){
+						echo '<input type="checkbox" data-name="',$page['title'],'" data-url="', $page['url'],'" data-origname="',$page['title'],'" data-type="Страница" > <a href="',$page['url'],'">',$page['title'],'</a>', "<br>\n";
+					}
+					
+				}
+					
+				echo '</div>';
+			}
+			function menuRecursive($pages, $url = '', $level = 0){
+				foreach($pages as $page)
+				{
+					echo ' ', str_repeat('---', $level), ' <input type="checkbox" data-name="',$page['title'],'" data-url="', $url, $page['url'],'" data-origname="',$page['title'],'" data-type="Страница" > <a href="',ROOT_URI, $url, $page['url'],'/">',$page['title'],'</a>', "<br>\n";
+					
+					if(isset($page['children']))
+						menuRecursive($page['children'], $url . $page['url'] . '/', $level + 1);
+				}
+			}
+			
+			function menuRecursive1($pages, $taxonomy, $url = '', $level = 0){
+				foreach($pages as $page)
+				{
+					echo ' ', str_repeat('---', $level), ' <input type="checkbox" data-name="',$page['name'],'" data-url="', $taxonomy, '/',$url, $page['slug'],'" data-origname="',$page['name'],'" data-type="Страница" > <a href="',ROOT_URI, $taxonomy, '/', $url, $page['slug'],'/">',$page['name'],'</a>', "<br>\n";
+					
+					if(isset($page['children']))
+						menuRecursive1($page['children'], $taxonomy, $url . $page['slug'] . '/', $level + 1);
+				}
+			}
+			
+		?>
+		<? /*
 		<div class="active">
+		
 		<?php
 			// foreach($categories as $cat)
 				// echo '<input type="checkbox" data-name="',$cat['name'],'" data-url="',$cat['url'],'-c',$cat['id'],'" data-origname="',$cat['name'],'" data-type="Категория" > ' , getCatLink($cat) , "<br>\n";
@@ -49,10 +122,19 @@ echo '<script>var menuItems = $.parseJSON(\'' . json_encode($data['menuItems']) 
 		</div>
 		<div>
 			<?php
-				foreach($data['pages'] as $page)
-					echo '<input type="checkbox" data-name="',$page['title'],'" data-url="',$page['url'],'" data-origname="',$page['title'],'" data-type="Страница" > <a href="',ROOT_URI, $page['url'],'/">',$page['title'],'</a>', "<br>\n";
+				// menuRecursive($data['pages']);
+				// function menuRecursive($pages, $url = '', $level = 0){
+					// foreach($pages as $page)
+					// {
+						// echo ' ', str_repeat('---', $level), ' <input type="checkbox" data-name="',$page['title'],'" data-url="', $url, $page['url'],'" data-origname="',$page['title'],'" data-type="Страница" > <a href="',ROOT_URI, $url, $page['url'],'/">',$page['title'],'</a>', "<br>\n";
+						
+						// if(isset($page['children']))
+							// menuRecursive($page['children'], $url . $page['url'] . '/', $level + 1);
+					// }
+				// }
+					
 			?>
-		</div>
+		</div>*/?>
 		<div id="some-link">
 			Имя<br>
 			<input class="name"></input><br><br>

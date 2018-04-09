@@ -160,6 +160,7 @@ class PostController extends Controller{
 				$this->request->location(SITE_URL . $this->getParentHierarchy($parent, $this->model->getPostsByPostType('page'),  'url') . '/' . $url . '/', 301);
 			}else{
 				$parents = $this->db->getAll('Select id, title, url, parent from posts where url IN(\''.implode("','", $hierarchy).'\') order by parent DESC');
+				//d($parents, $hierarchy, $parent);
 				if(count($parents) < count($hierarchy)){
 					$this->request->location(NULL, 404);
 				}else{
@@ -168,7 +169,7 @@ class PostController extends Controller{
 					$i = 0;
 					$addBreadCrumbs = [];
 					
-					foreach($parents as $parent){
+					foreach($parents as $parent){//d($parent['id']);
 						if($parent['id'] != $tempParent || $parent['url'] != $h[$i]){
 							$this->request->location(NULL, 404);
 						}
@@ -177,6 +178,8 @@ class PostController extends Controller{
 						$addBreadCrumbs[$h[$i]] = $parent['title'];
 						$i++;
 					}
+					if($tempParent)
+						$this->request->location(NULL, 404);
 					
 					foreach(array_reverse($addBreadCrumbs) as $link => $title){
 						$this->config->addBreadCrumbs($link, $title);
@@ -399,8 +402,8 @@ class PostController extends Controller{
 	}
 	
 	
-	private function postPermalink(&$post, $termsOnId, $termsOnParent, $termsByPostId){//var_dump(func_get_args());exit;
-		$permalink 	 = SITE_URL . trim(Options::slug(), '/') . '/' . $post['url'] . '/';
+	public function postPermalink(&$post, $termsOnId, $termsOnParent, $termsByPostId, $slug = false){//var_dump(func_get_args());exit;
+		$permalink 	 = SITE_URL . ($slug ?: trim(Options::slug(), '/')) . '/' . $post['url'] . '/';
 		$post['url'] = $post['permalink'] = applyFilter('postTypeLink', $permalink, $termsOnId, $termsOnParent, $termsByPostId);
 	}
 	

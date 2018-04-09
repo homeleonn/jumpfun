@@ -3,6 +3,7 @@
 // $di->get('config')->addPageType([
 		// 'type' => 'new',
 		// 'title' => 'Новости',
+		// 'title_for_admin' => 'Новости',
 		// 'description' => 'news1',
 		// 'add' => 'Добавить новость',
 		// 'edit' => 'Редактировать новость',

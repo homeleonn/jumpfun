@@ -31,7 +31,80 @@ class MenuController extends Controller{
 			
 		//$data['categories'] = Catalog::getAllCategories();
 		//$data['pages'] 		= Page::getAllPages();
-		$data['pages'] 		= $this->db->getAll('Select * from posts where post_type = \'page\'');
+		$data['title'] = 'Меню';
+		
+		$posts 		= $this->db->getAll('Select * from posts order by created ASC');
+		$postsOnTypes = Common::itemsOnKeys($posts, ['post_type']);
+		//$data['types'] = array_keys($postsOnTypes);
+		
+		global $di;
+		$taxonomy = new \frontend\models\Post\Taxonomy($di->get('db'));
+		$post = new \admin\models\Post\Post($taxonomy);
+		$postFront = new \frontend\models\Post\Post($taxonomy);
+		$postControllerFront = new \frontend\controllers\PostController;
+		//$data['pages'] 		= $post->listForParents($postsOnTypes['page'], NULL, TRUE);
+		//unset($postsOnTypes['page']);
+		
+		if(!empty($postsOnTypes))
+		{
+			$allTaxonomies = $allPostIds = $taxonomies = [];
+			foreach($postsOnTypes as $postType => &$posts)
+			{
+				if(!$options = $di->get('config')->getPageOptionsByType($postType))
+					continue;
+				
+				$data['types'][$options['type']] = $options;
+				//d($options['taxonomy']);
+				if(isset($options['taxonomy'])){
+					foreach($options['taxonomy'] as &$tax) $tax['archive'] = $options['has_archive'];
+					//d($options['taxonomy']);
+					$taxonomies = array_merge($taxonomies, $options['taxonomy']);
+				}
+				
+				if($options['hierarchical'])
+					$posts = $post->listForParents($posts, NULL, TRUE);
+				else{
+					$allPostIds 	= array_merge($allPostIds, Common::getKeys($posts, 'id'));
+					$allTaxonomies 	= array_merge($allTaxonomies, array_keys($options['taxonomy']));
+				}
+			}
+			//dd($taxonomies);
+			
+			$postsTerms = $post->taxonomy->getByTaxonomies($allTaxonomies);
+			
+			$relatedPostTerms = $postFront->getPostsTerms(' and tr.object_id IN( ' . implode(',', $allPostIds) . ') and tt.taxonomy IN(\''.implode("','", $allTaxonomies).'\')');
+			$relatedPostTerms = Common::itemsOnKeys($relatedPostTerms, ['object_id']);
+			
+			list($termsOnId, $termsOnParent, $termsOnTaxonomies) = Common::itemsOnKeys($postsTerms, ['id', 'parent', 'taxonomy']);
+			
+			//dd($postsTerms, $allTaxonomies, $allPostIds, $relatedPostTerms, $termsOnId, $termsOnParent);
+			//dd($post->hierarchyItems($postsTerms));
+			
+			foreach($postsOnTypes as $postType => &$posts)
+			{
+				$options = $data['types'][$postType] ?? null;
+				//d($options);
+				if($options && !$options['hierarchical'])
+				{
+					foreach($posts as &$onePost)
+					{
+						$postControllerFront->postPermalink($onePost, $termsOnId, $termsOnParent, $relatedPostTerms[$onePost['id']] ?? null, $options['rewrite']['slug']);
+					}
+				}
+			}
+			
+			if(!empty($taxonomies)){
+				$data['types']['taxonomies'] = $taxonomies;
+				foreach($taxonomies as $tax1 => $opt){
+					$postsOnTypes['taxonomies'][$tax1] = $post->hierarchyItems($termsOnTaxonomies[$tax1]);
+				}
+			}
+			
+			
+		}
+		
+		$data['posts_on_types'] = $postsOnTypes;
+		
 		$data['menus'] 		= $this->menus();
 		$data['menuItems'] 	= $this->menuItems($data['menus']['id']);
 		return $data;

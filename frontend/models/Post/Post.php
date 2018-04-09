@@ -60,7 +60,12 @@ class Post extends Model{
 	
 	public function getPostTerms($where){
 		if(!$where) return false;
-		return $this->db->getAll('Select t.*, tt.* from ' . str_replace(['posts p,', 'and p.id = tr.object_id'], '', $this->relationship) . $where);
+		return $this->db->getAll('Select DISTINCT t.*, tt.* from ' . str_replace(['posts p,', 'and p.id = tr.object_id'], '', $this->relationship) . $where);
+	}
+	
+	public function getPostsTerms($where){
+		if(!$where) return false;
+		return $this->db->getAll('Select t.*, tt.*, tr.object_id from ' . str_replace(['posts p,', 'and p.id = tr.object_id'], '', $this->relationship) . $where);
 	}
 	
 	public function getPostsByPostType($type){

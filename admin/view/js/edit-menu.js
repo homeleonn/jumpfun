@@ -121,8 +121,16 @@
 		
 		currentItem = countItems();
 		items.each(function(i, item){
+			// if($(item).data('sub')){
+				// $(item).data('id', -1);
+				// menuFill($(item).data(), $('.dd-item[data-id='+(currentItem - 1)+']'));
+			// }else{
+				// $(item).data('id', currentItem++);
+				// menuFill($(item).data());
+			// }
+			
 			$(item).data('id', currentItem++);
-			menuFill($(item).data());
+				menuFill($(item).data());
 		});
 		$('#nestable3').nestable().change();
 		$('#save-menu').removeClass('none');
@@ -205,14 +213,30 @@
 	}
 	
 	function menuFill(item, to){
+		//console.log(to);
+		//var aa = to ? 1 : 0;
 		var to = to || $('.dd > .dd-list');
 		var clone = $('#item-prototype li').clone();
+		/*if(aa){
+			console.log(to.find('.dd-list'));
+			if(!to.find('.dd-list').length)
+				$(to).append('<ol class="dd-list"></ol>');
+			
+			//to.find('.dd-list').append(clone);
+			item.id = -1;
+		} */
+		
 		clone.data(item);
+		$(clone).data('id', item.id).attr('data-id', item.id);
 		clone.find('.item-title').children('.new, .old').text(item.name);
 		clone.find('.sub').find('.linkname').val(item.name);
 		var fullUrl = !item.url.toLowerCase() ? 'javascript:void(0);' : root+item.url+'/';
 		clone.find('.sub').find('.original-link').html('<a href="'+fullUrl+'">'+item.origname+'</a>');
 		to.append(clone);
+		// if(!aa)
+			// to.append(clone);
+		// else
+			// to.find('.dd-list').append(clone);
 		
 		return clone;
 	}
@@ -220,5 +244,4 @@
 	function countItems(){
 		return $('.dd-item').length - 1;
 	}
-	
 }(jQuery));

@@ -129,7 +129,10 @@ function d(){
 }
 
 function dd(){
+	global $di, $start;
 	vd(func_get_args());
+	echo '<div style="display: table;clear:both;float:none;"></div>';
+	var_dump($di->get('db')->getStats(), 'Время обработки скрипта: ' . substr((microtime(true) - $start), 0, 6));
 	exit;
 }
 
@@ -241,7 +244,7 @@ function my_admin_post_options_form(){
 	$boxes = [
 		['for' => '#post-properties', 	'text' => 'Свойства страницы', 'checked' => 'checked',],
 		['for' => '#post-images', 		'text' => 'Изображение страницы', 'checked' => 'checked',],
-		['for' => '.extra-fields', 		'text' => 'Произвольные поля', 'checked' => '',],
+		['for' => '.extra-fields', 		'text' => 'Произвольные поля', 'checked' => 'checked',],
 		['for' => '#post-discussion', 	'text' => 'Обсуждение', 'checked' => 'checked',],
 		['for' => '#post-comments', 	'text' => 'Комментарии', 'checked' => 'checked',],
 	];
@@ -318,14 +321,14 @@ function getMenu(){
 		if($issetSubMenu){
 			$subCatsView = '';
 			foreach($newCats['subCats'][$cat['object_id']] as $subCat){
-				$currentSubCatUrl = SITE_URL . "{$subCat['url']}/";
+				$currentSubCatUrl = strpos($subCat['url'], 'http') === 0 ? $subCat['url'] : SITE_URL . "{$subCat['url']}/";
 				$subCatsView .= "<li><a href=\"{$currentSubCatUrl}\">{$subCat['name']}</a></li>";
 			}
 		}
 		
 		?>
 		<li class="top-menu">
-			<?php echo "<a href=\"".($issetSubMenu ? 'javascript:void(0);' : SITE_URL."{$cat['url']}/")."\">{$cat['name']}</a>";?>
+			<?php echo "<a href=\"".($issetSubMenu ? 'javascript:void(0);' : (strpos($cat['url'], 'http') === 0 ? $cat['url']:SITE_URL."{$cat['url']}/"))."\">{$cat['name']}</a>";?>
 			<?php if(!$issetSubMenu) {echo '</li>'; continue;}?>
 			<ul class="submenu"><?=$subCatsView?></ul>
 		</li>

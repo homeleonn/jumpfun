@@ -15,12 +15,16 @@ addAction('edit_post_after', 'seo');
 function seo(){
 	global $post;
 	$descr = isset($post['_seo_description']) ? $post['_seo_description'] : '';
+	$keys = isset($post['_seo_keywords']) ? $post['_seo_keywords'] : '';
 	include 'view.php';
 }
 
 addFilter('extra_fields_keys', 'seo_extra_fields_keys');
 function seo_extra_fields_keys($extraFieldKeys){
-	$extraFieldKeys[] = '_seo_description';
+	$extraFieldKeys = array_merge(
+		$extraFieldKeys, 
+		['_seo_description', '_seo_keywords']
+	);
 	
 	return $extraFieldKeys;
 }

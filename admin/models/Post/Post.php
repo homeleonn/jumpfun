@@ -77,7 +77,8 @@ class Post extends Model{
 		return $data;
 	}
 	
-	public function listForParents($posts = NULL, $parent = NULL){
+	public function listForParents($posts = NULL, $parent = NULL, $onlyData = false){
+		$this->options = HelperDi::get('config')->getPageOptionsByType('page');
 		if(!$posts){
 			if(!isset($this->options))
 				$this->options = HelperDi::get('config')->getPageOptionsByType('page');
@@ -85,6 +86,10 @@ class Post extends Model{
 		}
 			
 		$itemsToParents = $this->hierarchyItems($posts);
+		
+		if($onlyData)
+			return $itemsToParents;
+		
 		return $this->htmlSelectForParentHierarchy($this->hierarchy($itemsToParents, 'select', $parent));
 	}
 	
@@ -110,7 +115,7 @@ class Post extends Model{
 	 *  @param int $selfId item id for which returns parents
 	 *  @param int $parent item parent
 	 */
-	private function hierarchyItems($items, $selfId = NULL, $parent = NULL, $addKeys = []){
+	public function hierarchyItems($items, $selfId = NULL, $parent = NULL, $addKeys = []){
 		$isTerm = isset($items[0]['taxonomy']);
 		foreach($items as $item){
 			if($item['id'] == $selfId) continue;
