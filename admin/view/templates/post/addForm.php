@@ -14,9 +14,9 @@
 			<div>Текст</div>
 			<div id="editors"><textarea class="visual" name="content" id="content" value="1" style="width: 100%;height: 600px;display: none; visibility:hidden;"></textarea></div>
 		</div>
+		<?php include $this->getFile('sidebar/comments');?>
 		<?php include $this->getFile('sidebar/extraFields');?>
 		<?=doAction('add_extra_rows', $options['type']);?>
-		<?php include $this->getFile('sidebar/comments');?>
 		<?php doAction('add_post_after');?>
 	</div>
 	

@@ -8,4 +8,5 @@ return [
 	'main_page_data' => '68',
 	'title' => 'Аренда лимузинов в Одессе',
 	'description' => 'Аренда лимузинов в Одессе:description',
+	'plugins_activated' => 'a:1:{s:3:"seo";s:11:"seo/seo.php";}',
 ];

@@ -3,59 +3,58 @@
 namespace admin\controllers;
 
 use Jump\Controller;
-use Jump\traits\PostControllerTrait;
+use Jump\helpers\Common;
 
 class PluginController extends Controller{
 	private $folder = ROOT . 'content/plugins/';
+	private $activePlugins;
 	
+	public function __construct(){
+		$this->activePlugins = unserialize(Common::getOption('plugins_activated'));
+	}
+	
+	/**
+	 *  Show plugins
+	 */
 	public function actionIndex()
 	{
-		//return;
-		// $pluginFolders = glob($this->folder . '*');
 		$needles = ['Plugin Name', 'Plugin URI', 'Description', 'Version', 'Author', 'Author URI', 'License'];
+		$plugins = plugins($this->activePlugins);
 		
-		// if(!$pluginFolders) return ['empty' => 'Плагинов нет'];
-		
-		// foreach($pluginFolders as $folder)
-		// {
-			// $basename = basename($folder);
-			// $mainFile = $folder . '/' . $basename . '.php';
-			
-			// if(file_exists($mainFile))
-			// {
-				// $fileData = file_get_contents($mainFile);
-				
-				// foreach($needles as $needle)
-				// {
-					// $plugin[$needle] = preg_match(str_replace('needle', $needle, PLUGIN), $fileData, $matches) ? 
-						// trim($matches[1]):
-						// 'none';
-				// }
-				
-				// if($plugin['Plugin Name'] == 'none') continue;
-				
-				// $data['plugins'][] = $plugin;
-			// }
-		// }
-		// return $data;
-		$plugins = plugins();
 		foreach($plugins as $plugin)
 		{
-			$fileData = file_get_contents($plugin);
+			$fileData = file_get_contents($plugin['src']);
 			
 			foreach($needles as $needle)
 			{
-				$plugin1[$needle] = preg_match(str_replace('needle', $needle, PLUGIN), $fileData, $matches) ? 
+				$plugin[$needle] = preg_match(str_replace('needle', $needle, PLUGIN), $fileData, $matches) ? 
 					trim($matches[1]):
 					'none';
 			}
 			
-			if($plugin1['Plugin Name'] == 'none') continue;
+			if($plugin['Plugin Name'] == 'none') continue;
 			
-			$data['plugins'][] = $plugin1;
+			$data['plugins'][] 	= $plugin;
 		}
+		
 		$data['title'] = 'Плагины';
 		return $data;
-		dd($this->folder);
+	}
+	
+	/**
+	 *  Plugins toggle
+	 *  
+	 *  @param type $pluginFolder
+	 *  @param type $pluginFile
+	 */
+	public function actionToggle($pluginFolder, $pluginFile){
+		if(isset($this->activePlugins[$pluginFolder])){
+			unset($this->activePlugins[$pluginFolder]);
+		}else{
+			$this->activePlugins[$pluginFolder] = $pluginFolder . '/' . $pluginFile;
+		}
+		
+		Common::setOption('plugins_activated', serialize($this->activePlugins));
+		redirect('admin/plugins');
 	}
 }

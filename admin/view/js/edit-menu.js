@@ -5,7 +5,7 @@
 	$(function(){
 		
 		// Show menu items from active menu
-		if(menuItems)
+		if(typeof(menuItems) !== "undefined" && menuItems)
 			selectMenu(menuItems);
 		
 		

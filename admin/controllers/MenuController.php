@@ -7,6 +7,15 @@ use Jump\helpers\Msg;
 use Jump\helpers\Common;
 
 class MenuController extends Controller{
+	public function __construct(){
+		parent::__construct();
+		addAction('admin_footer', function(){
+			echo '
+			<script src="', SITE_URL,'admin/view/js/edit-menu.js"></script>
+			<script src="', SITE_URL,'admin/view/js/jquery.nestable.js"></script>';
+		});
+	}
+	
 	public function actionIndex(){
 		// creating new menu
 		if(isset($_POST['new_menu'])){

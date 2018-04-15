@@ -92,11 +92,14 @@ class PostController extends AdminController{
 		$extraFields = isset($this->request->post['extra_fileds']) ? $this->request->post['extra_fileds'] : [];
 		
 		//fill extra fields
-		$extraFieldKeys = [
+		$extraFieldKeys = [];
+		$extraFieldKeys = \applyFilter('extra_fields_keys', $extraFieldKeys);
+		
+		if(!$extraFieldKeys || !is_array($extraFieldKeys)) $extraFieldKeys = [];
+		$extraFieldKeys = array_merge($extraFieldKeys, [
 			'_jmp_post_template', 
 			'_jmp_post_img',
-		];
-		$extraFieldKeys = \applyFilter('extra_fields_keys', $extraFieldKeys);
+		]);
 		
 		foreach($extraFieldKeys as $key){
 			if(isset($this->request->post[$key]) && $this->request->post[$key]){

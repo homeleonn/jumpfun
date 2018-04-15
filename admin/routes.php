@@ -21,6 +21,7 @@ return [
 	['menu/activate', 'menu/activate', 'POST'],
 	
 	['plugins', 'plugin', 'GET'],
+	['plugins/toggle/(.*)/(.*)', 'plugin/toggle/$1/$2', 'GET'],
 	
 	
 	['settings', 'setting', 'GET'],

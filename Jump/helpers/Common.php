@@ -22,7 +22,6 @@ class Common{
 	public static function getConfig($filename){
 		return include ROOT . 'Jump/config/' . $filename . '.php';
 	}
-	
 	public static function isPage(){
 		return helperDI::get('config')->postType == 'page';
 	}

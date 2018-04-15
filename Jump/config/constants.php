@@ -31,6 +31,7 @@ define('THEME_DIR', ROOT . 'content/themes/default/');
 define('ADMIN_THEME', SITE_URL . 'admin/view/');
 define('UPLOADS_DIR', ROOT . 'content/uploads/');
 define('UPLOADS', SITE_URL . 'content/uploads/');
+define('PLUGINS', SITE_URL . 'content/plugins/');
 
 define('URL_PATTERN', '[а-яА-ЯЁa-zA-Z0-9-]+');
 define('URL_PATTERN_SLASH', '[а-яА-ЯЁa-zA-Z0-9-\/]+');

@@ -286,6 +286,12 @@ $(function(){
 	
 });
 
+function getContent(){
+	var editor = localStorage.getItem('visual-editor');
+	if(!editor) return false;
+	return (editor == 2 ? $('textarea#simple-editor').val() : tinyMCE.get('content').getContent()).trim();
+}
+
 if($('#edit-url-init').length)
 	var editUrl = new EditUrl();
 

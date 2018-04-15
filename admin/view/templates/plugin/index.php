@@ -9,10 +9,10 @@ if(isset($data['empty'])): echo $data['empty']; else:
 	</tr>
 	<?php foreach($data['plugins'] as $plugin):?>
 	<tr class="option-cell">
-		<td>
+		<td <?=$plugin['active']?' style="background-color: lightgreen;"':''?>>
 			<?=$plugin['Plugin Name']?>
 			<div class="options">
-				[<span style="color: coral;" class="pointer edit">Активировать</span>] 
+				[<span style="color: coral;" class="pointer edit"><a href="toggle/<?=$plugin['path']?>/"><?=$plugin['active']?'Деа':'А'?>ктивировать</a></span>] 
 				[<span style="color: red;" class="pointer remove">Удалить</span>]
 			</div>
 		</td>

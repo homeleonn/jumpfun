@@ -13,6 +13,8 @@ try{
 	// Dependency injection
     $di = DI::getInstance();
 	
+	require_once JUMP . '/helpers.php';
+	
 	// requiring services by a providers
     $services = require JUMP . '/config/services.php';
 	
@@ -20,7 +22,7 @@ try{
 		(new $service($di))->init();
 	}
 	
-	plugins(true);
+	plugins(unserialize(Common::getOption('plugins_activated')));
 	require_once THEME_DIR . 'functions.php';
 	
 	
