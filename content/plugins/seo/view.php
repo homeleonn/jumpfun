@@ -43,9 +43,8 @@ if(!window.jQuery)
 	function c(){
 		// del tags
 		content = content.replace(/<[^\s]*?>/g, '').trim();
-		var spaceLength = content.match(/\s+/g).length;
-		var length = spaceLength + 1;
-		console.log(content, length);
+		var spaceLength = content.match(/\s+/g);
+		var length = spaceLength == null ? (content ? 1 : 0) : spaceLength.length + 1;
 		
 		if(length < 300)
 			a('seo-content', 'red', ' Слишком мало текста, '+length+' слов, оптимальное количество слов 300!');

@@ -62,12 +62,11 @@
 		</div>
 		<div id="head-text">
 			<div>
-				<h1>Аренда лимузинов, седанов и микроавтобусов в Одессе</h1>
+				<h1><?=_('h1_main')?></h1>
 			</div>
-			<!--<button class="btn-tr b i">О нас</button>-->
 		</div>
 		<div id="main-logo"><img alt="Транспортная компания Дива в Одессе. Лимузины, седаны, микроавтобусы" src="<?=THEME?>img/logo2.png"></div>
 		<div id="sec-logo"><img src="<?=THEME?>img/second-logo.jpg"></div>
 	</header>
 	<div class="container-fluid main-content">
-	<?=$this->di->get('config')->getBreadCrumbs();?>
+	<?=getBreadCrumbs();?>

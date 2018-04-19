@@ -12,9 +12,5 @@ class RouterProvider extends AbstractProvider{
 		$router  = new Router($routes);
 		
 		$this->di->set($this->serviceName, $router);
-		
-		// Инициализируем типы страниц по умолчанию
-		//if(ENV == 'admin')
-			include ROOT . 'admin/defaultPageTypes.php';
 	}
 }

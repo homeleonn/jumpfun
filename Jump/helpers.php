@@ -344,3 +344,16 @@ function redirect($path){
 function addPageType($options){
 	DI::getD('config')->addPageType($options);
 }
+
+function getBreadCrumbs(){
+	return DI::getD('config')->getBreadCrumbs();
+}
+
+
+function _($key){
+	static $langText;
+	if(is_null($langText)){
+		$langText = require_once ROOT . '/content/languages/themes/'.LANG.'.php';
+	}
+	return isset($langText[$key]) ? $langText[$key] : 'undefined';
+}

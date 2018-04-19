@@ -173,6 +173,8 @@ function Slider(element){
 			}
 		});
 		
+		$('div#order').css('right', -($('div#order').height() / 2 - 13));
+		
 		
 		
 		

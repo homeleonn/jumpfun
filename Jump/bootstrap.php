@@ -13,8 +13,6 @@ try{
 	// Dependency injection
     $di = DI::getInstance();
 	
-	require_once JUMP . '/helpers.php';
-	
 	// requiring services by a providers
     $services = require JUMP . '/config/services.php';
 	
@@ -22,7 +20,16 @@ try{
 		(new $service($di))->init();
 	}
 	
+	require_once JUMP . '/helpers.php';
+		
+	// Инициализируем типы страниц по умолчанию
+	//if(ENV == 'admin')
+		include ROOT . 'admin/defaultPageTypes.php';
+	
+	// Plugins activating
 	plugins(unserialize(Common::getOption('plugins_activated')));
+	
+	// User functions
 	require_once THEME_DIR . 'functions.php';
 	
 	

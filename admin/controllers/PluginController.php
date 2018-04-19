@@ -20,6 +20,10 @@ class PluginController extends Controller{
 	{
 		$needles = ['Plugin Name', 'Plugin URI', 'Description', 'Version', 'Author', 'Author URI', 'License'];
 		$plugins = plugins($this->activePlugins);
+		$data['plugins'] = [];
+		$data['title'] = 'Плагины';
+		
+		if(!$plugins) return $data;
 		
 		foreach($plugins as $plugin)
 		{
@@ -37,7 +41,6 @@ class PluginController extends Controller{
 			$data['plugins'][] 	= $plugin;
 		}
 		
-		$data['title'] = 'Плагины';
 		return $data;
 	}
 	

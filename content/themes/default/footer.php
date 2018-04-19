@@ -95,7 +95,7 @@
 	
 	
 	<div id="up"><img src="<?=THEME?>img/up.png"></div>
-	<div id="order">Оформить заказ</div>
+	<div id="order"><?=_('checkout')?></div>
 	<div id="note-wrap">
 		<span style="width: 100%;height:100%; position: absolute; z-index: 1; display: block;" onclick="note.hide()"></span>
 		<div id="note" style="z-index: 2;">

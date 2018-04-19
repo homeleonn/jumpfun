@@ -16,6 +16,17 @@ if($_SERVER['PHP_SELF'] == '/index.php'){
 	$fullUri = $_SERVER['REQUEST_URI'] == ROOT_URI ? '/' : (ROOT_URI == '/' ? substr($_SERVER['REQUEST_URI'], 1) : str_replace(ROOT_URI, '', $_SERVER['REQUEST_URI']));
 }
 
+if(strpos($fullUri, 'en/') === 0) {
+	if($fullUri == 'en/') $fullUri = '/';
+	else{
+		$replaceCount = 1;
+		$fullUri = str_replace('en/', '', $fullUri, $replaceCount);
+	}
+	define('LANG', 'en');
+}else
+	define('LANG', 'ru');
+
+
 define('FULL_URI', $fullUri != '' ? $fullUri : '/');
 
 define('URI', explode('?', FULL_URI)[0]);
