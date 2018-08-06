@@ -2,6 +2,7 @@
 
 return [
 	['', 'dashboard', 'method' => 'GET'],
+	['', 'dashboard/save', 'method' => 'POST'],
 	
 	['media', 'media/show', 'GET'],
 	['media/async', 'media/show/async', 'GET'],

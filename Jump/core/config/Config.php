@@ -115,7 +115,7 @@ class Config{
 	}
 	
 	public function addBreadCrumbs($link, $name){
-		//var_dump($link, $name);exit;
+		//d($link, $name);
 		$this->breadcrumbs[($link . '/')] = $name;
 	}
 	
@@ -130,7 +130,7 @@ class Config{
 			$this->breadcrumbs = array_reverse($this->breadcrumbs);
 		}
 		if($breadcrumbsLength)
-			$this->breadcrumbs = array_merge(['' => 'Главная'], $this->breadcrumbs);
+			$this->breadcrumbs = array_merge([\langUrl() => 'Главная'], $this->breadcrumbs);
 		$endElement = array_pop($this->breadcrumbs);
 		
 			

@@ -62,7 +62,7 @@
 		</div>
 		<div id="head-text">
 			<div>
-				<h1><?=_('h1_main')?></h1>
+				<h1><?=__('h1_main')?></h1>
 			</div>
 		</div>
 		<div id="main-logo"><img alt="Транспортная компания Дива в Одессе. Лимузины, седаны, микроавтобусы" src="<?=THEME?>img/logo2.png"></div>

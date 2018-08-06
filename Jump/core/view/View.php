@@ -92,7 +92,7 @@ class View
 	}
 	
 	public function path(){
-		return ROOT . (ENV == 'frontend' ? 'content/themes/default/' : 'admin/view/'); 
+		return ROOT . (ENV == 'frontend' ? 'content/themes/'.$this->di->get('config')->getOption('theme').'/' : 'admin/view/'); 
 	}
 	
 	public function getFile($filename){

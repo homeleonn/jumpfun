@@ -24,9 +24,9 @@
 			<div>Текст</div>
 			<div id="editors"><textarea class="visual" name="content" id="content" value="1" style="width: 100%;height: 600px;display: none; visibility:hidden;"><?=htmlspecialchars($data['content'])?></textarea></div>
 		</div>
+		<?php doAction('edit_post_after');?>
 		<?php include $this->getFile('sidebar/comments');?>
 		<?php include $this->getFile('sidebar/extraFields');?>
-		<?php doAction('edit_post_after');?>
 	</div>
 	<div id="sidebar-right" class="col-md-4">
 		<br><br><span class="icon-calendar"></span> Добавлено: <?=$data['created']?>

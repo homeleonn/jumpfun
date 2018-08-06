@@ -155,7 +155,7 @@ class Common{
 		foreach($taxonomies as $taxName => $terms){
 			$html .= "<li>{$taxName}:";
 			foreach($terms as $termName => $termLink){
-				$html .= " <a href='". SITE_URL . $archive . "{$termLink}/'>{$termName}</a>,";
+				$html .= " <a href='". SITE_URL . langUrl() . $archive . "{$termLink}/'>{$termName}</a>,";
 			}
 			$html = substr($html, 0, -1) . '</li>';
 		}
@@ -168,7 +168,7 @@ class Common{
 		foreach($taxonomies as $taxName => $terms){
 			$html .= '<div class="filters"><div class="title">' . $taxName . '</div><div class="content">';
 			foreach($terms as $termName => $termLink){
-				$html .= " <a href='". SITE_URL . $archive . "{$termLink}/'>{$termName}</a><br>";
+				$html .= " <a href='". SITE_URL . langUrl() . $archive . "{$termLink}/'>{$termName}</a><br>";
 			}
 			$html .= '</div></div>';
 		}
@@ -208,8 +208,9 @@ class Common{
 		return $ip;
 	}
 	
-	public static function getOption($value){
-		return HelperDI::get('config')->getOption($value);
+	public static function getOption($key, $unsrlz = false){
+		$option = HelperDI::get('config')->getOption($key);
+		return $unsrlz ? unserialize($option) : $option;
 	}
 	
 	public static function setOption($key, $value){

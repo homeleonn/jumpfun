@@ -116,6 +116,9 @@ class Post extends Model{
 	 *  @param int $parent item parent
 	 */
 	public function hierarchyItems($items, $selfId = NULL, $parent = NULL, $addKeys = []){
+		if(empty($items)){
+			return [];
+		}
 		$isTerm = isset($items[0]['taxonomy']);
 		foreach($items as $item){
 			if($item['id'] == $selfId) continue;
@@ -192,10 +195,12 @@ class Post extends Model{
 	private function hierarchyListHtml($item, $level, $urlHierarchy){
 		$isPost = !isset($item['taxonomy']);
 		if($isPost && !$this->options['hierarchical']){
-			list($termsOnId, $termsOnParent) = Common::itemsOnKeys(getTermsByTaxonomies(), ['id', 'parent']);
-			$termsByPostId = getTermsByPostId($item['id']);
-			$permalink 	 = SITE_URL . trim(Options::slug(), '/') . '/' . $item['url'] . '/';
-			$item['url'] = applyFilter('postTypeLink', $permalink, $termsOnId, $termsOnParent, $termsByPostId);
+			if(!empty($terms = Common::itemsOnKeys(getTermsByTaxonomies(), ['id', 'parent']))){
+				list($termsOnId, $termsOnParent) = $terms;
+				$termsByPostId = getTermsByPostId($item['id']);
+				$permalink 	 = SITE_URL . trim(Options::slug(), '/') . '/' . $item['url'] . '/';
+				$item['url'] = applyFilter('postTypeLink', $permalink, $termsOnId, $termsOnParent, $termsByPostId);
+			}
 		}
 		
 		if($isPost){
@@ -311,7 +316,7 @@ class Post extends Model{
 	
 	
 	
-	public function addTermHelper($name, $term, $whisper = false, $slug = '', $description = '', $parent = 0){
+	public function addTermHelper($name, $term, $whisper = false, $slug = '', $description = '', $parent = 0){//dd(func_get_args());
 		// Checking on duplicate term for this taxonomy
 		$duplicate = $this->db->getOne('Select t.id from terms t, term_taxonomy tt where t.id = tt.term_id and t.slug = ?s and tt.taxonomy = \'' . $term .'\'', $name);
 		
@@ -320,12 +325,17 @@ class Post extends Model{
 			exit;
 		}
 		
-		$parent = $this->db->getOne('Select t.id from terms t, term_taxonomy tt where t.id = tt.term_id and t.id = ?i', $parent);
+		if($parent){
+			$parent = $this->db->getOne('Select t.id from terms t, term_taxonomy tt where t.id = tt.term_id and t.id = ?i', $parent);
 		
-		if(!$parent){
-			if($whisper) return false;
-			exit;
+			if(!$parent){
+				if($whisper) return false;
+				exit;
+			}
+		}else{
+			$parent = 0;
 		}
+		
 		
 		// Add new term and taxonomy
 		if($result = $this->db->query('INSERT INTO terms (name, slug) VALUES (?s, ?s)', $name, $slug ?: $name)){

@@ -1,6 +1,6 @@
 <?php
 
-// $di->get('config')->addPageType([
+// addPageType([
 		// 'type' => 'new',
 		// 'title' => 'Новости',
 		// 'title_for_admin' => 'Новости',
@@ -23,7 +23,7 @@
 		// ]
 // ]);
 
-$di->get('config')->addPageType([
+addPageType([
 		'type' => 'educator',
 		'title' => 'Преподаватели академии',
 		'title_for_admin' => 'Преподаватели',
@@ -52,6 +52,36 @@ $di->get('config')->addPageType([
 			],
 		]
 ]);
+
+
+
+
+// можешь придумать свой тип записи, например: врачи, игрушки
+// addPageType([
+		// 'type' => 'doctor', // doctor / toy
+		// 'title' => 'Врачи',
+		// 'title_for_admin' => 'Врачи',
+		// 'description' => 'news1', // Медицинский доктор — исторические: лекарь, цирюльник, лейб-медик, фельдшер, доктор и др.; современный — врач. См. также медицинские профессии.
+		// 'add' => 'Добавить врача',
+		// 'edit' => 'Редактировать врача',
+		// 'delete' => 'Удалить врача',
+		// 'common' => 'врачей',
+		// 'hierarchical' => false, // это позже если что объясню
+		// 'has_archive'  => 'doctors', // страница на которой будут отображаться все доктора / игрушки
+		// 'rewrite' => ['slug' => 'doctors/%doc-category%'], // slug будет добавлен к ссылке на странице конкретного врача (реализовано, но пока еще не гибко) doctors/%doc-category% , doc-category нужно будет добавить ниже в таксономию, тоже пока не гибко. Протестируй, в админке сразу появится новый пункт меню и можно попробовать.
+		// 'taxonomy' => [
+			// 'doc-category' => [
+				// 'title' => 'Категории',
+				// 'add' => 'Добавить категорию',
+				// 'edit' => 'Редактировать категорию',
+				// 'delete' => 'Удалить категорию',
+				// 'hierarchical' => true,
+			// ]
+		// ]
+// ]);
+
+
+
 function themeHTMLCommentTable($comment, $subComments = NULL, $level = 1){
 	ob_start();
 	?>

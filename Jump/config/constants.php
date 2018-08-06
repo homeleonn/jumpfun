@@ -36,8 +36,8 @@ define('FULL_URL', SITE_URL . (FULL_URI != '/' ? FULL_URI : ''));
 define('FULL_URL_WITHOUT_PARAMS', SITE_URL . (URI != '/' ? URI : ''));
 
 
-define('THEME', SITE_URL . 'content/themes/default/');
-define('THEME_DIR', ROOT . 'content/themes/default/');
+define('THEME', SITE_URL . 'content/themes/funkids/');
+define('THEME_DIR', ROOT . 'content/themes/funkids/');
 
 define('ADMIN_THEME', SITE_URL . 'admin/view/');
 define('UPLOADS_DIR', ROOT . 'content/uploads/');

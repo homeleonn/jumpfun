@@ -60,6 +60,9 @@ function getSections($type, $pageTypes){
 			],
 		];
 	}
+	
+	//$sections = applyFilter('edit_admin_menu', $sections);
+	
 	// echo "\n".'$sections = [';
 	// foreach($sections as $key => $s){
 		// echo "\n\t".'\''.$key . '\' => ';

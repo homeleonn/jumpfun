@@ -104,6 +104,7 @@ class PostController extends Controller{
 		
 		$this->addBreadCrumbs($post);
 		if(!isset($post['__model'])) $post['__model'] = $this->model;
+		//dd($post);
 		if($post['comment_status'] == 'open')
 		$post['comments'] = $this->model->getComments($post['id']);
 		return $post;
@@ -130,7 +131,7 @@ class PostController extends Controller{
 		$postTerms = $this->model->getPostTerms(' and tr.object_id = ' . $post['id'] . ' and tt.taxonomy IN(\''.implode("','", $postTypeTaxonomies).'\')');
 		
 		// Сгрупируем все термины данных таксономий по айди и родителю
-		list($termsOnId, $termsOnParent) = Common::itemsOnKeys($terms, ['id', 'parent']);
+		list($termsOnId, $termsOnParent) = !Common::itemsOnKeys($terms, ['id', 'parent']);
 		
 		// Получим термины в виде списка html
 		$post['terms'] = Common::termsHTML($this->postTermsLink($termsOnId, $termsOnParent, $postTerms), Options::getArchiveSlug());
@@ -139,12 +140,14 @@ class PostController extends Controller{
 		$this->postPermalink($post, $termsOnId, $termsOnParent, $postTerms);
 		
 		// Если правильная ссылка на запись и пришедшая не совпадают - отправляем по правильному адресу
-		if(FULL_URL != $post['url']){
+		if(\langUrl(FULL_URL) != $post['url']){
 			dd('$this->request->location('.$post['url'].')');
 		}
 		
 		// Указываем что выводить данную запись следует шаблоном single
 		$this->view->is('single');
+		$post = applyFilter('before_return_post', $post);
+		
 		return $post;
 	}
 	
@@ -318,7 +321,7 @@ class PostController extends Controller{
 				// 4.3 составить иерархию с помощью хелпера common
 		}
 		
-		list($termsOnId, $termsOnParent) = Common::itemsOnKeys($terms1, ['id', 'parent']);
+		list($termsOnId, $termsOnParent) = !Common::itemsOnKeys($terms1, ['id', 'parent']);
 		foreach($list[$listMark] as &$post){
 			if(!isset($termsByPostId[$post['id']])) $termsByPostId[$post['id']] = false;
 			$this->postPermalink($post, $termsOnId, $termsOnParent, isset($termsByPostId[$post['id']])?$termsByPostId[$post['id']]:false);
@@ -350,18 +353,20 @@ class PostController extends Controller{
 		//dd($list);
 		$archiveTerms = $terms1;
 		
-		list($termsOnId, $termsOnParent) = Common::itemsOnKeys($archiveTerms, ['id', 'parent']);
+		list($termsOnId, $termsOnParent) = !Common::itemsOnKeys($archiveTerms, ['id', 'parent']);
 		$postTerms = $this->postTermsLink($termsOnId, $termsOnParent, $archiveTerms);
 		
 		$list[$listMark] = $this->fillMeta($list[$listMark]);
 		
-		$list['filters'] = Common::archiveTermsHTML(array_reverse($postTerms), Options::getArchiveSlug());
+		if($postTerms)
+			$list['filters'] = Common::archiveTermsHTML(array_reverse($postTerms), Options::getArchiveSlug());
 		$list['__model'] = $this->model;
 		$this->view->is('list');
 		if($this->isFront){
 			$list['title'] = Common::getOption('title');
 			$list['description'] = Common::getOption('description');
 		}
+		$list[$listMark] = applyFilter('before_return_post', $list[$listMark]);
 		return $list;
 	}
 	
@@ -403,7 +408,7 @@ class PostController extends Controller{
 	
 	
 	public function postPermalink(&$post, $termsOnId, $termsOnParent, $termsByPostId, $slug = false){//var_dump(func_get_args());exit;
-		$permalink 	 = SITE_URL . ($slug ?: trim(Options::slug(), '/')) . '/' . $post['url'] . '/';
+		$permalink 	 = SITE_URL . langUrl() . ($slug ?: trim(Options::slug(), '/')) . '/' . $post['url'] . '/';
 		$post['url'] = $post['permalink'] = applyFilter('postTypeLink', $permalink, $termsOnId, $termsOnParent, $termsByPostId);
 	}
 	
@@ -429,8 +434,9 @@ class PostController extends Controller{
 	/*******************/
 	
 	private function addBreadCrumbs(&$post, $taxonomyTitle = null, $value = null, $type = null){//dd(func_get_args());
-		if($this->options['has_archive'] && !Options::front())
-			$this->config->addBreadCrumbs($this->options['has_archive'], $this->options['title']);
+		if($this->options['has_archive'] && !Options::front()){
+			$this->config->addBreadCrumbs(\langUrl() . $this->options['has_archive'], $this->options['title']);
+		}
 		
 		
 		if($type){
@@ -439,8 +445,11 @@ class PostController extends Controller{
 		}elseif(isset($post['id']) && $this->config->front_page != $post['id']){
 			$this->config->addBreadCrumbs($post['url'], $post['title']);
 			//if(isset($this->options['rewrite']['slug']))
-			if($this->options['title'])
+			if($this->options['title']){
+				$post['h1'] = $post['title'];
 				$post['title'] .= ' - ' . $this->options['title'];
+			}
+				
 		}
 			
 	}

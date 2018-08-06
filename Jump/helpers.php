@@ -73,10 +73,9 @@ function apply(){
 	$funcName = array_shift($args);
 	
 	if(!isset($GLOBALS[$type][$funcName]))
-		return;
+		return isset($args[0]) ? $args[0] : false;
 	
 	$isfilters = $type == 'jump_filters';
-	
 	foreach($GLOBALS[$type][$funcName] as $key => $filter){
 		$result = call_user_func_array($filter, $args);
 		if($isfilters){
@@ -262,7 +261,7 @@ function addPostImgForm($img = false){
 
 function getMenu(){
 	$cacheFileName = 'menu/menu';
-	if(Common::getCache($cacheFileName, -1)) return;
+	//if(Common::getCache($cacheFileName, -1)) return;
 	
 	$cats = DI::getD('db')->getAll('Select * from menu where menu_id = '.Common::getOption('menu_active_id').' ORDER BY sort, parent');
 	if(!$cats) return;
@@ -284,8 +283,9 @@ function getMenu(){
 	
 	/*Начинаем выводить меню, первым пунктом статично поставим главную страницу*/
 	?>
-	<nav>
-		<div class="menu-toggle" onclick="$(this).next().toggleClass('show')"><div></div><div></div><div></div></div>
+	<nav class="menu">
+		<label for="mobile-nav"><div></div></label>
+		<input type="checkbox" id="mobile-nav">
 		<ul class="menu"><li><a href="<?=SITE_URL?>">Главная</a></li>
 	<?php
 	/*Пройдемся по всем главнм категориям*/
@@ -309,7 +309,9 @@ function getMenu(){
 		</li>
 		<?php
 	}
-	echo '</ul></nav>';
+	echo '
+	<li class="top-menu hidd"><div style="background: white;">OurEmail@funkids <br>(067) 797-93-85 <br>(063) 200-85-95</div></li>
+	</ul></nav>';
 	
 	echo Common::setCache($cacheFileName);
 }
@@ -334,7 +336,7 @@ function uri($path){
 }
 
 function redirect($path){
-	DI::getD('request')->location(ROOT_URI . ($path ? $path . '/' : ''));
+	DI::getD('request')->location(ROOT_URI . ($path ? $path . (!isset(parse_url($path)['query']) ? '/' : '') : ''));
 }
 
 
@@ -350,10 +352,41 @@ function getBreadCrumbs(){
 }
 
 
-function _($key){
+function __($key){
 	static $langText;
 	if(is_null($langText)){
 		$langText = require_once ROOT . '/content/languages/themes/'.LANG.'.php';
 	}
 	return isset($langText[$key]) ? $langText[$key] : 'undefined';
+}
+
+function getOption($key){
+	return Common::getOption($key);
+}
+
+function setOption($key, $value){
+	Common::setOption($key, $value);
+}
+
+function langUrl($url = false){
+	static $lang;
+	if(is_null($lang))
+		$lang = (defined('LANG') && LANG != 'ru') ? LANG . '/' : '';
+	
+	if($url){
+		$replacement = false;
+		$replaceCount = 1;
+		
+		if(strpos($url, SITE_URL) === 0){
+			$replacement = SITE_URL;
+		}elseif(strpos($url, ROOT_URI) === 0){
+			$replacement = ROOT_URI;
+		}
+		
+		if($replacement)
+			$url = str_replace($replacement , $replacement  . $lang, $url, $replaceCount);
+		
+		return $url;
+	}
+	return $lang;
 }
