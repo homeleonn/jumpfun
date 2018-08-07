@@ -14,13 +14,13 @@ class PostController extends Controller{
 	private $isFront = false;
 	private $img = '_jmp_post_img';
 	
-	public function __construct(){
+	public function __construct($postType = false){
 		parent::__construct();
-		$this->setOptions();
+		$this->setOptions($postType);
 	}
 	
-	private function setOptions(){
-		$this->options = $this->config->getCurrentPageOptions();
+	private function setOptions($postType = false){
+		$this->options = $this->config->getCurrentPageOptions($postType);
 		Options::setOptions($this->options);
 	}
 	
@@ -227,10 +227,10 @@ class PostController extends Controller{
 		return $hierarchy;
 	}
 	
-	public function actionList($taxonomy = null, $taxonomySlug = null, $page = 1){//dd(func_get_args());
+	public function actionList($taxonomy = null, $taxonomySlug = null, $page = 1, $limit = false, $orderBy = false){//dd(func_get_args());
 		//$this->model->setLimit($this->page = $page, $this->perPage);
 		//d($this->options['rewrite']);
-		$this->model->setLimit($this->page = $page, $this->options['rewrite']['paged']);
+		$this->model->setLimit($this->page = $page, ($limit && is_numeric($limit)) ? $limit : $this->options['rewrite']['paged']);
 		$list = $this->options;
 		if($this->page > 1){
 			$list['title'] .= ' | Страница ' . $this->model->page;
@@ -242,7 +242,7 @@ class PostController extends Controller{
 		// Если не пришла таксономия и у данного типа поста есть архив -  выдаем просто весь архив
 		if(!$taxonomy){
 			//if($this->options['has_archive']){
-				if(!$list[$listMark] = $this->model->getPostsByPostType(Options::get('type'))) return 0;
+				if(!$list[$listMark] = $this->model->getPostsByPostType(Options::get('type'), $orderBy)) return 0;
 				$terms = $this->model->taxonomy->getAllByObjectsIds(array_keys(Common::itemsOnKeys($list[$listMark], ['id'])));
 				//dd(array_keys(Common::itemsOnKeys($list[$listMark], ['id'])), $list[$listMark], $terms);
 				
@@ -309,7 +309,7 @@ class PostController extends Controller{
 				$i++;
 			}
 			
-			if(!$list[$listMark] = $this->model->getPostsBysTermsTaxonomyIds($termsTaxonomyIds)) 
+			if(!$list[$listMark] = $this->model->getPostsBysTermsTaxonomyIds($termsTaxonomyIds, $orderBy)) 
 				return $this->options;
 			
 			$terms = $this->model->taxonomy->getAllByObjectsIds(array_keys(Common::itemsOnKeys($list[$listMark], ['id'])));

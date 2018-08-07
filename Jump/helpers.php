@@ -261,7 +261,7 @@ function addPostImgForm($img = false){
 
 function getMenu(){
 	$cacheFileName = 'menu/menu';
-	//if(Common::getCache($cacheFileName, -1)) return;
+	if(Common::getCache($cacheFileName, -1)) return;
 	
 	$cats = DI::getD('db')->getAll('Select * from menu where menu_id = '.Common::getOption('menu_active_id').' ORDER BY sort, parent');
 	if(!$cats) return;
@@ -286,7 +286,7 @@ function getMenu(){
 	<nav class="menu">
 		<label for="mobile-nav"><div></div></label>
 		<input type="checkbox" id="mobile-nav">
-		<ul class="menu"><li><a href="<?=SITE_URL?>">Главная</a></li>
+		<ul class="menu"><li><a href="<?=ROOT_URI?>">Главная</a></li>
 	<?php
 	/*Пройдемся по всем главнм категориям*/
 	foreach($newCats['cats'] as $cat){
@@ -296,21 +296,21 @@ function getMenu(){
 		if($issetSubMenu){
 			$subCatsView = '';
 			foreach($newCats['subCats'][$cat['object_id']] as $subCat){
-				$currentSubCatUrl = strpos($subCat['url'], 'http') === 0 ? $subCat['url'] : SITE_URL . "{$subCat['url']}/";
+				$currentSubCatUrl = strpos($subCat['url'], 'http') === 0 ? $subCat['url'] : ROOT_URI . "{$subCat['url']}/";
 				$subCatsView .= "<li><a href=\"{$currentSubCatUrl}\">{$subCat['name']}</a></li>";
 			}
 		}
 		
 		?>
 		<li class="top-menu">
-			<?php echo "<a href=\"".($issetSubMenu ? 'javascript:void(0);' : (strpos($cat['url'], 'http') === 0 ? $cat['url']:SITE_URL."{$cat['url']}/"))."\">{$cat['name']}</a>";?>
+			<?php echo "<a href=\"".($issetSubMenu ? 'javascript:void(0);' : (strpos($cat['url'], 'http') === 0 ? $cat['url']:ROOT_URI."{$cat['url']}/"))."\">{$cat['name']}</a>";?>
 			<?php if(!$issetSubMenu) {echo '</li>'; continue;}?>
 			<ul class="submenu"><?=$subCatsView?></ul>
 		</li>
 		<?php
 	}
 	echo '
-	<li class="top-menu hidd"><div style="background: white;">OurEmail@funkids <br>(067) 797-93-85 <br>(063) 200-85-95</div></li>
+	<li class="top-menu hidd"><div style="background: white; color: coral;">OurEmail@funkids <br>(067) 797-93-85 <br>(063) 200-85-95</div></li>
 	</ul></nav>';
 	
 	echo Common::setCache($cacheFileName);
@@ -389,4 +389,8 @@ function langUrl($url = false){
 		return $url;
 	}
 	return $lang;
+}
+
+function cacheIsEnable(){
+	return defined('CACHE_ON') && CACHE_ON;
 }

@@ -28,7 +28,7 @@ return [
 	// ['login/auth', 'user/auth', 'POST'],
 	
 	// ['user', 'user'],
-	
-	
+	['reviews', 'review|list', 'GET'],
+	['reviews/add', 'review|add', 'POST'],
 ];
 

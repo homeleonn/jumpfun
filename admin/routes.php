@@ -30,4 +30,8 @@ return [
 	
 	// ['categories', 'category/list', 'method' => 'GET'],
 	// ['products', 'products/list', 'method' => 'GET'],
+	
+	['reviews', 'review', 'GET'],
+	['review/delete/(\d+)', 'review/delete/$1', 'GET'],
+	['review/toggle/(\d+)', 'review/toggle/$1', 'GET'],
 ];

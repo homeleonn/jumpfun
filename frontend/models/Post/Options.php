@@ -10,7 +10,7 @@ class Options{
 	}
 	
 	public static function get($key = NULL){
-		return $key ? self::$options[$key] : self::$options;
+		return $key && isset(self::$options[$key]) ? self::$options[$key] : self::$options;
 	}
 	
 	public static function front(){

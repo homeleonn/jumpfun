@@ -67,7 +67,7 @@ class Config{
 			$paged = $options['rewrite']['paged'] ? "{$sep}page/([2-9]|\d{2,})" : '';
 			//$router->add($singleSlug . $sep . '(' . URL_PATTERN . ')', $type . ':single/$1' . $addArgs);
 			if($options['has_archive']){
-				$router->add($options['has_archive'] . $paged, $type . ':list'.S.S.S.'$2');
+				$router->add($options['has_archive'] . $paged, $type . ':list'.S.S.S.'$1');
 				$router->add($options['has_archive'], $type . ':list'.S.S.S);
 			}
 			if(!empty($options['taxonomy'])){
@@ -94,8 +94,9 @@ class Config{
 		$this->options['jump_pageTypes'][$options['type']] = $options;
 	}
 	
-	public function getCurrentPageOptions(){
-		$options = isset($this->options['jump_pageTypes'][$this->postType]) ? $this->options['jump_pageTypes'][$this->postType] :$this->postType;
+	public function getCurrentPageOptions($postType = false){
+		$postType = $postType ?: $this->postType;
+		$options = isset($this->options['jump_pageTypes'][$postType]) ? $this->options['jump_pageTypes'][$postType] :$postType;
 		
 		if(!is_array($options))
 			$option['type'] = $options;
@@ -115,7 +116,9 @@ class Config{
 	}
 	
 	public function addBreadCrumbs($link, $name){
-		//d($link, $name);
+		//d($link, $name, $this->breadcrumbs);
+		if(is_string($this->breadcrumbs))
+			$this->breadcrumbs = [];
 		$this->breadcrumbs[($link . '/')] = $name;
 	}
 	

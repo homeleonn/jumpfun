@@ -210,7 +210,7 @@ class PostController extends AdminController{
 			$postsOnId[$item['id']] = $item;
 		}
 		
-		//$this->view->render('comments/list', ['comments' => $comments, 'posts_on_id' => $postsOnId]);
+		$this->view->render('comments/list', ['comments' => $comments, 'posts_on_id' => $postsOnId]);
 	}
 	
 	public function postsLinkCreate($posts){

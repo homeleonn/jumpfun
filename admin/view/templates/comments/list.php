@@ -8,6 +8,7 @@
 	</tr>
 	<?php 
 		foreach($data['comments'] as $comment):
+		if(!isset($data['posts_on_id'][$comment['comment_post_id']])) continue;
 		$post = $data['posts_on_id'][$comment['comment_post_id']];
 	?>
 	<tr class="comment-cell" data-id="<?=$comment['comment_id']?>">

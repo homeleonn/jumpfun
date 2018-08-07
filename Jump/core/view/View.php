@@ -65,7 +65,16 @@ class View
 		
 		//dd($contentFile, $template);
 		if(!is_file($contentFile)){
-			$contentFile = $this->path . $this->is() . '.php';
+			
+			if(isset($post['id']) && is_file($contentFile = $this->path . 'page-' . $post['id'] . '.php')){}
+			elseif(isset($post['post_type']) && is_file($contentFile = $this->path . $post['post_type'] . '.php')){}
+			else
+				$contentFile = $this->path . $this->is() . '.php';
+		}
+		
+		if(!is_file($contentFile)){
+			if(!isset($post['post_type']) || !is_file($contentFile = $this->path . $post['post_type'] . '.php'))
+				$contentFile = $this->path . $this->is() . '.php';
 		}
 		
 		if(!is_file($contentFile)){

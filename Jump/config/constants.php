@@ -1,4 +1,5 @@
 <?php
+//var_dump(preg_replace('/<[^\s]*>/', '', '<strong>Аниматор в костюме "Бетмена"</strong> - лучший подарок для Вашего мальчика'));exit;
 session_start();
 ini_set('xdebug.var_display_max_depth', 50);
 ini_set('xdebug.var_display_max_children', 256);
@@ -52,5 +53,7 @@ define('S', '|'); //sumbol separator for args parse
 
 define('TEMPLATE', '/^[ \t\/*#@]*Template:(.*)$/mi');
 define('PLUGIN', '/^[ \t\/*#@]*needle:(.*)$/mi');
+
+define('CACHE_ON', TRUE);
 
 //var_dump($_SERVER, $_SESSION, ROOT_URI, FULL_URI, URI, SITE_URL, FULL_URL_WITHOUT_PARAMS, FULL_URL);exit;

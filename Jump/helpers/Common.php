@@ -90,6 +90,7 @@ class Common{
 				$itemsOnKey[$k][$item[$key]][] = $item;
 			}
 		}
+		if(empty($itemsOnKey)) return false;
 		return count($keys) == 1 ? $itemsOnKey[0] : $itemsOnKey;
 	}
 	
@@ -230,12 +231,12 @@ class Common{
 	}
 	
 	public static function getCache($cacheFileName, $delay = 86400, $outNow = true){
-		//if(!cacheIsEnable()) return false;
+		if(!cacheIsEnable()) return false;
 		$cacheFileName = UPLOADS_DIR . 'cache/' . $cacheFileName . '.html';
 		
 		if(file_exists($cacheFileName))
 		{
-			if($delay == -1 || (filemtime($cacheFileName) > time() - $delay)){
+			if($delay == -1 || (filemtime($cacheFileName) > time() - $delay)){//d(1, cacheIsEnable());
 				if(!$data = file_get_contents($cacheFileName)) return false;
 				if($outNow) echo $data;
 				else 	  return $data;
@@ -248,7 +249,7 @@ class Common{
 
 	public static function setCache($cacheFileName, $data = false){
 		if(!$data) $data = ob_get_clean();
-		//if(!cacheIsEnable()) return $data;
+		if(!cacheIsEnable()) return $data;
 		$cacheFileName = UPLOADS_DIR . 'cache/' . $cacheFileName . '.html';
 		
 		if(!is_dir($dir = dirname($cacheFileName))){
@@ -259,8 +260,39 @@ class Common{
 		return $data;
 	}
 	
+	public static function clearCache($cacheFileName){
+		if(is_file($cacheFileName = UPLOADS_DIR . 'cache/' . $cacheFileName . '.html')){
+			unlink($cacheFileName);
+		}
+	}
+	
 	
 	public static function className($namespace){
 		return end(explode('\\', $namespace));
+	}
+	
+	public static function textSanitize($content, $type = 'content', $tagsOn = false){
+		$types = [
+			'all' => [
+				'from' 	=> ['<?', '<?php', '<%'],
+				'to' 	=> ['']
+			],
+			'content' => [
+				'from' 	=> [],
+				'to' 	=> []
+			],
+			'title' => [
+				'from' 	=> ['\'', '"'],
+				'to' 	=> ['’', '»']
+			],
+		];
+		if(!isset($types[$type])) $type = 'content';
+		$content = str_replace($types[$type]['from'], $types[$type]['to'], str_replace($types['all']['from'], $types['all']['to'], $content));
+		if(!$tagsOn)
+			$content = htmlspecialchars($content);
+		if($type == 'content')
+			$content = html_entity_decode($content);
+		
+		return $content;
 	}
 }

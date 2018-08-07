@@ -40,5 +40,13 @@ class SettingController extends Controller{
 				Common::setOption('front_page', $save); 
 			}
 		}
+		
+		if(isset($_POST['title'])){
+			Common::setOption('title', Common::textSanitize($_POST['title'], 'title')); 
+		}
+		
+		if(isset($_POST['description'])){
+			Common::setOption('description', Common::textSanitize($_POST['description'], 'title')); 
+		}
 	}
 }

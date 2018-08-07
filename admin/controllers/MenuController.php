@@ -168,12 +168,14 @@ class MenuController extends Controller{
 			
 			$activeMenu = $newMenu[0]['id'];
 			$menu['value'] = serialize($newMenu);
-			$this->db->query("Update options SET value = 
-				CASE
-					WHEN name = 'menu' THEN '".serialize($newMenu)."'
-					WHEN name = 'menu_active_id' THEN '{$activeMenu}'
-				END 
-				WHERE name = 'menu' OR name = 'menu_active_id' LIMIT 2");
+			// $this->db->query("Update options SET option_value = 
+				// CASE
+					// WHEN name = 'menu' THEN '".serialize($newMenu)."'
+					// WHEN name = 'menu_active_id' THEN '{$activeMenu}'
+				// END 
+				// WHERE name = 'menu' OR name = 'menu_active_id' LIMIT 2");
+			Common::setOption('menu', serialize($newMenu));
+			Common::setOption('menu_active_id', $activeMenu);
 				
 			$this->db->query('Delete from menu where menu_id = ' . $id);
 		}

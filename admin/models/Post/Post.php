@@ -271,6 +271,7 @@ class Post extends Model{
 	}
 	
 	public function add($post, $extraFields){
+		doAction('before_post_add', $post);
 		$this->save($post);
 		
 		$postId = $this->db->insertId();
@@ -414,6 +415,11 @@ class Post extends Model{
 	
 	// Редактируем 
 	public function edit($post, $extraFields){//var_dump($_POST,  func_get_args());exit;
+		$postAllFields = $this->db->getRow('Select * from posts where id = ' . $post['id']);
+		unset($postAllFields['id']);
+		$post = array_merge($postAllFields, $post);
+		doAction('before_post_edit', $post);
+		
 		// запись
 		$this->save($post, true);
 		
@@ -442,7 +448,7 @@ class Post extends Model{
 			$set .= $k . ' = ?s, ';
 		}
 		
-		//var_dump($sql . substr($set, 0, -2) . $condition, $post);
+		//dd($sql . substr($set, 0, -2) . $condition, $post);
 		$this->db->query($sql . substr($set, 0, -2) . $condition, $post);
 		
 	}
@@ -596,14 +602,17 @@ class Post extends Model{
 	}
 	
 	private function delPost($id){
-		if(!$id = $this->db->getOne('Select id, parent from posts where id = ?i', $id))
+		if(!$post = $this->db->getRow('Select * from posts where id = ?i', $id))
 			exit($this->answers['not_found']);
+		
+		doAction('before_post_delete', $post);
 		
 		$this->db->query('Delete from posts where id = ' . $id);
 		$this->db->query('Delete from postmeta where post_id = ' . $id);
 		$this->db->query('Update posts SET parent = 0 where parent = ' . $id);
 		$this->db->query('Update term_taxonomy SET count = count - 1 where term_taxonomy_id IN(Select term_taxonomy_id from term_relationships where object_id = ?i)', $id);
 		$this->db->query('Delete from term_relationships where object_id = ' . $id);
+		//$this->db->query('Delete from comments where comment_post_id = ' . $id);
 		Msg::success();
 		
 	}

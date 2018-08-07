@@ -68,8 +68,8 @@ class Post extends Model{
 		return $this->db->getAll('Select t.*, tt.*, tr.object_id from ' . str_replace(['posts p,', 'and p.id = tr.object_id'], '', $this->relationship) . $where);
 	}
 	
-	public function getPostsByPostType($type){
-		$query = $this->select . 'post_type = ?s order by created DESC';
+	public function getPostsByPostType($type, $orderBy = false){
+		$query = $this->select . 'post_type = ?s order by ' .($orderBy ? implode(', ', $orderBy[0]) . ' ' . $orderBy[1]:' created DESC');
 		//return $this->db->getAll($query, $type);
 		return $this->getAll($query, [$type]);
 	}
@@ -82,8 +82,9 @@ class Post extends Model{
 		return $this->db->getOne('Select name from terms where slug = ?s LIMIT 1', $slug);
 	}
 	
-	public function getPostsBysTermsTaxonomyIds($termsTaxonomyIds){
-		$query = 'Select distinct p.* from ' . $this->relationship . 'and tt.term_taxonomy_id IN(?a) group by p.id order by p.created DESC';
+	public function getPostsBysTermsTaxonomyIds($termsTaxonomyIds, $orderBy = false){
+		$orderBy = $orderBy ? implode(', p.', $orderBy[0]) . ' ' . $orderBy[1] : 'p.created DESC';
+		$query = 'Select distinct p.* from ' . $this->relationship . 'and tt.term_taxonomy_id IN(?a) group by p.id order by ' . $orderBy;
 		$countCache = $this->db->getAll(str_replace('distinct p.*', 'count(distinct p.id) as count', $query), [$termsTaxonomyIds]);
 		$count = 0;
 		if($countCache){

@@ -22,7 +22,7 @@ class Jump{
 		}else{
 			$this->di->get('request')->location(NULL, 404);
 		}
-		//$this->stats();
+		$this->stats();
 	}
 	
 	private function stats(){
