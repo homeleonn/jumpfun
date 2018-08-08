@@ -8,7 +8,7 @@ use frontend\controllers\ReviewController as frontRC;
 
 class ReviewController extends Controller{
 	public function actionIndex(){
-		(new frontRC())->actionList();
+		(new frontRC())->actionList(true);
 	}
 	
 	public function actionDelete($id){

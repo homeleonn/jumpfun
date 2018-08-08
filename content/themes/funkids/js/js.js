@@ -197,6 +197,11 @@ $(function(){
 		$('#captcha').prop('src', root + 'get-captcha-for-comment/');
 	});
 	
+	$('.phone').click(function(e){
+		e.preventDefault();
+		note.get('Заказать обратный звонок', 3);
+	});
+	
 	
 	$('textarea.limit-symbols').keyup(function(){
 		var limit = $(this).data('limit');

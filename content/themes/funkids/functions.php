@@ -126,6 +126,35 @@ function funKids_popular(){
 	echo Common::setCache($funKidsCacheFileNames['popular']);
 }
 
+function funKids_like($id){
+	$popular = (new PostController('program'))->actionList(NULL, NULL, 1, 5, [['visits'], 'DESC']);
+	?>
+	<div class="">
+		<div class="carousel-widget container" data-carousel-widget-column="3">
+			<div class="widget-head">
+				<div class="title">Похожие программы</div>
+				<div class="controls">
+					<div class="rightside"></div>
+					<div class="leftside"></div>
+				</div>
+			</div>		
+			<div class="widget-content">
+				<div class="inside-content shower center">
+				<?php 
+					foreach($popular['__list'] as $item): 
+					if($item['id'] == $id) continue; 
+				?>
+					<div class="item"><div class="img"><img src="<?=UPLOADS . $item['_jmp_post_img']?>" alt="<?=$item['title']?>" /></div><div class="inline-title"><?=$item['title']?></div><?=funkids_clearTags(mb_substr($item['content'], 0 ,200)).'...'?><div><a href="<?=$item['permalink']?>" class="button">Перейти</a></div></div>
+				<?php endforeach; ?>
+				</div>
+			</div>
+		</div>
+		<div class="center"><a href="<?=uri('programs')?>" class="button">Все программы</a></div>
+	</div>
+	<?php
+}
+
+
 $funKidsCacheFileNames['catalog'] = 'funkids/catalogOfHeroes';
 
 function funKids_catalogHeroes(){

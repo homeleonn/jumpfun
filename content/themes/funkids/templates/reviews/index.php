@@ -15,5 +15,5 @@
 		<?php endforeach; ?>
 	</section>
 	
-	<div class="center"><a href="#" class="button">Оставить отзыв</a></div>
+	<div class="center"><a href="#" class="button get-review-form">Оставить отзыв</a></div>
 </div>

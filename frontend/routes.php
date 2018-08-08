@@ -30,5 +30,6 @@ return [
 	// ['user', 'user'],
 	['reviews', 'review|list', 'GET'],
 	['reviews/add', 'review|add', 'POST'],
+	['reviews/mail', 'review|mail', 'POST'],
 ];
 

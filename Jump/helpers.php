@@ -119,7 +119,7 @@ function session(){
 	}elseif(is_string($args[0]) && !isset($args[1])){
 		return Session::get($args[0]);
 	}else{
-		call_user_func_array(['Session', 'set'], $args);
+		call_user_func_array('Jump\helpers\Session::set', $args);
 	}
 }
 

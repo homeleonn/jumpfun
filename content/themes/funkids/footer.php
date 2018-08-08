@@ -61,7 +61,8 @@
 				</div>
 			</div>
 		</footer>
-		<div class="up"></div>
+		<div class="phone" title="Заказать обратный звонок"><span class="icon-phone"></span></div>
+		<div class="up" title="Подняться вверх"></div>
 	</div>
 	<div id="shower">
 		<span></span>

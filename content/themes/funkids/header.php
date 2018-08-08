@@ -11,6 +11,7 @@
 	<link href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,700italic,400,800,700,600" rel="stylesheet" type="text/css">
 	<script src="<?=THEME?>js/jq3.js"></script>
 	<script src="<?=THEME?>js/js.js"></script>
+	<script src="<?=THEME?>js/mail.js"></script>
 	<?php jmpHead() ?>
 	<link rel="shortcut icon" href="<?=ROOT_URI?>favicon.ico" type="image/x-icon">
 </head>

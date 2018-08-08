@@ -58,6 +58,11 @@ img{
 	clear: both;
 }
 
+.none{
+	display: none;
+}
+
+
 .block{
 	display: block !important;
 }
@@ -671,7 +676,7 @@ footer .social-bottom a{
 	margin: 3px;
 }
 
-.up{
+.up, .phone{
 	position: fixed;
 	right: 20px;
 	bottom: 20px;
@@ -683,13 +688,28 @@ footer .social-bottom a{
 	opacity: .6;
 }
 
+.phone{
+	position: fixed;
+	right: 20px;
+	bottom: 70px;
+	padding: 7px;
+	background: lightblue;
+	border: 2px steelblue solid;
+	border-radius: 50%;
+	color: white;
+}
+
 .up:before{
 	font-family: "fontello";
 	content: '\e825';
 }
 
-.up:hover{
+.up:hover, .phone:hover{
 	opacity: 1;
+}
+
+.phone:hover{
+	color: red;
 }
 
 
@@ -1419,11 +1439,15 @@ textarea, input[type="text"]{
 	min-width: 200px;
 	min-height: 100px;
 	margin: 10px auto;
-	border: 0;
+	border: 1px #000 solid;
 	border-radius: 3px;
 	padding: 5px;
-	background: rgba(0, 0, 0, 1);
+	~background: rgba(0, 0, 0, 1);
 	display: block;
+}
+
+#order-question .contacts textarea{
+	background: #fff;
 }
 
 input#set-quest{

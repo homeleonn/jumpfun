@@ -19,4 +19,5 @@
 			}
 		?>
 	</div>
+	<?php funKids_like($id)?>
 </div>

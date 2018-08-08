@@ -186,8 +186,12 @@ class PostController extends AdminController{
 	
 	public function actionCommentsList(){
 		$comments 			= $this->db->getAll('Select * from comments limit 20');
+		if(!$comments) { return []; }
+		
 		$ids 				= Common::getKeys($comments, 'comment_post_id', true);
 		$posts 				= $this->db->getAll('Select id, title, url, post_type, parent from posts where id IN('.implode(',', $ids).')');
+		if(empty($posts)) { return []; }
+		
 		$postsOnTypes 		= Common::itemsOnKeys($posts, ['post_type']);
 		$currentPostTypes 	= array_keys($postsOnTypes);
 		$pageTypes 			= $this->config->getOption('jump_pageTypes');
