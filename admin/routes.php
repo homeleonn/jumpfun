@@ -10,6 +10,7 @@ return [
 	['media/del/(\d+)', 'media/del/$1', 'POST'],
 	
 	['users', 'user/list', 'GET'],
+	['user/clearcache', 'user/clearCache', 'POST'],
 	
 	['comments', 'post/commentsList', 'GET'],
 	['delComment/(\d+)', 'user/delComment/$1', 'POST'],

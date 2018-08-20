@@ -81,6 +81,7 @@ class PostController extends AdminController{
 		$post = [
 			'parent' 		=> isset($this->request->post['parent']) ? (int)$this->request->post['parent'] : 0,
 			'title' 		=> $this->textSanitize($this->request->post['title'], 'title'),
+			'short_title' 	=> $this->textSanitize($this->request->post['short_title'], 'title'),
 			'url' 			=> Transliteration::run($urlStringForTranslit),
 			'content' 		=> $this->textSanitize($this->request->post['content']),
 			'modified' 		=> MyDate::getDateTime(),

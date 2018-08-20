@@ -26,8 +26,8 @@ function getSections($type, $pageTypes){
 			}
 		}
 		$sections = array_merge($sections, 
-			['Комментарии||comment' => 'comments'],
-			['Пользователи||user' => 'users'],
+			//['Комментарии||comment' => 'comments'],
+			//['Пользователи||user' => 'users'],
 			['Плагины||cog' => 'plugins'],
 			['Настройки||cog' => [
 					'Общие' => 'settings',

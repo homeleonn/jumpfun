@@ -155,11 +155,34 @@ function Slider(element){
 	});
 })(jQuery);
 
+;(function($){
+	
+	var variant = 0;
+	var vars = ['test-back1', 'test-back2', 'test-back3'];
+	
+	$(function(){
+		$('.extra-services.front-page').on('click', function(){
+			$(this).removeClass(vars[variant]);
+			if(vars.length <= ++variant) {
+				variant = 0;
+			}
+			$(this).addClass(vars[variant]);
+		});
+	});
+	
+
+})(jQuery);
 
 
 $(function(){
 	slider = new Slider('slider');
 	shower = new Shower('.shower');
+	
+	
+	
+	setInterval(function(){
+		$('.phone').toggleClass('red');
+	}, 1000);
 	
 	if(document.location.host){
 		$('img[alt="www.000webhost.com"]').remove();
@@ -168,6 +191,13 @@ $(function(){
 	setInterval(function(){
 		$('.arr-right').click();
 	}, 5000);
+	
+	$(".front-menu").on("click","a", function (event) {
+		event.preventDefault();
+		var id  = $(this).attr('href'),
+			top = $(id).offset().top;
+		$('body,html').animate({scrollTop: top - 50}, 500);
+	});
 	
 	$('.up').click(function(){
 		$('html, body').animate({
@@ -197,7 +227,7 @@ $(function(){
 		$('#captcha').prop('src', root + 'get-captcha-for-comment/');
 	});
 	
-	$('.phone').click(function(e){
+	$('.phone, .phone-top, .bottom-phone .icon-phone').click(function(e){
 		e.preventDefault();
 		note.get('Заказать обратный звонок', 3);
 	});
@@ -212,31 +242,82 @@ $(function(){
 		$(this).next().text('Осталось: '+ (parseInt($(this).data('limit'), 10) - $(this).val().length) + ' символов');
 	});
 	
-	$('.review-set').click(function(){
-		var $name = $(this).parent().children('#review-name');
-		var name = $name.val();
-		if(!name){$name.css('border', '2px red solid'); return;}
-		
-		var $text = $(this).parent().children('#review-text');
-		var text = $(this).parent().children('#review-text').val();
-		if(!text){$text.css('border', '2px red solid');return;}
-		
-		var $captcha = $(this).parent().find('#captcha-code');
-		if(!$captcha.val()){$captcha.css('border', '2px red solid');return;}
-		
-		var self = this;
-		$.post(root + 'reviews/add/', {name:name,text:text, captcha:$captcha.val()}, function(msg){
-			if(msg == 5){
-				$captcha.css('border', '2px red solid');
-				$(self).parent().find('.captcha-reload').click();
-			}else{
-				note.get('Отзыв', msg);
-			}
-		});
+	
+	$('#callme .send').click(function(){
+		requestSet(3, this);
+	});
+	
+	$('#review-form .send').click(function(){
+		requestSet(4, this);
 	});
 	
 });
+
 var menuFixed = false;
+
+function requestSet(type, el){
+	var type = type || 2;
+	var data = {};
+	var title = 'Сообщение';
+	var $wrapper = $(el).closest('.request-wrapper');
+	
+	var $captcha = $wrapper.find(".captcha-wrapper");
+	
+	if(!$captcha.hasClass('none')){
+		var captcha = $captcha.find('.captcha-code').val();
+		if(!captcha.length){
+			fillIErrorInput($captcha.find('.captcha-code'));
+			$captcha.find('.captcha-reload').click();
+			return;
+		}
+	}
+	switch(type){
+		case 3:{
+	console.log(type);
+			var $tel = $wrapper.find('.tel');
+			if(!$tel.val()) {fillIErrorInput($tel);return;}
+			if(checkTel($tel.val())){
+				data.type 	= type;
+				data.tel 	= $tel.val();
+				data.captcha= captcha;
+				title = 'Обратный звонок';
+			}else{
+				fillIErrorInput($tel);
+				return;
+			}
+		}break;
+		case 4:{
+			var $name = $wrapper.find('.name');
+			var $text = $wrapper.find('textarea.text');
+			if(!$name.val()) {fillIErrorInput($name);return;}
+			if(!$text.val()) {fillIErrorInput($text);return;}
+			data.type 	= type;
+			data.name 	= $name.val();
+			data.text 	= $text.val();
+			data.captcha= captcha;
+			title = 'Отзыв';
+		}break;
+	}
+	
+	$.post(root + 'reviews/mail/', data, function(msg){
+		if(msg == 999){
+			note.get('Ошибка', 'Неопределенная ошибка');
+		}else if(msg == 0){
+			fillIErrorInput($captcha.find('.captcha-code'));
+			$captcha.find('.captcha-reload').click();
+		}else if(msg == 1){
+			$captcha.removeClass('none');
+			$captcha.find('img.captcha').prop('src', root + 'get-captcha-for-comment/');
+			return;
+		}else{
+			note.get(title, msg);
+		}
+	});
+}
+
+function fillIErrorInput($input){console.log($input);
+	$input.css('border', '2px red solid');
+}
 
 var note = new Note();
 var question;
@@ -258,6 +339,10 @@ function Note(){
 			this.clone('#review-form');
 		}else{
 			$('#note-content').html(content);
+		}
+		
+		if(content == 3 || content == 4){
+			$('#captcha-wrapper').clone().addClass('none').insertBefore($('#note-content .send'));
 		}
 		
 		if(submit) $('#note-submit').addClass('block');
@@ -447,7 +532,7 @@ $(function(){
 		$('.menu a[href="'+root+'"]').addClass('active');
 	}else{
 		var parts = document.location.pathname.split(root)[1].split('/');
-		$('.menu a[href="'+root+parts[1]+'/"]').addClass('active');
+		$('.menu a[href="'+root+parts[0]+'/"]').addClass('active');
 	}
 	var $active = $('.menu a[href="'+document.location.pathname+'"]');
 	if(!$active.parent('li').length){
@@ -486,7 +571,7 @@ $(function(){
 					//$sub.append(data.comment);
 					$(data.comment).insertBefore($('#comments-block-form'))
 				}else{
-					$parent.append('<tr><td colspan="3" class="sub-comments"><div style="">Ответы (1)</div>' + data.comment + '</td></tr>');
+					$parent.append('<tr><td colspan="3" class="sub-comments"><div>Ответы (1)</div>' + data.comment + '</td></tr>');
 				}
 				
 			}else{
@@ -509,17 +594,19 @@ $(function(){
 		window.scrollTo(0, $('#comment-text').offset().top - 300);
 	});
 	
-	$('.captcha-reload').on('click', function(){
-		captchaReload();
+	$('body').on('click', '.captcha-reload', function(){
+		captchaReload(this);
 	});
 });
 
-function captchaReload(){
+function captchaReload(el){
 	if(typeof captcha1 != 'undefined' && captcha1) return false;
 	captcha1 = true; 
-	$('#captcha').addClass('rotate1').attr('src', root+'get-captcha-for-comment/?async&'+Math.random())
+	console.log($(el), el);
+	var $captcha = $(el).closest('.captcha-wrapper').find('.captcha');
+	$captcha.addClass('rotate1').attr('src', root+'get-captcha-for-comment/?async&'+Math.random())
 	setTimeout(function(){ 
-		$('#captcha').removeClass('rotate1');
+		$captcha.removeClass('rotate1');
 		captcha1 = false; 
-	}, 1000)
+	}, 1000);
 }

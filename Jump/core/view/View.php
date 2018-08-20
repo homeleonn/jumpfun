@@ -63,7 +63,7 @@ class View
 			}
 		}
 		
-		//dd($contentFile, $template);
+		//d($post['post_type']);
 		if(!is_file($contentFile)){
 			
 			if(isset($post['id']) && is_file($contentFile = $this->path . 'page-' . $post['id'] . '.php')){}
@@ -141,7 +141,7 @@ class View
 	
 	private function haveChild($id = 0){
 		if(is_null($this->children)){
-			if(!isset($this->senderModel)) return;
+			if(!isset($this->senderModel) || !$id) return;
 			$this->children = $this->senderModel->getChildrens($id);
 			if(!$this->children) $this->children = false;
 		}

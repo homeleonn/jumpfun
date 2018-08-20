@@ -1,9 +1,9 @@
 <?//=dd(get_defined_vars());?>
 <div class="container">
 	<?=isset($h1)?'<h1>'.$h1.'</h1>':''?>
-	<div class="floatimg shower"><div class="img"><img src="<?=(isset($_jmp_post_img) ? $_jmp_post_img : THEME . 'img/002.jpg')?>" alt="" style="max-width: 300px;"></div></div>
+	<div class="floatimg shower main-img"><div class="img"><img src="<?=(isset($_jmp_post_img) ? $_jmp_post_img : THEME . 'img/002.jpg')?>" alt=""></div></div>
 	<?php if(isset($terms)) echo $terms;?>
-	<div style="padding: 10px;"><?=$content?></div>
+	<div  class="tcontent"><?=$content?></div>
 	<?php //include $this->get('comments');?>
 	<?php 
 		if(isAdmin()){

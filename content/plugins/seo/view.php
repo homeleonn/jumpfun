@@ -2,11 +2,11 @@
 <div id="post-seo" class="side-block">
 	<div class="block-title">SEO</div>
 	<div class="block-content">
+		<b>SEO-заголовок(тег: title):</b><br>
+		<input type="text" class="w100" name="_seo_title" value="<?=$title?>"><br>
 		<b>Описание(Мета-тег: description):</b><br>
-		<input type="text" class="w100" name="_seo_description" value="<?=$descr?>"><br><br>
-		<b>Ключевые слова(Мета-тег: keywords):</b><br>
-		<input type="text" class="w100" name="_seo_keywords" value="<?=$keys?>">
-		<div id="seo-recommended"></div>
+		<input type="text" class="w100" name="_seo_description" value="<?=$descr?>">
+		<div id="seo-recommended"><small>* отклонение в несколько символов незначительно</small></div>
 	</div>
 </div>
 <script>
@@ -15,8 +15,8 @@ if(!window.jQuery)
 	document.write('<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></scr'+'ipt>');
 
 (function(){
+	var $title 		= $('[name="_seo_title"]');
 	var $desc 		= $('[name="_seo_description"]');
-	var $keys 		= $('[name="_seo_keywords"]');
 	var $recBlock 	= $('#seo-recommended');
 	
 	var content;
@@ -32,12 +32,25 @@ if(!window.jQuery)
 	
 	function b(){
 		var length = $desc.val().length;
-		if(length > 160)
-			a('seo-desc', 'red', ' <b>Мета-описание</b> слишком длинное, '+length+' символов, оптимальная длинна 150-160 символов!');
-		else if(length < 100)
-			a('seo-desc', 'red', ' <b>Мета-описание</b> слишком короткое, '+length+' символов, оптимальная длинна 150-160 символов!');
+		var optimal = 'оптимальная длинна 170-290 символов!';
+		if(length > 290)
+			a('seo-desc', 'red', ' <b>Мета-описание</b> слишком длинное, '+length+' символов, ' + optimal);
+		else if(length < 170)
+			a('seo-desc', 'red', ' <b>Мета-описание</b> слишком короткое, '+length+' символов, ' + optimal);
 		else
-			a('seo-desc', 'green', ' <b>Мета-описание</b> '+length+' символов. Отлично!');
+			a('seo-desc', 'green', ' <b>Мета-описание</b> '+length+' символов. Отлично, ' + optimal);
+	}
+	
+	function d(){
+		var length = $title.val().length;
+		if(!length) length = $('#title').val().length;
+		var optimal = 'оптимальная длинна 70-80 символов!';
+		if(length > 80)
+			a('seo-title', 'red', ' <b>СЕО-заголовк</b> слишком длинный, '+length+' символов, ' + optimal);
+		else if(length < 70)
+			a('seo-title', 'red', ' <b>СЕО-заголовк</b> слишком длинный, '+length+' символов, ' + optimal);
+		else
+			a('seo-title', 'green', ' <b>СЕО-заголовк</b> '+length+' символов. Отлично, ' + optimal);
 	}
 	
 	function c(){
@@ -62,8 +75,12 @@ if(!window.jQuery)
 			});
 		}, 1);
 		
+		d();
+		$('[name="_seo_title"], #title').on('blur', d);
+		
 		b();
 		$desc.on('blur', b);
+		
 	});
 	
 	

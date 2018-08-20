@@ -43,7 +43,7 @@ function plugins(array $activePlugins = []){
 
 
 
-function add($type, $funcName, $userFunc){
+function add($type, $funcName, $userFunc, $front = false){
 	// if(is_array($userFunc)){
 		// if(isset($userFunc[0]) && isset($userFunc[1])){
 			// if(is_object($userFunc[0]) && method_exists($userFunc[0], $userFunc[1])){
@@ -52,11 +52,19 @@ function add($type, $funcName, $userFunc){
 		// }
 		// dd($userFunc);
 	// }
-	$GLOBALS['jump_'.$type][$funcName][] = $userFunc;
+	if($front){
+		if(!isset($GLOBALS['jump_'.$type][$funcName]))
+			$GLOBALS['jump_'.$type][$funcName] = [];
+		
+		array_unshift($GLOBALS['jump_'.$type][$funcName], $userFunc);
+	}else{
+		$GLOBALS['jump_'.$type][$funcName][] = $userFunc;
+	}
+	
 }
 
-function addAction($actionName, $userFunc){
-	add('actions', $actionName, $userFunc);
+function addAction($actionName, $userFunc, $front = false){
+	add('actions', $actionName, $userFunc, $front);
 }
 
 function addFilter($filterName, $userFunc){
@@ -179,10 +187,13 @@ function getTermsByTaxonomies(){
 
 //var_dump(getTermsByPostId(70));
 function jmpHead(){
+	global $post;
+	$post = applyFilter('jhead', $post);
+echo <<<EOT
+<title>{$post['title']}</title>\n\t
+EOT;
 	doAction('jhead');
 }
-
-
 
 
 
@@ -310,7 +321,13 @@ function getMenu(){
 		<?php
 	}
 	echo '
-	<li class="top-menu hidd"><div style="background: white; color: coral;">OurEmail@funkids <br>(067) 797-93-85 <br>(063) 200-85-95</div></li>
+	<li class="top-menu hidd extra-contacts">
+		<div style="background: white; color: coral;">
+			<a href="tel:+380677979385">+38 (067) 797-93-85</a>
+			<a href="tel:+380632008595">+38 (063) 200-85-95</a>
+			Почта: <a href="mailto:funkids@mail">funkidssodessa@gmail.com</a>
+		</div>
+	</li>
 	</ul></nav>';
 	
 	echo Common::setCache($cacheFileName);
@@ -345,6 +362,13 @@ function redirect($path){
  */
 function addPageType($options){
 	DI::getD('config')->addPageType($options);
+}
+
+/**
+ *  Alias for service config->getPageOptionsByType
+ */
+function getPageOptionsByType($type){
+	return DI::getD('config')->getPageOptionsByType($type);
 }
 
 function getBreadCrumbs(){

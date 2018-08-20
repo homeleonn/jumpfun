@@ -105,7 +105,13 @@ class Request{
 		];
 		if($code)
 			header("HTTP/1.1 {$code} {$codes[$code]}");
+		
 		if($code == 404){
+			$page404 = THEME_DIR . '404.php';
+			if(file_exists($page)){
+				include_once $page;
+				exit;
+			}
 			exit('Page not found');
 		}
 			

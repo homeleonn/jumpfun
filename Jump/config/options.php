@@ -10,4 +10,5 @@ return [
 	'description' => 'Организация детских праздников Одесса:description',
 	'plugins_activated' => 'a:1:{s:3:"seo";s:11:"seo/seo.php";}',
 	'l10n' => 'a:1:{s:12:"default_lang";s:3:"esp";}',
+	'extra_fields' => 'a:1:{s:7:"program";a:1:{i:0;s:5:"price";}}',
 ];

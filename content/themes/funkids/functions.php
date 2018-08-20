@@ -4,6 +4,57 @@ use Jump\DI\DI;
 use Jump\helpers\Common;
 
 
+function funkids_programPrice(){
+	global $post;
+	$price = isset($post['_jmp_program_price']) ? $post['_jmp_program_price'] : '';
+	//dd($post);
+	?>
+	Стоимость: <input type="text" name="_jmp_program_price" value="<?=$price?>"> грн
+	<?php
+}
+
+// addAction('add_post_after', 'funkids_programPrice', true);
+// addAction('edit_post_after', 'funkids_programPrice', true);
+// addFilter('extra_fields_keys', 'funkids_extra_fields_keys');
+
+function funkids_extra_fields_keys($extraFieldKeys){
+	$extraFieldKeys = array_merge(
+		$extraFieldKeys, 
+		['_jmp_program_price']
+	);
+	
+	return $extraFieldKeys;
+}
+
+addPageType([
+		'type' => 'new',
+		'title' => 'Новости',
+		'h1' => 'Новости организации детских праздников в Одессе | FunKids',
+		'title_for_admin' => 'Новости',
+		'description' => 'Новости организации детских праздников в Одессе | FunKids',
+		'add' => 'Добавить новость',
+		'edit' => 'Редактировать новость',
+		'delete' => 'Удалить новость',
+		'common' => 'новостей',
+		'hierarchical' => false,
+		'has_archive'  => 'news',
+		'rewrite' => ['slug' => 'news', 'with_front' => false, 'paged' => 20],
+]);
+
+addPageType([
+		'type' => 'service',
+		'title' => 'Доп. Услуги',
+		'h1' => 'Дополнительные услуги для праздника',
+		'title_for_admin' => 'Доп. Услуги',
+		'description' => 'Дополнительные услуги для организации детских праздников в Одессе | FunKids',
+		'add' => 'Добавить услугу',
+		'edit' => 'Редактировать услугу',
+		'delete' => 'Удалить услугу',
+		'common' => 'услуг',
+		'hierarchical' => false,
+		'has_archive'  => 'services',
+		'rewrite' => ['slug' => 'services', 'with_front' => false, 'paged' => 20],
+]);
 
 // addPageType([
 		// 'type' => 'new',
@@ -96,17 +147,41 @@ function isMain(){
 
 use frontend\controllers\PostController;
 
+
+$funKidsCacheFileNames['programs_all'] = 'funkids/programs_all';
+
+function funKids_all(){
+	global $funKidsCacheFileNames;
+	if(Common::getCache($funKidsCacheFileNames['programs_all'], -1)) return;
+	$popular = (new PostController('program'))->actionList(NULL, NULL, 1, 30, [['visits'], 'DESC']);
+	?>
+	<div class="all-progs" id="all-progs">
+		<h2 class="section-title">Наши шоу программы</h2>
+		<div class="twrapper">
+			<div class="row flex">
+			<?php foreach($popular['__list'] as $item): ?>
+				<div class="item col-md-3 center"><a href="<?=$item['permalink']?>"><img src="<?=UPLOADS . $item['_jmp_post_img']?>" alt="<?=$item['short_title'] ?: $item['title']?> - шоу программа funkids Одесса, аниматоры" /><div class="inline-title"><?=$item['short_title'] ?: $item['title']?></div></a></div>
+			<?php endforeach; ?>
+			</div>
+		</div>
+	</div>
+	<?php
+	echo Common::setCache($funKidsCacheFileNames['programs_all']);
+}
+
+
 $funKidsCacheFileNames['popular'] = 'funkids/popularHeroes';
 
 function funKids_popular(){
 	global $funKidsCacheFileNames;
 	if(Common::getCache($funKidsCacheFileNames['popular'], -1)) return;
-	$popular = (new PostController('program'))->actionList(NULL, NULL, 1, 4, [['visits'], 'DESC']);
+	$popular = (new PostController('program'))->actionList(NULL, NULL, 1, 5, [['visits'], 'DESC']);
 	?>
-	<div class="popular-progs">
+	<div class="popular-progs" id="popular-progs">
+		<h2 class="section-title">Популярные программы</h2>
 		<div class="carousel-widget container" data-carousel-widget-column="3">
 			<div class="widget-head">
-				<div class="title">Популярные программы</div>
+				<div class="title"></div>
 				<div class="controls">
 					<div class="rightside"></div>
 					<div class="leftside"></div>
@@ -115,7 +190,7 @@ function funKids_popular(){
 			<div class="widget-content">
 				<div class="inside-content shower center">
 				<?php foreach($popular['__list'] as $item): ?>
-					<div class="item"><div class="img"><img src="<?=UPLOADS . $item['_jmp_post_img']?>" alt="<?=$item['title']?>" /></div><div class="inline-title"><?=$item['title']?></div><?=funkids_clearTags(mb_substr($item['content'], 0 ,200)).'...'?><div><a href="<?=$item['permalink']?>" class="button">Перейти</a></div></div>
+					<div class="item"><div class="img"><img src="<?=UPLOADS . $item['_jmp_post_img']?>" alt="<?=$item['short_title'] ?: $item['title']?> - популярный аниматор в Одессе" /></div><div class="inline-title"><?=$item['short_title'] ?: $item['title']?></div><?=funkids_clearTags(mb_substr($item['content'], 0 ,200)).'...'?><div><a href="<?=$item['permalink']?>" class="button">Перейти</a></div></div>
 				<?php endforeach; ?>
 				</div>
 			</div>
@@ -126,10 +201,40 @@ function funKids_popular(){
 	echo Common::setCache($funKidsCacheFileNames['popular']);
 }
 
-function funKids_like($id){
-	$popular = (new PostController('program'))->actionList(NULL, NULL, 1, 5, [['visits'], 'DESC']);
+
+$funKidsCacheFileNames['services'] = 'funkids/services';
+
+function funKids_services(){
+	global $funKidsCacheFileNames;
+	if(Common::getCache($funKidsCacheFileNames['services'], -1)) return;
+	$services = (new PostController('service'))->actionList(NULL, NULL, 1);
 	?>
-	<div class="">
+	<div class="extra-services front-page" id="extra-services">
+		<h2 class="section-title"><div>Дополнительные</div> <div>услуги</div></h2>
+		<div class="container shower">
+			<h3 class="center">Вы можете заказать дополнительные атрибуты к празднику, которые оставят незабываемые впечатления!</h3>
+			<div class="flex">
+			<?php foreach($services['__list'] as $item): ?>
+				<div class="item"><div class="img"><img src="<?=UPLOADS . $item['_jmp_post_img']?>" alt="<?=$item['short_title'] ?: $item['title']?> - дополнительная услуга детский праздник" /></div><div class="inline-title center"><a href="<?=$item['permalink']?>"><?=$item['short_title'] ?: $item['title']?></a></div></div>
+			<?php endforeach; ?>
+			</div>
+			<div class="center"><a href="<?=uri('services')?>" class="button">Все доп. услуги</a></div>
+		</div>
+	</div>
+	<?php
+	echo Common::setCache($funKidsCacheFileNames['services']);
+}
+
+
+$funKidsCacheFileNames['like'] = 'funkids/like';
+function funKids_like($id){
+	global $funKidsCacheFileNames;
+	if(Common::getCache($funKidsCacheFileNames['like'].$id, 86400)) return;
+	$popular = (new PostController('program'))->actionList(NULL, NULL, 1, 5, [['id'], ['DESC', 'ASC'][mt_rand(0, 1)]]);
+	shuffle($popular['__list']);
+	//dd($popular['__list']);
+	?>
+	<div>
 		<div class="carousel-widget container" data-carousel-widget-column="3">
 			<div class="widget-head">
 				<div class="title">Похожие программы</div>
@@ -144,7 +249,7 @@ function funKids_like($id){
 					foreach($popular['__list'] as $item): 
 					if($item['id'] == $id) continue; 
 				?>
-					<div class="item"><div class="img"><img src="<?=UPLOADS . $item['_jmp_post_img']?>" alt="<?=$item['title']?>" /></div><div class="inline-title"><?=$item['title']?></div><?=funkids_clearTags(mb_substr($item['content'], 0 ,200)).'...'?><div><a href="<?=$item['permalink']?>" class="button">Перейти</a></div></div>
+					<div class="item"><div class="img"><img src="<?=UPLOADS . $item['_jmp_post_img']?>" alt="<?=$item['short_title'] ?: $item['title']?> - похожие шоу программы, аниматоры" /></div><div class="inline-title"><?=$item['short_title'] ?: $item['title']?></div><?=funkids_clearTags(mb_substr($item['content'], 0 ,200)).'...'?><div><a href="<?=$item['permalink']?>" class="button">Перейти</a></div></div>
 				<?php endforeach; ?>
 				</div>
 			</div>
@@ -152,6 +257,7 @@ function funKids_like($id){
 		<div class="center"><a href="<?=uri('programs')?>" class="button">Все программы</a></div>
 	</div>
 	<?php
+	echo Common::setCache($funKidsCacheFileNames['like'].$id);
 }
 
 
@@ -159,17 +265,27 @@ $funKidsCacheFileNames['catalog'] = 'funkids/catalogOfHeroes';
 
 function funKids_catalogHeroes(){
 	global $funKidsCacheFileNames;
-	if(Common::getCache($funKidsCacheFileNames['catalog'])) return;
+	if(Common::getCache($funKidsCacheFileNames['catalog'], -1)) return;
 	$heroes = (new PostController('program'))->actionList();
 	foreach($heroes['__list'] as $h){
-		?><div class="item"><a href="<?=$h['permalink']?>"><?=$h['title']?></a></div><?php
+		?><div class="item"><a href="<?=$h['permalink']?>"><?=$h['short_title'] ?: $h['title']?></a>
+			<div class="preview center">
+				<img src="<?=funKidsUploadedImgPath($h['_jmp_post_img'])?>" alt="<?=$h['title']?> - герой, аниматор, детский праздник в Одессе" /><div class="inline-title"><?=$h['short_title'] ?: $h['title']?></div><?=funkids_clearTags(mb_substr($h['content'], 0 ,200)).'...'?>
+			</div>
+		</div><?php
 	}
 	echo Common::setCache($funKidsCacheFileNames['catalog']);
 }
 
 function funkids_clearTags($text){
-	//return preg_replace('/<[^\s]*/', '', preg_replace('/<[^\s]*>/', '', $text));
 	return preg_replace(['/<[^\s]*>/', '/<.*/', '/.*>/'], '', $text);
+}
+
+
+function funKidsUploadedImgPath($path, $thumb = false){
+	$pathParts = pathinfo($path);
+	$imgPath = $pathParts['dirname'] . '/' . $pathParts['filename'] . ($thumb ? '-150x150' : '') . '.' . $pathParts['extension'];
+	return UPLOADS . (is_file(UPLOADS_DIR . $imgPath) ? $imgPath : $path);
 }
 
 
@@ -177,45 +293,54 @@ $funKidsCacheFileNames['reviews'] = 'funkids/reviews';
 
 function funkids_getLastReviews(){
 	global $funKidsCacheFileNames;
-	if(Common::getCache($funKidsCacheFileNames['reviews'])) return;
+	if(Common::getCache($funKidsCacheFileNames['reviews'], -1)) return;
 	$reviews = DI::getD('db')->getAll('Select * from reviews where status = 1 order by id DESC limit 3');
 	?>
-	<section class="reviews topoffset">
-				<div class="carousel-widget container" data-carousel-widget-column="2">
-					<div class="widget-head">
-						<div class="title">Последние отзывы наших клиентов</div>
-						<div class="controls">
-							<div class="rightside"></div>
-							<div class="leftside"></div>
-						</div>
-					</div>
-					<div class="widget-content">
-						<div class="inside-content">
-						<?php foreach($reviews as $review): ?>
-							<div class="item">
-								<div class="floatimg">
-									<img src="<?=THEME?>img/review.jpg" alt="Отзыв клиента <?=$review['name']?>" />
-								</div>
-								<p class="quote-big">
-									<?=$review['text']?>
-								</p>
-								<div class="right fs22"><?=$review['name']?></div>
-							</div>
-						<?php endforeach; ?>
-						</div>
-					</div>
+	<div class="reviews topoffset" id="reviews">
+		<div class="carousel-widget container" data-carousel-widget-column="2">
+			<div class="widget-head">
+				<div class="title">Последние отзывы наших клиентов</div>
+				<div class="controls">
+					<div class="rightside"></div>
+					<div class="leftside"></div>
 				</div>
-			</section>
+			</div>
+			<div class="widget-content">
+				<div class="inside-content">
+				<?php foreach($reviews as $review): ?>
+					<div class="item">
+						<div class="floatimg">
+							<img src="<?=THEME?>img/review.jpg" alt="Отзыв клиента <?=$review['name']?>" />
+						</div>
+						<p class="quote-big">
+							<?=$review['text']?>
+						</p>
+						<div class="right fs22"><?=$review['name']?></div>
+					</div>
+				<?php endforeach; ?>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="container center">
+		<a href="<?=uri('reviews')?>" class="button">Перейти ко всем отзывам</a>
+		<a href="#" class="button get-review-form">Оставить отзыв</a>
+	</div>
 	<?php
 	echo Common::setCache($funKidsCacheFileNames['reviews']);
 }
 
 
 function funClearCache($post){
+	global $funKidsCacheFileNames;
+	
 	if($post['post_type'] == 'program'){
-		global $funKidsCacheFileNames;
-		Common::clearCache($funKidsCacheFileNames['popular']);
+		//Common::clearCache($funKidsCacheFileNames['popular']);
 		Common::clearCache($funKidsCacheFileNames['catalog']);
+		Common::clearCache($funKidsCacheFileNames['programs_all']);
+	}
+	elseif($post['post_type'] == 'service'){
+		Common::clearCache($funKidsCacheFileNames['services']);
 	}
 }
 
@@ -223,32 +348,6 @@ addAction('before_post_add', 'funClearCache');
 addAction('before_post_edit', 'funClearCache');
 addAction('before_post_delete', 'funClearCache');
 
-
-
-
-// можешь придумать свой тип записи, например: врачи, игрушки
-// addPageType([
-		// 'type' => 'doctor', // doctor / toy
-		// 'title' => 'Врачи',
-		// 'title_for_admin' => 'Врачи',
-		// 'description' => 'news1', // Медицинский доктор — исторические: лекарь, цирюльник, лейб-медик, фельдшер, доктор и др.; современный — врач. См. также медицинские профессии.
-		// 'add' => 'Добавить врача',
-		// 'edit' => 'Редактировать врача',
-		// 'delete' => 'Удалить врача',
-		// 'common' => 'врачей',
-		// 'hierarchical' => false, // это позже если что объясню
-		// 'has_archive'  => 'doctors', // страница на которой будут отображаться все доктора / игрушки
-		// 'rewrite' => ['slug' => 'doctors/%doc-category%'], // slug будет добавлен к ссылке на странице конкретного врача (реализовано, но пока еще не гибко) doctors/%doc-category% , doc-category нужно будет добавить ниже в таксономию, тоже пока не гибко. Протестируй, в админке сразу появится новый пункт меню и можно попробовать.
-		// 'taxonomy' => [
-			// 'doc-category' => [
-				// 'title' => 'Категории',
-				// 'add' => 'Добавить категорию',
-				// 'edit' => 'Редактировать категорию',
-				// 'delete' => 'Удалить категорию',
-				// 'hierarchical' => true,
-			// ]
-		// ]
-// ]);
 
 
 
@@ -275,7 +374,7 @@ function themeHTMLCommentTable($comment, $subComments = NULL, $level = 1){
 		<?php if($subComments): $subCommentsCount = count($subComments); ?>
 		<tr>
 			<td colspan="3" class="sub-comments">
-				<div style="">Ответы (<?=$subCommentsCount?>)</div>
+				<div>Ответы (<?=$subCommentsCount?>)</div>
 				<?php
 					foreach(array_reverse($subComments) as $subComment){
 						echo themeHTMLCommentTable($subComment);

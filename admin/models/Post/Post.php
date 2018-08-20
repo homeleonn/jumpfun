@@ -29,7 +29,7 @@ class Post extends Model{
 	
 	public function postList(){
 		// Get all posts
-		if(!$posts = $this->getAllPosts($this->options['type'], ['id', 'parent', 'title', 'url', 'created'])) return false;
+		if(!$posts = $this->getAllPosts($this->options['type'], ['id', 'parent', 'title', 'short_title', 'url', 'created'])) return false;
 		
 		$addKeys = [];
 		if(!$this->options['hierarchical']){
@@ -66,15 +66,25 @@ class Post extends Model{
 	public function addForm(){
 		$data = [];
 		if($this->options['hierarchical']){
-			$posts = $this->getAllPosts($this->options['type'], ['id', 'parent', 'title', 'url']);
+			$posts = $this->getAllPosts($this->options['type'], ['id', 'parent', 'title', 'short_title', 'url']);
 			$data['listForParents'] = $this->listForParents($posts);
 			$data['templates'] 		= $this->htmlSelectForTemplateList();
 		}elseif($this->options['taxonomy']){
 			$data['terms'] = $this->getTermList(array_keys($this->options['taxonomy']));
 			$data['terms'] = $this->hierarchyItems($data['terms']);
 		}
+		
+		$data['extra_fields_list'] = $this->getExtraFieldsOptions();
 			
 		return $data;
+	}
+	
+	private function getExtraFieldsOptions(){
+		$extra_fields_list = Common::getOption('extra_fields');
+		$extra_fields_list = $extra_fields_list ? unserialize($extra_fields_list) : false;
+		return isset($extra_fields_list[$this->options['type']]) ?
+										$extra_fields_list[$this->options['type']]:
+										false;
 	}
 	
 	public function listForParents($posts = NULL, $parent = NULL, $onlyData = false){
@@ -82,7 +92,7 @@ class Post extends Model{
 		if(!$posts){
 			if(!isset($this->options))
 				$this->options = HelperDi::get('config')->getPageOptionsByType('page');
-			$posts = $this->getAllPosts($this->options['type'], ['id', 'parent', 'title', 'url']);
+			$posts = $this->getAllPosts($this->options['type'], ['id', 'parent', 'title', 'short_title', 'url']);
 		}
 			
 		$itemsToParents = $this->hierarchyItems($posts);
@@ -204,7 +214,7 @@ class Post extends Model{
 		}
 		
 		if($isPost){
-			$url = $this->options['hierarchical'] ? ROOT_URI . $urlHierarchy . Options::getArchiveSlug() . $item['url'] . '/' : $item['url'];
+			$url = ROOT_URI . ($this->options['hierarchical'] ? ROOT_URI . $urlHierarchy . Options::getArchiveSlug() . $item['url'] . '/' : Options::getArchiveSlug() . $item['url'] . '/');
 		}else{
 			$url = ROOT_URI . Options::getArchiveSlug() . $item['taxonomy'] . '/' . $urlHierarchy . $item['slug'] . '/' ;
 		}
@@ -216,7 +226,7 @@ class Post extends Model{
 		?>
 			<tr>
 				<td class="admin-page-list">
-					<?=str_repeat('&mdash;', $level) . ' ' . sprintf($edit, $item[$isPost ? 'title' : 'name']);?>
+					<?=str_repeat('&mdash;', $level) . ' ' . sprintf($edit, $item[$isPost ? ($item['short_title']?'short_title':'title') : 'name']);?>
 					<div style="position: absolute;">
 						[<?=$link;?>]
 						[<a href="#">свойства</a>]
@@ -382,6 +392,8 @@ class Post extends Model{
 			if($post['terms'])
 				$post['terms'] = $this->hierarchyItems($post['terms']);
 		}
+		
+		$post['extra_fields_list'] = $this->getExtraFieldsOptions();
 		
 		return $post;
 	}

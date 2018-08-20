@@ -59,7 +59,7 @@ class PostController extends Controller{
 	 *  @return array post
 	 */
 	public function actionSingle($url, $id = NULL){//dd(func_get_args(), $this->config->front_page);
-	
+		//doAction()
 		if($data = $this->checkFront($url))
 			return $data;
 		
@@ -105,8 +105,8 @@ class PostController extends Controller{
 		$this->addBreadCrumbs($post);
 		if(!isset($post['__model'])) $post['__model'] = $this->model;
 		//dd($post);
-		if($post['comment_status'] == 'open')
-		$post['comments'] = $this->model->getComments($post['id']);
+		// if($post['comment_status'] == 'open')
+		// $post['comments'] = $this->model->getComments($post['id']);
 		return $post;
 	}
 	
@@ -123,18 +123,23 @@ class PostController extends Controller{
 	{
 		// What are the taxonomies of the post
 		$postTypeTaxonomies = array_keys(Options::get('taxonomy'));
-		
-		// Get terms by post taxonomies
-		$terms = $this->model->taxonomy->getByTaxonomies(); 
-		
-		// Получим термины относящиеся к данной записи, которые привязаны к таксономиям данного типа записи
-		$postTerms = $this->model->getPostTerms(' and tr.object_id = ' . $post['id'] . ' and tt.taxonomy IN(\''.implode("','", $postTypeTaxonomies).'\')');
-		
-		// Сгрупируем все термины данных таксономий по айди и родителю
-		list($termsOnId, $termsOnParent) = !Common::itemsOnKeys($terms, ['id', 'parent']);
-		
-		// Получим термины в виде списка html
-		$post['terms'] = Common::termsHTML($this->postTermsLink($termsOnId, $termsOnParent, $postTerms), Options::getArchiveSlug());
+		if(empty($postTypeTaxonomies)){
+			$termsOnId = $termsOnParent = $postTerms = [];
+			
+			$post['terms'] = NULL;
+		}else{
+			// Get terms by post taxonomies
+			$terms = $this->model->taxonomy->getByTaxonomies(); 
+			
+			// Получим термины относящиеся к данной записи, которые привязаны к таксономиям данного типа записи
+			$postTerms = $this->model->getPostTerms(' and tr.object_id = ' . $post['id'] . ' and tt.taxonomy IN(\''.implode("','", $postTypeTaxonomies).'\')');
+			
+			// Сгрупируем все термины данных таксономий по айди и родителю
+			list($termsOnId, $termsOnParent) = !Common::itemsOnKeys($terms, ['id', 'parent']);
+			
+			// Получим термины в виде списка html
+			$post['terms'] = Common::termsHTML($this->postTermsLink($termsOnId, $termsOnParent, $postTerms), Options::getArchiveSlug());
+		}
 		
 		// Сформируем полную ссылку на пост, учитывая иерархию терминов к которым принадлежит запись
 		$this->postPermalink($post, $termsOnId, $termsOnParent, $postTerms);
@@ -162,7 +167,7 @@ class PostController extends Controller{
 				//dd($this->model->getPostsByPostType('page') , $parent, 'url');
 				$this->request->location(SITE_URL . $this->getParentHierarchy($parent, $this->model->getPostsByPostType('page'),  'url') . '/' . $url . '/', 301);
 			}else{
-				$parents = $this->db->getAll('Select id, title, url, parent from posts where url IN(\''.implode("','", $hierarchy).'\') order by parent DESC');
+				$parents = $this->db->getAll('Select id, title, short_title, url, parent from posts where url IN(\''.implode("','", $hierarchy).'\') order by parent DESC');
 				//d($parents, $hierarchy, $parent);
 				if(count($parents) < count($hierarchy)){
 					$this->request->location(NULL, 404);
@@ -176,9 +181,8 @@ class PostController extends Controller{
 						if($parent['id'] != $tempParent || $parent['url'] != $h[$i]){
 							$this->request->location(NULL, 404);
 						}
-						
 						$tempParent = $parent['parent'];
-						$addBreadCrumbs[$h[$i]] = $parent['title'];
+						$addBreadCrumbs[$h[$i]] = $parent['short_title'] ?: $parent['title'];
 						$i++;
 					}
 					if($tempParent)
@@ -243,7 +247,7 @@ class PostController extends Controller{
 		if(!$taxonomy){
 			//if($this->options['has_archive']){
 				if(!$list[$listMark] = $this->model->getPostsByPostType(Options::get('type'), $orderBy)) return 0;
-				$terms = $this->model->taxonomy->getAllByObjectsIds(array_keys(Common::itemsOnKeys($list[$listMark], ['id'])));
+				$terms = !empty(Options::get('taxonomy')) ? $this->model->taxonomy->getAllByObjectsIds(array_keys(Common::itemsOnKeys($list[$listMark], ['id']))) : [];
 				//dd(array_keys(Common::itemsOnKeys($list[$listMark], ['id'])), $list[$listMark], $terms);
 				
 				$termsByPostId = $terms ? Common::itemsOnKeys($terms, ['object_id']) : [];
@@ -377,7 +381,8 @@ class PostController extends Controller{
 		//dd($ids);
 		
 		$meta = $this->db->getAll('Select post_id, meta_key, meta_value from postmeta where post_id IN('.implode(',', $ids).')');
-		$comments = $this->db->getAll('Select comment_post_id from comments where comment_post_id IN('.implode(',', $ids).')');
+		//$comments = $this->db->getAll('Select comment_post_id from comments where comment_post_id IN('.implode(',', $ids).')');
+		$comments = [];
 		
 		$commnetsOnId = $comments ? Common::itemsOnKeys($comments, ['comment_post_id']) : [];
 		if($meta){
@@ -441,9 +446,9 @@ class PostController extends Controller{
 		
 		if($type){
 			if(is_array($value)) $value = implode(' > ', $value);
-			$this->addBreadCrumbsHelper($taxonomyTitle, $value, $taxonomyTitle, $post['title']);
+			$this->addBreadCrumbsHelper($taxonomyTitle, $value, $taxonomyTitle, $post['short_title'] ?: $post['title']);
 		}elseif(isset($post['id']) && $this->config->front_page != $post['id']){
-			$this->config->addBreadCrumbs($post['url'], $post['title']);
+			$this->config->addBreadCrumbs($post['url'], $post['short_title'] ?: $post['title']);
 			//if(isset($this->options['rewrite']['slug']))
 			if($this->options['title']){
 				$post['h1'] = $post['title'];

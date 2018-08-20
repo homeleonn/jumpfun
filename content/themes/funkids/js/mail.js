@@ -9,8 +9,9 @@
 			var message = $parent.find("#qq").val();
 			var captcha = '';
 			
-			if(!name.length || !message.length){
-				note.get('Ошибка', 'Имя либо сообщение не введены');
+			if(!message) message = '';
+			if(!name.length){
+				note.get('Ошибка', 'Введите Ваше имя');
 				return;
 			}
 			
@@ -25,28 +26,29 @@
 			}
 			
 			
-			var $captcha = $parent.find("#captcha-wrapper");
+			var $captcha = $parent.find(".captcha-wrapper");
 			
 			if(!$captcha.hasClass('none')){
-				var captcha = $captcha.find('#captcha-code').val();
+				var captcha = $captcha.find('.captcha-code').val();
 				if(!captcha.length){
 					note.get('Ошибка', 'Введите защитный код');
 					return;
 				}
 			}
 			
-			$.post(root + 'reviews/mail/', {name:name,tel:tel,mail:mail,text:message,captcha:captcha}, function(msg){
+			$.post(root + 'reviews/mail/', {type:2,name:name,tel:tel,mail:mail,text:message,captcha:captcha}, function(msg){
 				if(msg == 0){
 					note.get('Сообщение', 'Неверно введен защитный код');
 					$captcha.find('.captcha-reload').click();
 				}else if(msg == 1){
 					$captcha.removeClass('none');
-					$captcha.find('img#captcha').prop('src', root + 'get-captcha-for-comment/');
+					$captcha.find('img.captcha').prop('src', root + 'get-captcha-for-comment/');
 					return;
 				}else{
-					// $parent.find("#qname, #qtel, #qmail, #qq, #captcha-code").val('');
-					// if(captcha.length)
-						// $captcha.find('.captcha-reload').click();
+					$parent.find("#qname, #qtel, #qmail, #qq, #captcha-code").val('');
+					if(captcha.length)
+						$captcha.find('.captcha-reload').click();
+					note.get('Сообщение', msg);
 				}
 			});
 		});

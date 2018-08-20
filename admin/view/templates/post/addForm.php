@@ -11,6 +11,10 @@
 			<div><input class="w100" type="text" name="title" id="title" placeholder=""></div>
 		</div>
 		<div class="block1">
+			<div>Краткий заголовок <span class="icon-help-circled" title="хлебные крошки, меню. Если главный заголовок имеет небольшую длинну, данное поле можно не заполнять"></span></div>
+			<div><input class="w100" type="text" name="short_title" id="short_title" placeholder=""></div>
+		</div>
+		<div class="block1">
 			<div>Текст</div>
 			<div id="editors"><textarea class="visual" name="content" id="content" value="1" style="width: 100%;height: 600px;display: none; visibility:hidden;"></textarea></div>
 		</div>
@@ -28,7 +32,7 @@
 
 		<?php include $this->getFile('sidebar/categoriesAndTags');?>
 		<?php include $this->getFile('sidebar/listForParents');?>
-		<?php include $this->getFile('sidebar/discussion');?>
+		<?php //include $this->getFile('sidebar/discussion');?>
 		<?php include $this->getFile('sidebar/image');?>
 	</div>
 	

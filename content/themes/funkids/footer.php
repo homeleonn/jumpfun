@@ -4,45 +4,20 @@
 			<div class="container-fluid">
 				<div class="container">
 					<div class="row top">
-						<div class="col-md-<?=isMain()?3:6?>">
+						<div class="col-md-<?=isMain()?6:6?>">
 							<div class="logo-text">
-								<a href="#" class="clearfix">
-									<div class="first-word">Fun</div>
-									<div class="second-word">Kids</div>
-								</a>
+								<a href="<?=SITE_URL?>"><img src="<?=THEME?>img/logo_trnsprnt1.png" alt=""></a>
 								<div class="inline-title center">Огранизация детских праздников</div>
 							</div>
 						</div>
 						<?php if(isMain()):?>
-						<div class="col-md-6">
-							<div class="carousel-widget mini-gallery" data-carousel-widget-column="1">
-								<div class="widget-head">
-									<div class="title">Мини-галерея</div>
-									<div class="controls">
-										<div class="rightside"></div>
-										<div class="leftside"></div>
-									</div>
-								</div>
-								<div class="widget-content">
-									<div class="inside-content shower">
-								<div class="item"><div class="img"><img src="<?=THEME?>img/mini-gallery/1.jpg" alt="" /></div></div>
-								<div class="item"><div class="img"><img src="<?=THEME?>img/mini-gallery/22.jpg" alt="" /></div></div>
-								<div class="item"><div class="img"><img src="<?=THEME?>img/mini-gallery/33.jpg" alt="" /></div></div>
-								<div class="item"><div class="img"><img src="<?=THEME?>img/mini-gallery/44.jpg" alt="" /></div></div>
-								<div class="item"><div class="img"><img src="<?=THEME?>img/mini-gallery/5.jpg" alt="" /></div></div>
-								<div class="item"><div class="img"><img src="<?=THEME?>img/mini-gallery/7.jpg" alt="" /></div></div>
-								<div class="item"><div class="img"><img src="<?=THEME?>img/mini-gallery/8.jpg" alt="" /></div></div>
-								<div class="item"><div class="img"><img src="<?=THEME?>img/mini-gallery/10.jpg" alt="" /></div></div>
-									</div>
-								</div>
-							</div>
-						</div>
 						<?php endif;?>
-						<div class="col-md-<?=isMain()?3:6?> center">
-							<div class="fs25 mb30">
+						<div class="col-md-<?=isMain()?6:6?> center">
+							<div class="fs25 mb30 white">
 								Позвоните нам:<br>
-								(067) 797-93-85 <br>
-								(063) 200-85-95
+								<a href="tel:+380677979385">+38 (067) 797-93-85</a><br>
+								<a href="tel:+380632008595">+38 (063) 200-85-95</a>
+								<hr>Почта: <a href="mailto:funkids@mail" class="fs18">funkidssodessa@gmail.com</a>
 							</div>
 							
 							
@@ -52,11 +27,11 @@
 					</div>
 					
 					<div class="copyright">Copyrights © 2018: Fun Kids Odessa</div>
-					<div class="social-bottom">
-						<a href="#" rel="nofollow"><span class="facebook icon-facebook-1"></span></a>
-						<a href="#" rel="nofollow"><span class="twitter icon-twitter"></span></a>
-						<a href="#" rel="nofollow"><span class="youtube icon-youtube"></span></a>
-						<a href="#" rel="nofollow"><span class="gplus icon-gplus"></span></a>
+					<div class="social-bottom">	
+						<a href="https://vk.com/club163464318" rel="nofollow" target="_blank"><span class="vk icon-vk"></span></a>
+						<a href="https://www.instagram.com/funkids_odessa/" rel="nofollow" target="_blank"><span class="instagram icon-instagram"></span></a>
+						<a href="https://www.youtube.com/channel/UChNlyGg0f5F-mDHxy8UP8IQ" rel="nofollow" target="_blank"><span class="youtube icon-youtube"></span></a>
+						<a href="https://www.facebook.com/profile.php?id=100004157191483&refsrc=https%3A%2F%2Fm.facebook.com%2Ffbrdr%2F2048%2F100004157191483%2F" rel="nofollow" target="_blank"><span class="facebook icon-facebook-1"></span></a>
 					</div>
 				</div>
 			</div>
@@ -77,46 +52,48 @@
 		</div>
 	</div>
 	<div id="note-wrap">
-		<span style="width: 100%;height:100%; position: absolute; z-index: 1; display: block;" onclick="note.hide()"></span>
-		<div id="note" style="z-index: 2;">
+		<span onclick="note.hide()"></span>
+		<div id="note">
 			<div id="note-title">Заголовок</div>
 			<div id="note-content">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
-			<div style="text-align: center;">
+			<div class="center">
 				<button id="note-submit" class="button7">Отправить</button>
 				<button id="note-close" onclick="note.hide()">X</button>
 			</div>
 		</div>
 	</div>
 	
-	<div id="order-question">
-		<form>
-			<div class="inp">
-				<input type="text" id="qname" placeholder="Ваше имя">
-				<input type="text" id="qtel"  placeholder="Ваш телефон">
-				<input type="text" id="qmail" name="email" placeholder="Ваша электронная почта*" onblur="checkBlurMail(this)">
-			</div>
-			<textarea id="qq" placeholder="Введите Ваше сообщение"></textarea>
-			<input type="button" class="button7" id="q-set" value="Отправить">
-		</form>
+	
+	<div id="callme" class="request-wrapper center none">
+		<input type="text" class="tel" name="tel" value="" placeholder="Ваш телефон">
+		<input type="button" class="send" value="Отправить">
 	</div>
 	
-	<div id="callme">
-		<input type="text" id="call-tel"  placeholder="Ваш телефон">
-		<input type="button" id="call-set" value="Отправить">
+	<div id="review-form" class="request-wrapper">
+		<input type="text" class="name" placeholder="Ваше имя">
+		<textarea placeholder="Введите Ваш отзыв" class="text limit-symbols" data-limit="500" rows="5"></textarea>
+		<input type="button" class="send" value="Отправить">
 	</div>
 	
-	<div id="review-form">
-		<input type="text" id="review-name"  placeholder="Ваше имя">
-		<textarea id="review-text" placeholder="Введите Ваш отзыв" class="limit-symbols" data-limit="500" rows="5"></textarea>
-		<div id="captcha-wrapper" style="margin: 10px 0;">
-			<img alt="captcha" id="captcha" class="pointer captcha-reload">
-			<span class="icon-arrows-cw captcha-reload" title="Обновить капчу"></span> <br>Введите символы с картинки 
-			<input type="text" id="captcha-code" name="captcha_code">
-		</div>
-		<input type="button" id="review-set" class="review-set" value="Отправить">
+	<div class="captcha-wrapper none" id="captcha-wrapper">
+		<img alt="captcha" class="captcha pointer captcha-reload" src="">
+		<span class="icon-arrows-cw captcha-reload" title="Обновить капчу"></span> <br>Введите символы с картинки 
+		<input type="text" class="captcha-code">
 	</div>
+	
+	
+	<script src="<?=THEME?>js/js.js"></script>
+	<script src="<?=THEME?>js/mail.js"></script>
 	<script>
-		var root = <?=ROOT_URI?>;
+		var root = "<?=ROOT_URI?>";
+	</script>
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-124185796-1"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+
+		gtag('config', 'UA-124185796-1');
 	</script>
 </body>
 </html>

@@ -17,7 +17,11 @@
 				<input type="button" id="edit-url-ok" value="ок" style="padding: 0px 4px; display: none;">
 				<input type="button" id="edit-url-cancel" value="отмена" style="padding: 0px 4px; display: none;">
 			</div>
+		</div>
 		
+		<div class="block1">
+			<div>Краткий заголовок(<small>хлебные крошки, меню</small>)</div>
+			<div><input class="w100" value="<?=$data['short_title']?>" type="text" name="short_title" id="short_title" placeholder=""></div>
 		</div>
 		
 		<div class="block1">
@@ -25,7 +29,7 @@
 			<div id="editors"><textarea class="visual" name="content" id="content" value="1" style="width: 100%;height: 600px;display: none; visibility:hidden;"><?=htmlspecialchars($data['content'])?></textarea></div>
 		</div>
 		<?php doAction('edit_post_after');?>
-		<?php include $this->getFile('sidebar/comments');?>
+		<?php //include $this->getFile('sidebar/comments');?>
 		<?php include $this->getFile('sidebar/extraFields');?>
 	</div>
 	<div id="sidebar-right" class="col-md-4">
@@ -35,7 +39,7 @@
 		
 		<?php include $this->getFile('sidebar/categoriesAndTags');?>
 		<?php include $this->getFile('sidebar/listForParents');?>
-		<?php include $this->getFile('sidebar/discussion');?>
+		<?php //include $this->getFile('sidebar/discussion');?>
 		<?php include $this->getFile('sidebar/image');?>
 	</div>
 </form>

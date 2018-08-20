@@ -52,6 +52,7 @@ class Taxonomy{
 	
 	public function getByTaxonomies($taxonomies = NULL){
 		$taxonomies = $taxonomies ?: array_keys(Options::get('taxonomy'));
+		if(empty($taxonomies)) return [];
 		if(($cache = self::cache($taxonomies)) === NULL)
 			self::cache($taxonomies, $this->db->getAll('Select t.*, tt.* from terms as t, term_taxonomy as tt where t.id = tt.term_id and tt.taxonomy IN(?a)', [$taxonomies]));
 		return self::cache($taxonomies);

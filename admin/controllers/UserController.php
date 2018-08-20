@@ -62,4 +62,8 @@ class UserController extends Controller{
 		
 		return $content;
 	}
+	
+	function actionClearCache(){
+		
+	}
 }

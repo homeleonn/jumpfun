@@ -22,7 +22,18 @@
 			</div>
 			<div class="row">
 				<div class="col-md-4">
-					<select id="select_extra_name" class="w100"><option value="0">-- Выберите --</option></select>
+					<select id="select_extra_name" class="w100">
+						<option value="0">-- Выберите --</option>
+						<?php 
+						if(isset($data['extra_fields_list']) && $data['extra_fields_list']){
+							$i = 1;
+							foreach($data['extra_fields_list'] as $field){
+								echo '<option value="',($i++),'">',$field,'</option>';
+							}
+						}
+								
+						?>
+					</select>
 					<input type="text" id="input_extra_name" class="w100 none"><br>
 					<a href="#" id="init_new_extra" class="mtop10">Введите новое</a>
 				</div>

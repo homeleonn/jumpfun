@@ -1,5 +1,4 @@
 <?php
-//var_dump(preg_replace('/<[^\s]*>/', '', '<strong>Аниматор в костюме "Бетмена"</strong> - лучший подарок для Вашего мальчика'));exit;
 session_start();
 ini_set('xdebug.var_display_max_depth', 50);
 ini_set('xdebug.var_display_max_children', 256);
@@ -9,7 +8,7 @@ ini_set('xdebug.overload_var_dump', '1');
 
 define('DS', DIRECTORY_SEPARATOR);
 
-define('ROOT_URI', str_replace($_SERVER['DOCUMENT_ROOT'], '', str_replace('\\', '/', ROOT)) ?: '/');
+define('ROOT_URI', (substr($_SERVER['DOCUMENT_ROOT'], -1) == '/' ? '/' : '') . str_replace($_SERVER['DOCUMENT_ROOT'], '', str_replace('\\', '/', ROOT)) ?: '/');
 
 if($_SERVER['PHP_SELF'] == '/index.php'){
 	$fullUri = $_SERVER['REQUEST_URI'] == '/' ? '' : substr($_SERVER['REQUEST_URI'], 1);
@@ -56,4 +55,4 @@ define('PLUGIN', '/^[ \t\/*#@]*needle:(.*)$/mi');
 
 define('CACHE_ON', TRUE);
 
-//var_dump($_SERVER, $_SESSION, ROOT_URI, FULL_URI, URI, SITE_URL, FULL_URL_WITHOUT_PARAMS, FULL_URL);exit;
+//echo '<pre>';var_dump($_SERVER, $_SESSION, ROOT_URI, FULL_URI, URI, SITE_URL, FULL_URL_WITHOUT_PARAMS, FULL_URL);exit;

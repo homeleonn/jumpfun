@@ -30,6 +30,14 @@ $(function(){
 	}else{
 		$active.parent().addClass('active').closest('li.top').addClass('active')
 	}
+	
+	
+	/*clear cache*/
+	$('#clear-cache').click(function(){
+		if(confirm('Подтвердите очистку кеша!')){
+			$.post(root + 'user/clearcache/', function(){alert('Ok!')});
+		}
+	});
 });
 
 function menuSelector(href){
@@ -85,13 +93,17 @@ function ExtraFiled(){
 	}
 	
 	this.set = function(){
-		if($('#select_extra_name')[0].selectedIndex == 1){
+		if($('#select_extra_name')[0].selectedIndex == 0){
+			console.log($('#select_extra_name')[0].selectedIndex);
 			alert('Выберите имя поля или введите новое');return;
 		}else{
 			var nameEl 	= $('#input_extra_name');
 			var valueEl = $('#extra_value_editor');
 			var name 	= nameEl.val();
 			var value 	= valueEl.val();
+			if(name == ''){
+				name = $('#select_extra_name option:selected').text();
+			}
 			if(name == ''){
 				alert('Выберите имя поля или введите новое');return;
 			}else if(value == ''){

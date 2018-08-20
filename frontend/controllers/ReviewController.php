@@ -17,15 +17,18 @@ class ReviewController extends Controller{
 	}
 	
 	public function actionAdd(){
-		if($_POST['captcha'] != $_SESSION['captcha_code']) exit('5');
-		$name = htmlspecialchars($_POST['name']);
-		$text = htmlspecialchars($_POST['text']);
+		$name = self::clearMsg($_POST['name'], 50);
+		$text = self::clearMsg($_POST['text'], 500);
 		$this->db->query('Insert into reviews (name, text) VALUES (\''.$name.'\', \''.$text.'\')');
-		echo 'Спасибо за Ваш отзыв, после проверки сообщения Ваш отзыв появится на сайте и его смогут прочитать все желающие, мы ценим каждого клиента! <br>С наилучшими пожеланиями. © команда FunKids';
-		exit;
+		exit('Спасибо за Ваш отзыв, после проверки сообщения Ваш отзыв появится на сайте и его смогут прочитать все желающие, мы ценим каждого клиента! <br>С наилучшими пожеланиями. © команда FunKids');
 	}
 	
-	public function actionMail(){//d($_POST, session());
+	public function actionMail(){//d($_REQUEST, session());
+	
+		if(!isset($_POST['type'])){
+			exit('999');
+		}
+		
 		$goMail = false;
 		
 		$currentIp = Common::ipCollect();
@@ -46,7 +49,7 @@ class ReviewController extends Controller{
 			}
 			else
 			{
-				if(session('captcha_code') == $_POST['captcha'])
+				if(session('captcha_code') === $_POST['captcha'])
 				{
 					$goMail = true;
 				}else{
@@ -63,33 +66,53 @@ class ReviewController extends Controller{
 			$times[$currentIp] = time();
 			file_put_contents($timeoutIpStorage, serialize($times), LOCK_EX);
 			
-			$name = self::clearMsg($_POST['name'], 50);
-			$mail = self::clearMsg($_POST['mail'], 100);
-			$tel = self::clearMsg($_POST['tel'], 50);
-			$text = self::clearMsg($_POST['text'], 500);
 			$mess = '
 			<div style="width: 90%; margin: 0 auto;font-family: tahoma, times, sans-ms;">
-				<h1 style="padding: 10px;background: royalblue; color: white; font-weight: bold; margin-bottom: 20px;border-radius: 10px;text-align: center;">Заявка с сайта академии FunKids</h1>
+				<h1 style="padding: 10px;background: royalblue; color: white; font-weight: bold; margin-bottom: 20px;border-radius: 10px;text-align: center;">Заявка с сайта FunKids</h1>
 				<table width="100%" cellspacing="0" cellpadding="5" border="1">';
+				
+			switch($_POST['type']){
+				case '3':{
+					$tel = self::clearMsg($_POST['tel'], 50);
+					$mess .= '
+						<tr><td colspan="2">Пользователь запросил обратный звонок</td></tr>
+						<tr><td width="20%">Телефон</td><td>'.$tel.'</td></tr>
+						<tr><td>Айпи</td><td>'.$currentIp.'</td></tr>
+					';
+				}break;
+				case '2':{
+					$name = self::clearMsg($_POST['name'], 50);
+					$mail = self::clearMsg($_POST['mail'], 100);
+					$tel = self::clearMsg($_POST['tel'], 50);
+					$text = self::clearMsg($_POST['text'], 500);
+					
+					$mess .= '
+						<tr><td width="20%">Имя:</td><td>'.$name.'</td></tr>
+						<tr><td>Контактный телефон</td><td>'.$tel.'</td></tr>
+						<tr><td>Контактная почта</td><td>'.$mail.'</td></tr>
+						<tr><td>Сообщение</td><td>'.$text.'</td></tr>
+						<tr><td>Айпи</td><td>'.$currentIp.'</td></tr>
+					';
+				}break;
+				case '4':{
+					$this->actionAdd();
+					return;
+				}break;
+				
+				default: return;
+			}
 			
-			$mess .= '
-				<tr><td width="20%">Имя:</td><td>'.$name.'</td></tr>
-				<tr><td>Контактный телефон</td><td>'.$tel.'</td></tr>
-				<tr><td>Контактная почта</td><td>'.$mail.'</td></tr>
-				<tr><td>Сообщение</td><td>'.$text.'</td></tr>
-				<tr><td>Айпи</td><td>'.$currentIp.'</td></tr>
-			';
 			
 			$mess .= '</table></div>';
 			
 			$mail_title = 'Заявка с сайта FunKids';
-			$to = '<wirus@ukr.net>';
+			$to = '<funkidssodessa@gmail.com>, <wirus@ukr.net>';
 			$from = 'FunKids';
 			$headers  = "MIME-Version: 1.0\r\n";
 			$headers .= "Content-type: text/html; charset=utf-8\r\n";
 			$headers .= "From:info@funkids.od.ua\r\n";
 			//mail($to, $mail_title, $mess, $headers);
-		
+			
 			exit('Спасибо за Ваше сообщение. <br>С наилучшими пожеланиями. © команда FunKids');
 		}
 		exit;
