@@ -6,8 +6,8 @@
 					<div class="row top">
 						<div class="col-md-<?=isMain()?6:6?>">
 							<div class="logo-text">
-								<a href="<?=SITE_URL?>"><img src="<?=THEME?>img/logo_trnsprnt1.png" alt=""></a>
-								<div class="inline-title center">Огранизация детских праздников</div>
+								<a href="<?=SITE_URL?>"><img src="<?=THEME?>img/logo_trnsprnt1.png" alt="Логотип в футере сайта"></a>
+								<div class="inline-title center">Организация детских праздников</div>
 							</div>
 						</div>
 						<?php if(isMain()):?>
@@ -17,12 +17,8 @@
 								Позвоните нам:<br>
 								<a href="tel:+380677979385">+38 (067) 797-93-85</a><br>
 								<a href="tel:+380632008595">+38 (063) 200-85-95</a>
-								<hr>Почта: <a href="mailto:funkids@mail" class="fs18">funkidssodessa@gmail.com</a>
+								<br>Почта: <a href="mailto:funkids@mail" class="fs18">funkidssodessa@gmail.com</a>
 							</div>
-							
-							
-							<div class="fs25">Наш офис:</div>
-							Одесса, ул. Дерибасовская, 5
 						</div>
 					</div>
 					
@@ -43,19 +39,24 @@
 		<span></span>
 		<div id="img">
 			<img src="" alt="Просмотр изображения">
-			<div id="showerTools">
+			<!--<div id="showerTools">
 				<div></div>
 				<div></div>
+			</div>-->
+			<div id="shower-tools1">
+				<div id="shower-prev"></div>
+				<div id="shower-next"></div>
 			</div>
 			<div id="counter">0 / 0</div>
+			<div id="shower-title"></div>
 			<div id="close">x</div>
 		</div>
 	</div>
 	<div id="note-wrap">
 		<span onclick="note.hide()"></span>
 		<div id="note">
-			<div id="note-title">Заголовок</div>
-			<div id="note-content">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
+			<div id="note-title"></div>
+			<div id="note-content"></div>
 			<div class="center">
 				<button id="note-submit" class="button7">Отправить</button>
 				<button id="note-close" onclick="note.hide()">X</button>
@@ -81,19 +82,36 @@
 		<input type="text" class="captcha-code">
 	</div>
 	
-	
+	<script type='text/javascript' src='//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js'></script>
 	<script src="<?=THEME?>js/js.js"></script>
-	<script src="<?=THEME?>js/mail.js"></script>
 	<script>
 		var root = "<?=ROOT_URI?>";
 	</script>
-	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-124185796-1"></script>
 	<script>
-		window.dataLayer = window.dataLayer || [];
-		function gtag(){dataLayer.push(arguments);}
-		gtag('js', new Date());
-
-		gtag('config', 'UA-124185796-1');
+		$(function(){
+			$.getScript("https://www.googletagmanager.com/gtag/js?id=UA-124185796-1", function(){
+				window.dataLayer = window.dataLayer || [];
+				function gtag(){dataLayer.push(arguments);}
+				gtag('js', new Date());
+				gtag('config', 'UA-124185796-1');
+			});
+			
+		});
+		
+		
+	</script>
+	<script type="application/ld+json">
+	{
+	  "@context" : "http://schema.org",
+	  "@type" : "Organization",
+	  "name" : "FUNKIDS",
+	  "url" : "http://funkids.od.ua/",
+	  "sameAs" : [
+		"https://vk.com/club163464318","https://www.facebook.com/profile.php?id=100004157191483&refsrc=https%3A%2F%2Fm.facebook.com%2Ffbrdr%2F2048%2F100004157191483%2F",
+		"https://www.instagram.com/funkids_odessa/",
+		"https://www.youtube.com/channel/UChNlyGg0f5F-mDHxy8UP8IQ"
+	  ]
+	}
 	</script>
 </body>
 </html>

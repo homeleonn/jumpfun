@@ -15,11 +15,18 @@
 	<div class="media-thumbs">
 	<?php 
 	foreach($data['media'] as $media):
-		$img = explode('.', $media['src']);
-		$img = UPLOADS . $img[0] . '-150x150.' . $img[1];
+		$meta = unserialize($media['meta']);
+		if(isset($meta['sizes']['thumbnail'])){
+			$img = $meta['dir'] . $meta['sizes']['thumbnail']['file'];
+			unset($meta['sizes']['thumbnail']);
+		}else{
+			$img = $media['src'];
+		}
+		$img = UPLOADS . $img; 
+		
 		$orig = UPLOADS . $media['src'];
 	?>
-		<div class="media-thumb"><img src="<?=$img;?>" data-original="<?=$orig?>" data-id="<?=$media['id']?>"></div>
+		<div class="media-thumb"><img src="<?=$img;?>" data-original="<?=$orig?>" data-id="<?=$media['id']?>" data-meta='<?=json_encode($meta)?>' data-dir="<?=UPLOADS . $meta['dir'];?>"></div>
 	<?php endforeach;?>
 	</div>
 	<div id="media-original-show" class=" none">
@@ -29,5 +36,6 @@
 		<span class="icon-pencil"></span>
 		<span class="icon-cancel media-delete" id="media-delete"></span><br>
 		<div class="btn none padd10" id="select-for-post">Выбрать</div>
+		<div class="thumbnails"></div>
 	</div>
 </div>

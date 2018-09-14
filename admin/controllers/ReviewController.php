@@ -13,14 +13,14 @@ class ReviewController extends Controller{
 	
 	public function actionDelete($id){
 		$this->db->query('Delete from reviews where id = ' . $id);
-		Common::clearCache('funkids/reviews');
+		doAction('reviewDelete');
 		redirect('admin/reviews');
 	}
 	
 	public function actionToggle($id){
 		$currentStatus = $this->db->getOne('Select status from reviews where id = ' . $id);
 		$this->db->query('Update reviews SET status = '.((int)$currentStatus ? 0 : 1).' where id = ' . $id);
-		Common::clearCache('funkids/reviews');
+		doAction('reviewToggle');
 		redirect('admin/reviews');
 	}
 }

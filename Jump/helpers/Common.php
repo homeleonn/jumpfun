@@ -237,10 +237,16 @@ class Common{
 		if(file_exists($cacheFileName))
 		{
 			if($delay == -1 || (filemtime($cacheFileName) > time() - $delay)){//d(1, cacheIsEnable());
-				if(!$data = file_get_contents($cacheFileName)) return false;
-				if($outNow) echo $data;
-				else 	  return $data;
-				return true;
+				if(($data = file_get_contents($cacheFileName)) === FALSE) return false;
+				
+				if($data != ''){
+					if($outNow){
+						echo $data;
+					}else{
+						return $data;
+					}   
+					return true;
+				}
 			}
 		}
 		ob_start();

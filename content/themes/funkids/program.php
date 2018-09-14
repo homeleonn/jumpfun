@@ -8,14 +8,18 @@
 			</div>
 		</div>
 	</div>
-	<div class="col-md-9">
+	<div class="col-md-9 shower">
 		<?=isset($h1)?'<h1>'.$h1.'</h1>':''?>
-		<div class="floatimg shower main-img"><div class="img"><img src="<?=(isset($_jmp_post_img) ? $_jmp_post_img : THEME . 'img/002.jpg')?>" alt="<?=$h1?>"></div></div>
+		<div class="floatimg main-img">
+			<a href="<?=postImgSrc($post)?>" title="<?=$short_title?>" class="shower">
+				<img src="<?=postImgSrc($post, 'medium')?>" data-large-img="<?=postImgSrc($post)?>" alt="<?=$h1?>">
+			</a>
+		</div>
 		<?php if(isset($terms)) echo $terms;?>
 		<div class="tcontent"><?=$content?></div>
 	</div>
 	<div class="sep"></div>
-	<div class="container shower">
+	<div class="container">
 		<div class="inline-title">В программу входят</div>
 		<div class="row center prog-filling flex line">
 			<div><img src="<?=THEME?>img/costumes.jpg" alt="Костюмы аниматоров"><div class="inline-title">Костюмы</div></div>
@@ -25,7 +29,8 @@
 			<div><img src="<?=THEME?>img/dj.jpg" alt="Диджей, DJ, Ди-джей, музыка на день рождения ребенка"><div class="inline-title">Диджей</div></div>
 		</div>
 		<div class="sep"></div>
-		<div class="inline-title center">Не забывайте о наших <a href="<?=uri('services')?>">дополнительных услугах</a>, что бы сделать праздник еще ярче! <br><a href="<?=uri('services')?>" class="button">Перейти к доп. услугам</a></div>
+		<div class="inline-title small center">Не забывайте о наших <a class="under" href="<?=uri('services')?>">дополнительных услугах</a>, что бы сделать праздник еще ярче! <br><a href="<?=uri('services')?>" class="button">Перейти к доп. услугам</a></div>
+		
 	</div>
 	
 	<div class="sep"></div>

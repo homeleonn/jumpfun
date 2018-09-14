@@ -24,7 +24,10 @@ trait PostTrait{
 		if(!$meta) return $post;
 		foreach($meta as $m){
 			if($mod && $m['meta_key'] == '_jmp_post_img'){
-				$m['meta_value'] = UPLOADS . $this->db->getOne('select src from media where id = ' . $m['meta_value']);
+				$media = $this->db->getRow('select * from media where id = ' . $m['meta_value']);
+				$m['meta_value'] = $media['src'];
+				$post['_jmp_post_img_meta'] = unserialize($media['meta']);
+				
 			}
 			$post[$m['meta_key']] = $m['meta_value'];
 			if(mb_substr($m['meta_key'], 0, 1) == '_') continue;

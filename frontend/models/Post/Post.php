@@ -68,11 +68,13 @@ class Post extends Model{
 		return $this->db->getAll('Select t.*, tt.*, tr.object_id from ' . str_replace(['posts p,', 'and p.id = tr.object_id'], '', $this->relationship) . $where);
 	}
 	
-	public function getPostsByPostType($type, $orderBy = false){
-		$query = $this->select . 'post_type = ?s order by ' .($orderBy ? implode(', ', $orderBy[0]) . ' ' . $orderBy[1]:' created DESC');
+	public function getPostsByPostType($type, $orderBy = false){//dd($orderBy);
+		$query = '' . $this->select . 'post_type = ?s order by ' .($orderBy ? ' ' . implode(', ', $orderBy[0]) . ' ' . $orderBy[1] . ', created DESC':'created DESC');
 		//return $this->db->getAll($query, $type);
 		return $this->getAll($query, [$type]);
 	}
+	
+
 	
 	private function checkTermExists($taxonomy, $value){
 		return $this->db->getOne('Select t.name from terms as t, term_taxonomy as tt where t.id = tt.term_id and t.slug = ?s and tt.taxonomy = ?s', $value, $taxonomy);

@@ -58,8 +58,14 @@ class PostController extends Controller{
 	 *  
 	 *  @return array post
 	 */
-	public function actionSingle($url, $id = NULL){//dd(func_get_args(), $this->config->front_page);
-		//doAction()
+	public function actionSingle($url, $id = NULL){
+		global $funkidsFileCacheName;
+		$funkidsFileCacheName = (is_null($id) ? md5($url) : ($id == getOption('front_page') ? $id : ''));
+		if($funkidsFileCacheName != ''){
+			//if(!is_null($id))
+				if(Common::getCache($funkidsFileCacheName = 'pages/' . $funkidsFileCacheName, -1) !== FALSE){$this->view->rendered = true;return;}	
+		}
+		
 		if($data = $this->checkFront($url))
 			return $data;
 		
@@ -231,7 +237,13 @@ class PostController extends Controller{
 		return $hierarchy;
 	}
 	
-	public function actionList($taxonomy = null, $taxonomySlug = null, $page = 1, $limit = false, $orderBy = false){//dd(func_get_args());
+	public function actionList($taxonomy = null, $taxonomySlug = null, $page = 1, $limit = false, $orderBy = false){//dd(func_get_args(), $this->options);
+		global $thatCache;//dd($thatCache);
+		if($taxonomy == '' && $taxonomySlug == '' && !$thatCache){
+			global $funkidsFileCacheName;
+			$funkidsFileCacheName = 'pages/list-' . $this->options['type'];
+			if(Common::getCache($funkidsFileCacheName, -1) !== FALSE){$this->view->rendered = true;return;}
+		}
 		//$this->model->setLimit($this->page = $page, $this->perPage);
 		//d($this->options['rewrite']);
 		$this->model->setLimit($this->page = $page, ($limit && is_numeric($limit)) ? $limit : $this->options['rewrite']['paged']);
@@ -398,6 +410,7 @@ class PostController extends Controller{
 				$mediaOnId = Common::itemsOnKeys($media, ['id']);
 				foreach($mediaIds as $postId => $mediaId){
 					$postsOnId[$postId][0][$this->img] = $mediaOnId[$mediaId][0]['src'];
+					$postsOnId[$postId][0][$this->img . '_meta'] = unserialize($mediaOnId[$mediaId][0]['meta']);
 				}
 			}
 			

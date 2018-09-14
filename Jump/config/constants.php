@@ -43,6 +43,7 @@ define('ADMIN_THEME', SITE_URL . 'admin/view/');
 define('UPLOADS_DIR', ROOT . 'content/uploads/');
 define('UPLOADS', SITE_URL . 'content/uploads/');
 define('PLUGINS', SITE_URL . 'content/plugins/');
+define('CACHE_DIR', ROOT . 'content/uploads/cache/');
 
 define('URL_PATTERN', '[а-яА-ЯЁa-zA-Z0-9-]+');
 define('URL_PATTERN_SLASH', '[а-яА-ЯЁa-zA-Z0-9-\/]+');
@@ -53,6 +54,6 @@ define('S', '|'); //sumbol separator for args parse
 define('TEMPLATE', '/^[ \t\/*#@]*Template:(.*)$/mi');
 define('PLUGIN', '/^[ \t\/*#@]*needle:(.*)$/mi');
 
-define('CACHE_ON', TRUE);
+define('CACHE_ON', FALSE);
 
 //echo '<pre>';var_dump($_SERVER, $_SESSION, ROOT_URI, FULL_URI, URI, SITE_URL, FULL_URL_WITHOUT_PARAMS, FULL_URL);exit;

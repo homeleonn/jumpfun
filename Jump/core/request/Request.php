@@ -108,8 +108,8 @@ class Request{
 		
 		if($code == 404){
 			$page404 = THEME_DIR . '404.php';
-			if(file_exists($page)){
-				include_once $page;
+			if(file_exists($page404)){
+				include_once $page404;
 				exit;
 			}
 			exit('Page not found');

@@ -6,11 +6,15 @@
 	<?php jmpHead() ?>
 	<link rel="stylesheet" href="<?=THEME?>css/bootstrap.min.css">
 	<link rel="stylesheet" href="<?=THEME?>css/fontello.css">
-	<link rel="stylesheet" href="<?=THEME?>css/front-slider.css">
 	<link rel="stylesheet" href="<?=THEME?>css/style.css">
 	<link href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,700italic,400,800,700,600" rel="stylesheet" type="text/css">
-	<script src="<?=THEME?>js/jq3.js"></script>
 	<link rel="shortcut icon" href="<?=ROOT_URI?>favicon.ico" type="image/x-icon">
+	<script>
+		// add callbacks onload window
+		function $$(callback){
+			window.addEventListener('load', callback);
+		}
+	</script>
 </head>
 <body>
 	<div class="wrapper<?=isMain()?' main':''?>" id="wrapper">
@@ -57,13 +61,27 @@
 						<div class="slider">
 							<div class="ss">
 								<div class="item active">
-									<iframe width="1120" height="385" src="https://www.youtube.com/embed/ZfZfm1twto8" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+									<div class="yout"><div class="yplay">&#9658;</div><img data-youtube="ZfZfm1twto8" src="<?=THEME?>img/mini-gallery/50.jpg"></div>
 								</div>
 								<div class="item">
-									<img src="<?=THEME?>img/front-slider/1.jpg" alt="Красивые картинки детский праздник Одесса" />
+									<img src="<?=THEME?>img/1x1.gif" data-src="<?=THEME?>img/mini-gallery/51.jpg" alt="Праздник дня рождения с аниматорами Одессв" />
 									<div class="slider-title">
-										<div>Детские праздники Одесса 2</div>
-										<div>Широкий выбор праздничных программ на любой вкус</div>
+										<div>Праздник дня рождения</div>
+										<div>Веселые ребята и их родители с нашими аниматорами</div>
+									</div>
+								</div>
+								<div class="item">
+									<img src="<?=THEME?>img/1x1.gif" data-src="<?=THEME?>img/mini-gallery/52.jpg" alt="Детский праздник, шоу программа человек-паук и Оптимус Прайм" />
+									<div class="slider-title">
+										<div>Детский праздник в Одессе</div>
+										<div>Аниматоры человек-паук и Оптимус Прайм, дети остаются довольными</div>
+									</div>
+								</div>
+								<div class="item">
+									<img src="<?=THEME?>img/1x1.gif" data-src="<?=THEME?>img/mini-gallery/53.jpg" alt="Красивые картинки детский праздник Одесса" />
+									<div class="slider-title">
+										<div>Бэтмен на защите праздника</div>
+										<div>Детская шоу программа Бэтмена - яркие впечатления детей</div>
 									</div>
 								</div>
 							</div>
@@ -71,6 +89,7 @@
 								<div class="arr-left"></div>
 								<div class="arr-right"></div>
 							</div>
+							<div class="progressbar"></div>
 						</div>
 					</div>
 					<?php endif;?>

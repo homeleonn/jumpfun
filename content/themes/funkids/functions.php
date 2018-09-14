@@ -3,7 +3,7 @@
 use Jump\DI\DI;
 use Jump\helpers\Common;
 
-
+ 
 function funkids_programPrice(){
 	global $post;
 	$price = isset($post['_jmp_program_price']) ? $post['_jmp_program_price'] : '';
@@ -29,9 +29,10 @@ function funkids_extra_fields_keys($extraFieldKeys){
 addPageType([
 		'type' => 'new',
 		'title' => 'Новости',
+		'_seo_title' => 'Новостная лента организаторов детских праздников Одесса',
 		'h1' => 'Новости организации детских праздников в Одессе | FunKids',
 		'title_for_admin' => 'Новости',
-		'description' => 'Новости организации детских праздников в Одессе | FunKids',
+		'description' => 'Новости организации детских праздников в Одессе, узнавайте о праздновениях только актуальные новости, новые аниматоры, костюмы, шоу программы | FunKids',
 		'add' => 'Добавить новость',
 		'edit' => 'Редактировать новость',
 		'delete' => 'Удалить новость',
@@ -44,6 +45,7 @@ addPageType([
 addPageType([
 		'type' => 'service',
 		'title' => 'Доп. Услуги',
+		'_seo_title' => 'Дополнительные услуги на день рождения ребенка, заказ организация торжеств для детей в Одессе',
 		'h1' => 'Дополнительные услуги для праздника',
 		'title_for_admin' => 'Доп. Услуги',
 		'description' => 'Дополнительные услуги для организации детских праздников в Одессе | FunKids',
@@ -112,9 +114,10 @@ addPageType([
 addPageType([
 		'type' => 'program',
 		'title' => 'Программы',
-		'h1' => 'Программы детских праздников в Одессе',
+		'_seo_title' => 'Детские аниматоры, шоу программы Одесса | Заказать праздник для ребенка недорого',
+		'h1' => 'Шоу программы, аниматоры на детский праздник в Одессе',
 		'title_for_admin' => 'Программы',
-		'description' => 'Программы',
+		'description' => 'Заказать детского аниматора на день рождения ребенка Одесса, широкий выбор аниматоров и шоу программы, а так же красочные детские ведущие, которые порадуют детей интересными конкурсами и подарят массу ярких впечатлений. Все останутся довольны. Заказать аниматора для ребенка на праздник. Цена',
 		'add' => 'Добавить программу',
 		'edit' => 'Редактировать программу',
 		'delete' => 'Удалить программу',
@@ -145,22 +148,54 @@ function isMain(){
 	return URI == '/';
 }
 
+function resizePhotos(){
+	$percent = 0.4;
+	foreach(glob(THEME_DIR . '../1/*') as $img){
+		$img1 = imagecreatefromjpeg($img);
+		// получение новых размеров
+		list($width, $height) = getimagesize($img);
+		if($width > 900){
+			$new_width = $width * $percent;
+			$new_height = $height * $percent;
+
+			// ресэмплирование
+			$image_p = imagecreatetruecolor($new_width, $new_height);
+			imagecopyresampled($image_p, $img1, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+			imagejpeg($image_p, THEME_DIR . '../3/' . pathinfo($img)['basename'], 50);
+		}else{
+			imagejpeg($img1, THEME_DIR . '../3/' . pathinfo($img)['basename'], 50);
+		}
+		
+	}
+	dd();
+}
+
+//resizePhotos();
+
 use frontend\controllers\PostController;
 
 
 $funKidsCacheFileNames['programs_all'] = 'funkids/programs_all';
 
 function funKids_all(){
-	global $funKidsCacheFileNames;
+	global $funKidsCacheFileNames, $thatCache;
+	$thatCache = true;
 	if(Common::getCache($funKidsCacheFileNames['programs_all'], -1)) return;
 	$popular = (new PostController('program'))->actionList(NULL, NULL, 1, 30, [['visits'], 'DESC']);
 	?>
 	<div class="all-progs" id="all-progs">
-		<h2 class="section-title">Наши шоу программы</h2>
+		<h2 class="section-title">Шоу программы аниматоров</h2>
 		<div class="twrapper">
 			<div class="row flex">
 			<?php foreach($popular['__list'] as $item): ?>
-				<div class="item col-md-3 center"><a href="<?=$item['permalink']?>"><img src="<?=UPLOADS . $item['_jmp_post_img']?>" alt="<?=$item['short_title'] ?: $item['title']?> - шоу программа funkids Одесса, аниматоры" /><div class="inline-title"><?=$item['short_title'] ?: $item['title']?></div></a></div>
+				<div class="item col-md-3 col-sm-6 col-xs-12 center">
+				<a href="<?=$item['permalink']?>">
+					<div class="img-wrapper">
+						<img src="<?=postImgSrc($item, 'medium')?>" alt="<?=$item['short_title'] ?: $item['title']?> - шоу программа funkids Одесса, аниматоры" />
+					</div>
+					<div class="inline-title"><?=$item['short_title'] ?: $item['title']?></div>
+				</a>
+				</div>
 			<?php endforeach; ?>
 			</div>
 		</div>
@@ -190,7 +225,7 @@ function funKids_popular(){
 			<div class="widget-content">
 				<div class="inside-content shower center">
 				<?php foreach($popular['__list'] as $item): ?>
-					<div class="item"><div class="img"><img src="<?=UPLOADS . $item['_jmp_post_img']?>" alt="<?=$item['short_title'] ?: $item['title']?> - популярный аниматор в Одессе" /></div><div class="inline-title"><?=$item['short_title'] ?: $item['title']?></div><?=funkids_clearTags(mb_substr($item['content'], 0 ,200)).'...'?><div><a href="<?=$item['permalink']?>" class="button">Перейти</a></div></div>
+					<div class="item"><div class="img"><img src="<?=postImgSrc($item, 'medium')?>" alt="<?=$item['short_title'] ?: $item['title']?> - популярный аниматор в Одессе" /></div><div class="inline-title"><?=$item['short_title'] ?: $item['title']?></div><?=funkids_clearTags(mb_substr($item['content'], 0 ,200)).'...'?><div><a href="<?=$item['permalink']?>" class="button">Перейти</a></div></div>
 				<?php endforeach; ?>
 				</div>
 			</div>
@@ -205,17 +240,25 @@ function funKids_popular(){
 $funKidsCacheFileNames['services'] = 'funkids/services';
 
 function funKids_services(){
-	global $funKidsCacheFileNames;
+	global $funKidsCacheFileNames, $thatCache;
+	$thatCache = true;
 	if(Common::getCache($funKidsCacheFileNames['services'], -1)) return;
 	$services = (new PostController('service'))->actionList(NULL, NULL, 1);
 	?>
 	<div class="extra-services front-page" id="extra-services">
 		<h2 class="section-title"><div>Дополнительные</div> <div>услуги</div></h2>
-		<div class="container shower">
+		<div class="container">
 			<h3 class="center">Вы можете заказать дополнительные атрибуты к празднику, которые оставят незабываемые впечатления!</h3>
 			<div class="flex">
 			<?php foreach($services['__list'] as $item): ?>
-				<div class="item"><div class="img"><img src="<?=UPLOADS . $item['_jmp_post_img']?>" alt="<?=$item['short_title'] ?: $item['title']?> - дополнительная услуга детский праздник" /></div><div class="inline-title center"><a href="<?=$item['permalink']?>"><?=$item['short_title'] ?: $item['title']?></a></div></div>
+				<div class="item">
+					<a href="<?=$item['permalink']?>">
+						<div class="img2">
+							<img src="<?=postImgSrc($item, 'medium')?>" alt="<?=$item['short_title'] ?: $item['title']?> - дополнительная услуга детский праздник" />
+						</div>
+						<div class="inline-title center"><?=$item['short_title'] ?: $item['title']?></div>
+					</a>
+				</div>
 			<?php endforeach; ?>
 			</div>
 			<div class="center"><a href="<?=uri('services')?>" class="button">Все доп. услуги</a></div>
@@ -228,7 +271,8 @@ function funKids_services(){
 
 $funKidsCacheFileNames['like'] = 'funkids/like';
 function funKids_like($id){
-	global $funKidsCacheFileNames;
+	global $funKidsCacheFileNames, $thatCache;
+	$thatCache = true;
 	if(Common::getCache($funKidsCacheFileNames['like'].$id, 86400)) return;
 	$popular = (new PostController('program'))->actionList(NULL, NULL, 1, 5, [['id'], ['DESC', 'ASC'][mt_rand(0, 1)]]);
 	shuffle($popular['__list']);
@@ -237,19 +281,26 @@ function funKids_like($id){
 	<div>
 		<div class="carousel-widget container" data-carousel-widget-column="3">
 			<div class="widget-head">
-				<div class="title">Похожие программы</div>
+				<div class="title">Похожие программы аниматоров</div>
 				<div class="controls">
 					<div class="rightside"></div>
 					<div class="leftside"></div>
 				</div>
 			</div>		
 			<div class="widget-content">
-				<div class="inside-content shower center">
+				<div class="inside-content center">
 				<?php 
 					foreach($popular['__list'] as $item): 
 					if($item['id'] == $id) continue; 
 				?>
-					<div class="item"><div class="img"><img src="<?=UPLOADS . $item['_jmp_post_img']?>" alt="<?=$item['short_title'] ?: $item['title']?> - похожие шоу программы, аниматоры" /></div><div class="inline-title"><?=$item['short_title'] ?: $item['title']?></div><?=funkids_clearTags(mb_substr($item['content'], 0 ,200)).'...'?><div><a href="<?=$item['permalink']?>" class="button">Перейти</a></div></div>
+					<article class="item">
+						<div class="img2">
+							<img src="<?=postImgSrc($item, 'medium')?>" alt="<?=$item['short_title'] ?: $item['title']?> - похожие шоу программы, аниматоры" />
+						</div>
+						<h1 class="inline-title"><?=$item['title']?></h1>
+						<?=funkids_clearTags(mb_substr($item['content'], 0 ,200)).'...'?>
+						<div><a href="<?=$item['permalink']?>" class="button">Перейти</a></div>
+					</article>
 				<?php endforeach; ?>
 				</div>
 			</div>
@@ -264,13 +315,14 @@ function funKids_like($id){
 $funKidsCacheFileNames['catalog'] = 'funkids/catalogOfHeroes';
 
 function funKids_catalogHeroes(){
-	global $funKidsCacheFileNames;
+	global $funKidsCacheFileNames, $thatCache;
+	$thatCache = true;
 	if(Common::getCache($funKidsCacheFileNames['catalog'], -1)) return;
 	$heroes = (new PostController('program'))->actionList();
 	foreach($heroes['__list'] as $h){
 		?><div class="item"><a href="<?=$h['permalink']?>"><?=$h['short_title'] ?: $h['title']?></a>
 			<div class="preview center">
-				<img src="<?=funKidsUploadedImgPath($h['_jmp_post_img'])?>" alt="<?=$h['title']?> - герой, аниматор, детский праздник в Одессе" /><div class="inline-title"><?=$h['short_title'] ?: $h['title']?></div><?=funkids_clearTags(mb_substr($h['content'], 0 ,200)).'...'?>
+				<img src="<?=THEME?>img/1x1.gif" data-src="<?=postImgSrc($h, 'medium')?>" alt="<?=$h['title']?> - герой, аниматор, детский праздник в Одессе" /><div class="inline-title"><?=$h['short_title'] ?: $h['title']?></div><?=funkids_clearTags(mb_substr($h['content'], 0 ,200)).'...'?>
 			</div>
 		</div><?php
 	}
@@ -294,7 +346,7 @@ $funKidsCacheFileNames['reviews'] = 'funkids/reviews';
 function funkids_getLastReviews(){
 	global $funKidsCacheFileNames;
 	if(Common::getCache($funKidsCacheFileNames['reviews'], -1)) return;
-	$reviews = DI::getD('db')->getAll('Select * from reviews where status = 1 order by id DESC limit 3');
+	$reviews = DI::getD('db')->getAll('Select * from reviews where status = 1 order by id DESC limit 10');
 	?>
 	<div class="reviews topoffset" id="reviews">
 		<div class="carousel-widget container" data-carousel-widget-column="2">
@@ -331,23 +383,59 @@ function funkids_getLastReviews(){
 }
 
 
-function funClearCache($post){
+function funClearCache($post){//dd(getPageOptionsByType($post['post_type']));
 	global $funKidsCacheFileNames;
+	$postOptions = getPageOptionsByType($post['post_type']);
 	
 	if($post['post_type'] == 'program'){
 		//Common::clearCache($funKidsCacheFileNames['popular']);
 		Common::clearCache($funKidsCacheFileNames['catalog']);
 		Common::clearCache($funKidsCacheFileNames['programs_all']);
+		Common::clearCache('pages/' . getOption('front_page'));
 	}
 	elseif($post['post_type'] == 'service'){
 		Common::clearCache($funKidsCacheFileNames['services']);
+		Common::clearCache('pages/' . getOption('front_page'));
 	}
+	
+	if(isset($post['id']) && $post['id'] == getOption('front_page')){
+		Common::clearCache('pages/' . $post['id']);
+	}
+	
+	if(isset($post['url'])){
+		$preSlug = !$postOptions['rewrite']['with_front'] ? $postOptions['rewrite']['slug'] . '/' : '';
+		Common::clearCache('pages/' . md5($preSlug . $post['url']));
+	}
+	
+	if(!$postOptions['hierarchical']){
+		Common::clearCache('pages/list-' . $post['post_type']);
+	}
+	
 }
 
 addAction('before_post_add', 'funClearCache');
 addAction('before_post_edit', 'funClearCache');
 addAction('before_post_delete', 'funClearCache');
+addAction('reviewDelete', 'funClearCacheReviews');
+addAction('reviewToggle', 'funClearCacheReviews');
 
+function funClearCacheReviews(){
+	Common::clearCache('funkids/reviews');
+	Common::clearCache('pages/' . getOption('front_page'));
+}
+
+addAction('before_single_page', function($id){
+	global $funkidsFileCacheName;
+	if($id != getOption('front_page')) return;
+	$funkidsFileCacheName = 'pages/' . $id;
+	if(Common::getCache($funkidsFileCacheName, -1)) return -2;
+});
+
+addAction('after_rendering', function(){
+	global $funkidsFileCacheName;
+	if($funkidsFileCacheName)
+		echo Common::setCache($funkidsFileCacheName);
+});
 
 
 

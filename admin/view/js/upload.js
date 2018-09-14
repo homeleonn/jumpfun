@@ -122,12 +122,21 @@ function chooseMediaThumb(el){
 	$('.media-thumb').removeClass('chosen');
 	$(el).addClass('chosen');
 	$(showBlock).removeClass('none').addClass('col-md-4');
-	var originalImgSrc = $(el).children('img').data('original');
+	$img = $(el).children('img');
+	var originalImgSrc = $img.data('original');
+	var meta = $img.data('meta');
 	var showImg = new Image();
 	showImg.onload = function(){
 		$(showBlock + ' > img').attr('src', this.src);
-		$(showBlock + ' > .size').html($(showBlock + ' > img')[0].naturalWidth + 'x' + $(showBlock + ' > img')[0].naturalHeight);
+		$(showBlock + ' > .size').html('Original: ' + $(showBlock + ' > img')[0].naturalWidth + 'x' + $(showBlock + ' > img')[0].naturalHeight);
 		$(showBlock + ' input').val(originalImgSrc);
+		if(typeof meta.sizes){
+			$(showBlock + ' .thumbnails').html('');
+			for(i in meta.sizes){
+				$(showBlock + ' .thumbnails').append('<hr><b>' + i + ': ' + meta.sizes[i].width + 'x' + meta.sizes[i].height + '<br>Путь:<br><input class="w100 copy" value="'+$img.data('dir') + meta.sizes[i].file+'">');
+				$(showBlock + ' .thumbnails').append('<hr><a class="w100 copy" href="'+$img.data('dir') + meta.sizes[i].file+'">'+$img.data('dir') + meta.sizes[i].file+'</a>');
+			}
+		}
 	};
 	showImg.src = originalImgSrc;
 }

@@ -35,9 +35,24 @@ $(function(){
 	/*clear cache*/
 	$('#clear-cache').click(function(){
 		if(confirm('Подтвердите очистку кеша!')){
-			$.post(root + 'user/clearcache/', function(){alert('Ok!')});
+			$.post(root + 'admin/user/clearcache/', function(){alert('Ok!')});
 		}
 	});
+	
+	$('.thumbnails').on('click', '.copy', function(e){
+		if (document.selection) {
+			const range = document.body.createTextRange();
+			range.moveToElementText(this);
+			range.select();
+		} else if (window.getSelection) {
+			const range = document.createRange();
+			range.selectNode(this);
+			window.getSelection().addRange(range);
+		}
+		document.execCommand('copy');
+		e.preventDefault();
+	});
+	
 });
 
 function menuSelector(href){

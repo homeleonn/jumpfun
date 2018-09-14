@@ -104,7 +104,7 @@ function applyFilter(){
 
 function vd(){
 	$trace = debug_backtrace()[1];
-	echo '<small style="color: green;"><pre>',$trace['file'],':',$trace['line'],':</pre></small>';
+	echo '<small style="color: green;"><pre>',$trace['file'],':',$trace['line'],':</pre></small><pre>';
 	call_user_func_array('var_dump', func_get_args()[0] ?: [NULL]);
 }
 
@@ -203,8 +203,200 @@ function my_add_extra_rows($postType){
 }
 
 
+function watermark($photo, $watermark, $to){
+	$im = imagecreatefromjpeg($photo);
+	$stamp = imagecreatefrompng($watermark);
+	$size = getimagesize($photo);
+	$sx = imagesx($stamp);
+	$sy = imagesy($stamp);
+
+	imagecopymerge_alpha($im, $stamp, 0, 0, 0, 0, $sx, $sy, 50);
+
+	imagejpeg($im, $to);
+	imagedestroy($im);
+}
+
+function imagecopymerge_alpha($dst_im, $src_im, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h, $pct){
+	// creating a cut resource
+	$cut = imagecreatetruecolor($src_w, $src_h);
+
+	// copying relevant section from background to the cut resource
+	imagecopy($cut, $dst_im, 0, 0, $dst_x, $dst_y, $src_w, $src_h);
+   
+	// copying relevant section from watermark to the cut resource
+	imagecopy($cut, $src_im, 0, 0, $src_x, $src_y, $src_w, $src_h);
+   
+	// insert cut resource to destination image
+	imagecopymerge($dst_im, $cut, $dst_x, $dst_y, 0, 0, $src_w, $src_h, $pct);
+} 
 
 
+function imagettfstroketext(&$image, $size, $angle, $x, $y, &$textcolor, &$strokecolor, $fontfile, $text, $px) {
+    for($c1 = ($x-abs($px)); $c1 <= ($x+abs($px)); $c1++)
+        for($c2 = ($y-abs($px)); $c2 <= ($y+abs($px)); $c2++)
+            $bg = imagettftext($image, $size, $angle, $c1, $c2, $strokecolor, $fontfile, $text);
+   return imagettftext($image, $size, $angle, $x, $y, $textcolor, $fontfile, $text);
+}
+
+
+function addPrefix($string, $prefix, $delim = '.'){
+	return Common::prefix($string, $prefix, $delim);
+}
+
+function test($type = 1){
+
+	global $di;
+	// $di->get('db')->query('ALTER TABLE media ADD meta longtext NOT NULL');
+	$imgs = $di->get('db')->getAll('Select * from media');
+	//dd(dirname($imgs[0]['src']));
+	$i = 0;
+	ini_set('gd.jpeg_ignore_warning', 1);
+	foreach($imgs as $img){
+		$fullPath = UPLOADS_DIR . $img['src'];
+		$sizes = getimagesize($fullPath);
+		$imgPathParts = pathinfo($img['src']);
+		$mediumW = 320;
+		$mediumH = 320;
+		$data = [
+			'width' => $sizes[0],
+			'height' => $sizes[1],
+			'dir' => $imgPathParts['dirname'] . '/',
+			'sizes' => [
+				'thumbnail' => [
+					'file' => addPrefix($imgPathParts['basename'], '-150x150'),
+					'width' => 150,
+					'height' => 150,
+					'mime' => $sizes['mime'],
+				]
+			]
+		];
+		
+		if($sizes[0] >= $sizes[1]){
+			$ratio = $mediumW / $sizes[0];
+			$newW = $mediumW;
+			$newH = (int)round($sizes[1] * $ratio);
+		}else{
+			$ratio = $mediumH / $sizes[1];
+			$newW = (int)round($sizes[0] * $ratio);
+			$newH = $mediumH;
+		}
+		
+		
+		$data['sizes']['medium'] = [
+			'file' => addPrefix($imgPathParts['basename'], "-{$newW}x{$newH}"),
+			'width' => $newW,
+			'height' => $newH,
+			'mime' => $sizes['mime'],
+		];
+		
+		$image_p = imagecreatetruecolor($newW, $newH);
+		
+		$meta = unserialize($img['meta']);
+		
+		if(isset($meta['sizes']['medium'])){
+			unlink(UPLOADS_DIR . $data['dir'] . $meta['sizes']['medium']['file']);
+		}
+		$imageParams = [$image_p, UPLOADS_DIR . $meta['dir'] . $data['sizes']['medium']['file']];
+		
+		$imgType = explode('/', $sizes['mime'])[1];
+		
+		ob_start();
+		$image = call_user_func('imagecreatefrom' . $imgType, $fullPath);
+		ob_end_clean();
+		
+		
+		imagecopyresampled($image_p, $image, 0, 0, 0, 0, $newW, $newH, $sizes[0], $sizes[1]);
+		
+		$alpha = ['png', 'gif'];
+		if(in_array($imgType, $alpha)){
+			imagealphablending($image, false);
+			imagesavealpha($image, true);
+		}else{
+			$imageParams[] = 80; // quality
+		}
+		
+		
+		call_user_func_array('image' . $imgType, $imageParams);dd();
+		$di->get('db')->query('Update media SET meta = \''.serialize($data).'\' where id = ' . $img['id']);
+		
+		
+	}dd();
+}
+
+//test();
+
+
+function resizeOriginalPhoto(){
+	global $di;
+	// $di->get('db')->query('ALTER TABLE media ADD meta longtext NOT NULL');
+	$imgs = $di->get('db')->getAll('Select * from media');
+	//dd(dirname($imgs[0]['src']));
+	$i = 0;
+	ini_set('gd.jpeg_ignore_warning', 1);
+	foreach($imgs as $img){
+		$fullPath = UPLOADS_DIR . $img['src'];
+		$sizes = getimagesize($fullPath);
+		$image_p = imagecreatetruecolor($sizes[0], $sizes[1]);
+		
+		$imageParams = [$image_p, $fullPath];
+		
+		$imgType = explode('/', $sizes['mime'])[1];
+		
+		ob_start();
+		$image = call_user_func('imagecreatefrom' . $imgType, $fullPath);
+		ob_end_clean();
+		
+		
+		imagecopyresampled($image_p, $image, 0, 0, 0, 0, $sizes[0], $sizes[1], $sizes[0], $sizes[1]);
+		
+		$alpha = ['png', 'gif'];
+		if(in_array($imgType, $alpha)){
+			imagealphablending($image, false);
+			imagesavealpha($image, true);
+		}else{
+			$imageParams[] = 70; // quality
+		}
+		
+		
+		call_user_func_array('image' . $imgType, $imageParams);d($fullPath);
+	}
+}
+
+///resizeOriginalPhoto();
+
+function test1(){
+	dd(unserialize('a:3:{s:5:"width";i:1399;s:6:"height";i:791;s:5:"sizes";a:2:{s:9:"thumbnail";a:4:{s:4:"file";s:23:"AOD5D9by1O3-150x150.jpg";s:5:"width";i:150;s:6:"height";i:150;s:4:"mime";s:10:"image/jpeg";}s:6:"medium";a:4:{s:4:"file";s:23:"AOD5D9by1O3-300x170.jpg";s:5:"width";i:300;s:6:"height";i:170;s:4:"mime";s:10:"image/jpeg";}}}'));
+}
+
+//test1();
+
+function postImgSrc($post, $thumbnail = 'orig'){
+	$validKeys = ['thumbnail', 'medium'];
+	
+	if(in_array($thumbnail, $validKeys) && isset($post['_jmp_post_img_meta']['sizes'][$thumbnail])){
+		return UPLOADS . substr($post['_jmp_post_img'], 0, strrpos($post['_jmp_post_img'], '/') + 1) . $post['_jmp_post_img_meta']['sizes'][$thumbnail]['file'];
+	}
+	
+	return isset($post['_jmp_post_img']) ? UPLOADS . $post['_jmp_post_img'] : THEME . 'img/002.jpg';
+}
+
+
+function test2(){
+	global $di;
+	$media = $di->get('db')->getAll('Select * from media');
+	$ins = '';
+	foreach($media as $m){
+		$m['meta'] = unserialize($m['meta']);
+		$m['meta']['dir'] = '2018/08/';
+		foreach($m['meta']['sizes'] as &$s){
+			$s['file'] = str_replace($m['meta']['dir'], '', $s['file']);
+		}
+		$m['meta'] = serialize($m['meta']);
+		$di->get('db')->query("Update media SET meta = '{$m['meta']}' where id = {$m['id']}");
+	}
+	dd();
+}
+//test2();
 
 function getExtraField($index, $name, $value){
 	?>
@@ -322,7 +514,7 @@ function getMenu(){
 	}
 	echo '
 	<li class="top-menu hidd extra-contacts">
-		<div style="background: white; color: coral;">
+		<div>
 			<a href="tel:+380677979385">+38 (067) 797-93-85</a>
 			<a href="tel:+380632008595">+38 (063) 200-85-95</a>
 			Почта: <a href="mailto:funkids@mail">funkidssodessa@gmail.com</a>
@@ -417,4 +609,32 @@ function langUrl($url = false){
 
 function cacheIsEnable(){
 	return defined('CACHE_ON') && CACHE_ON;
+}
+
+
+/*filesystem*/
+function do_mkdir($path, $rights = 0644){
+	if(file_exists($path)){
+		return false;
+	}
+	
+	return mkdir($path, $rights) ? true : false;
+}
+
+
+function do_rmdir($dir) {
+	if ($objs = glob($dir."/*")) {
+		foreach($objs as $obj) {
+			is_dir($obj) ? do_rmdir($obj) : unlink($obj);
+		}
+	}
+	rmdir($dir);
+}
+
+
+function clientIp($compareIp = false){
+	$ip = 	 !empty($_SERVER['HTTP_CLIENT_IP'])   	  ? $_SERVER['HTTP_CLIENT_IP'] : 
+			(!empty($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR']);
+	
+	return !$compareIp ? $ip : $ip == $compareIp;
 }

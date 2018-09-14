@@ -20,7 +20,7 @@
 		</div>
 		
 		<div class="block1">
-			<div>Краткий заголовок(<small>хлебные крошки, меню</small>)</div>
+			<div>Краткий заголовок <span class="icon-help-circled" title="хлебные крошки, меню. Если главный заголовок имеет небольшую длинну, данное поле можно не заполнять"></span></div>
 			<div><input class="w100" value="<?=$data['short_title']?>" type="text" name="short_title" id="short_title" placeholder=""></div>
 		</div>
 		

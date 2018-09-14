@@ -89,6 +89,7 @@ class View
 		if($withBlocks)
 			include $this->path . 'footer.php';
 		$this->rendered = true;
+		doAction('after_rendering');
 	}
 	
 	public function rendered(){

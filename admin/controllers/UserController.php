@@ -64,6 +64,13 @@ class UserController extends Controller{
 	}
 	
 	function actionClearCache(){
-		
+		if ($objs = glob(CACHE_DIR."*")) {
+			foreach($objs as $obj) {
+				if(is_dir($obj)){
+					do_rmdir($obj);
+				}
+			}
+		}
+		exit;
 	}
 }

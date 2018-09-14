@@ -38,6 +38,7 @@ class SettingController extends Controller{
 			}
 			if($save){
 				Common::setOption('front_page', $save); 
+				Common::clearCache('pages/' . $save);
 			}
 		}
 		

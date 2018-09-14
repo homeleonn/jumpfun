@@ -66,6 +66,9 @@ class Uploader{
 	}
 	
 	public function thumbCut($src, $mime, $src_w, $src_h, $dest_w = 150, $dest_h = 150){
+		if($dest_w > $src_w) $dest_w = $src_w;
+		if($dest_h > $src_h) $dest_h = $src_h;
+		
 		if(($difference = ($src_w - $src_h) / 2) < 0)
 			$difference = -$difference;
 		

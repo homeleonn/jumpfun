@@ -18,14 +18,28 @@
 	position: relative;
 	overflow: hidden; 
 	width: 100%;
-	
+}
+
+.slider > .progressbar{
+	content: '';
+	position:absolute;
+	bottom: 0px;
+	left: 0px;
+	width: 0%;
+	height: 6px;
+	border-radius: 0 4px 4px 0;
+	background: lightgreen;
+	max-width: 100% !important;
 }
 
 .ss .item{
 	position: relative;
 	display: none;
 	transition: .5s ease-in-out left;
+	max-height: 400px;
+	overflow: hidden;
 }
+
 
 .slider .item > img{
 	display: block;
