@@ -35,53 +35,6 @@
 		<div class="phone" title="Заказать обратный звонок"><span class="icon-phone"></span></div>
 		<div class="up" title="Подняться вверх"></div>
 	</div>
-	<div id="shower">
-		<span></span>
-		<div id="img">
-			<img src="" alt="Просмотр изображения">
-			<!--<div id="showerTools">
-				<div></div>
-				<div></div>
-			</div>-->
-			<div id="shower-tools1">
-				<div id="shower-prev"></div>
-				<div id="shower-next"></div>
-			</div>
-			<div id="counter">0 / 0</div>
-			<div id="shower-title"></div>
-			<div id="close">x</div>
-		</div>
-	</div>
-	<div id="note-wrap">
-		<span onclick="note.hide()"></span>
-		<div id="note">
-			<div id="note-title"></div>
-			<div id="note-content"></div>
-			<div class="center">
-				<button id="note-submit" class="button7">Отправить</button>
-				<button id="note-close" onclick="note.hide()">X</button>
-			</div>
-		</div>
-	</div>
-	
-	
-	<div id="callme" class="request-wrapper center none">
-		<input type="text" class="tel" name="tel" value="" placeholder="Ваш телефон">
-		<input type="button" class="send" value="Отправить">
-	</div>
-	
-	<div id="review-form" class="request-wrapper">
-		<input type="text" class="name" placeholder="Ваше имя">
-		<textarea placeholder="Введите Ваш отзыв" class="text limit-symbols" data-limit="500" rows="5"></textarea>
-		<input type="button" class="send" value="Отправить">
-	</div>
-	
-	<div class="captcha-wrapper none" id="captcha-wrapper">
-		<img alt="captcha" class="captcha pointer captcha-reload" src="">
-		<span class="icon-arrows-cw captcha-reload" title="Обновить капчу"></span> <br>Введите символы с картинки 
-		<input type="text" class="captcha-code">
-	</div>
-	
 	<script type='text/javascript' src='//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js'></script>
 	<script src="<?=THEME?>js/js.js"></script>
 	<script>

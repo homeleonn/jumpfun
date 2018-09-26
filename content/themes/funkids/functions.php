@@ -191,7 +191,7 @@ function funKids_all(){
 				<div class="item col-md-3 col-sm-6 col-xs-12 center">
 				<a href="<?=$item['permalink']?>">
 					<div class="img-wrapper">
-						<img src="<?=postImgSrc($item, 'medium')?>" alt="<?=$item['short_title'] ?: $item['title']?> - шоу программа funkids Одесса, аниматоры" />
+						<img src="<?=postImgSrc($item, 'medium')?>" data-src="<?=postImgSrc($item)?>" class="lazy" alt="<?=$item['short_title'] ?: $item['title']?> - шоу программа funkids Одесса, аниматоры" />
 					</div>
 					<div class="inline-title"><?=$item['short_title'] ?: $item['title']?></div>
 				</a>
@@ -225,7 +225,7 @@ function funKids_popular(){
 			<div class="widget-content">
 				<div class="inside-content shower center">
 				<?php foreach($popular['__list'] as $item): ?>
-					<div class="item"><div class="img"><img src="<?=postImgSrc($item, 'medium')?>" alt="<?=$item['short_title'] ?: $item['title']?> - популярный аниматор в Одессе" /></div><div class="inline-title"><?=$item['short_title'] ?: $item['title']?></div><?=funkids_clearTags(mb_substr($item['content'], 0 ,200)).'...'?><div><a href="<?=$item['permalink']?>" class="button">Перейти</a></div></div>
+					<div class="item"><div class="img"><img src="<?=postImgSrc($item, 'medium')?>" data-src="<?=postImgSrc($item)?>" class="lazy" alt="<?=$item['short_title'] ?: $item['title']?> - популярный аниматор в Одессе" /></div><div class="inline-title"><?=$item['short_title'] ?: $item['title']?></div><?=funkids_clearTags(mb_substr($item['content'], 0 ,200)).'...'?><div><a href="<?=$item['permalink']?>" class="button">Перейти</a></div></div>
 				<?php endforeach; ?>
 				</div>
 			</div>
@@ -254,7 +254,7 @@ function funKids_services(){
 				<div class="item">
 					<a href="<?=$item['permalink']?>">
 						<div class="img2">
-							<img src="<?=postImgSrc($item, 'medium')?>" alt="<?=$item['short_title'] ?: $item['title']?> - дополнительная услуга детский праздник" />
+							<img src="<?=postImgSrc($item, 'medium')?>" data-src="<?=postImgSrc($item)?>" class="lazy" alt="<?=$item['short_title'] ?: $item['title']?> - дополнительная услуга детский праздник" />
 						</div>
 						<div class="inline-title center"><?=$item['short_title'] ?: $item['title']?></div>
 					</a>
@@ -319,13 +319,34 @@ function funKids_catalogHeroes(){
 	$thatCache = true;
 	if(Common::getCache($funKidsCacheFileNames['catalog'], -1)) return;
 	$heroes = (new PostController('program'))->actionList();
+	$heroesImgs = [];
 	foreach($heroes['__list'] as $h){
-		?><div class="item"><a href="<?=$h['permalink']?>"><?=$h['short_title'] ?: $h['title']?></a>
+		$heroesImgs[] = postImgSrc($h, 'medium');
+		?>
+		<article class="item"><a href="<?=$h['permalink']?>"><?=$h['short_title'] ?: $h['title']?></a>
 			<div class="preview center">
-				<img src="<?=THEME?>img/1x1.gif" data-src="<?=postImgSrc($h, 'medium')?>" alt="<?=$h['title']?> - герой, аниматор, детский праздник в Одессе" /><div class="inline-title"><?=$h['short_title'] ?: $h['title']?></div><?=funkids_clearTags(mb_substr($h['content'], 0 ,200)).'...'?>
+				<noscript><img src="<?=postImgSrc($h, 'medium')?>" alt="<?=$h['title']?> - герой, аниматор, детский праздник в Одессе" /></noscript>
+				<div class="inline-title"><h1><?=$h['short_title'] ?: $h['title']?></h1></div><?=funkids_clearTags(mb_substr($h['content'], 0 ,200)).'...'?>
 			</div>
-		</div><?php
+		</article>
+		<?php
 	}
+	?>
+	<script>
+		$$(function(){
+			var heroesImgs = <?=json_encode($heroesImgs)?>;
+			var load = false;
+			$('.heroes-catalog .item').hover(function(){
+				if(!load){
+					load = true;
+					$('.heroes-catalog > .list > article > .preview').each(function(i){console.log(i);
+						$(this).prepend('<img src="'+heroesImgs[i]+'">');
+					});
+				}
+			});
+		});
+	</script>
+	<?php
 	echo Common::setCache($funKidsCacheFileNames['catalog']);
 }
 
@@ -351,7 +372,7 @@ function funkids_getLastReviews(){
 	<div class="reviews topoffset" id="reviews">
 		<div class="carousel-widget container" data-carousel-widget-column="2">
 			<div class="widget-head">
-				<div class="title">Последние отзывы наших клиентов</div>
+				<div class="title"><h2>Последние отзывы наших клиентов</h2></div>
 				<div class="controls">
 					<div class="rightside"></div>
 					<div class="leftside"></div>
@@ -361,9 +382,7 @@ function funkids_getLastReviews(){
 				<div class="inside-content">
 				<?php foreach($reviews as $review): ?>
 					<div class="item">
-						<div class="floatimg">
-							<img src="<?=THEME?>img/review.jpg" alt="Отзыв клиента <?=$review['name']?>" />
-						</div>
+						<div class="floatimg sprite reviewimg"></div>
 						<p class="quote-big">
 							<?=$review['text']?>
 						</p>

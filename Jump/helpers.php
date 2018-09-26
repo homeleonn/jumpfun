@@ -333,7 +333,7 @@ function resizeOriginalPhoto(){
 	//dd(dirname($imgs[0]['src']));
 	$i = 0;
 	ini_set('gd.jpeg_ignore_warning', 1);
-	foreach($imgs as $img){
+	foreach($imgs as $img){d($img, unserialize($img['meta']));continue;
 		$fullPath = UPLOADS_DIR . $img['src'];
 		$sizes = getimagesize($fullPath);
 		$image_p = imagecreatetruecolor($sizes[0], $sizes[1]);
@@ -358,11 +358,11 @@ function resizeOriginalPhoto(){
 		}
 		
 		
-		call_user_func_array('image' . $imgType, $imageParams);d($fullPath);
+		//call_user_func_array('image' . $imgType, $imageParams);d($fullPath);
 	}
 }
 
-///resizeOriginalPhoto();
+//resizeOriginalPhoto();
 
 function test1(){
 	dd(unserialize('a:3:{s:5:"width";i:1399;s:6:"height";i:791;s:5:"sizes";a:2:{s:9:"thumbnail";a:4:{s:4:"file";s:23:"AOD5D9by1O3-150x150.jpg";s:5:"width";i:150;s:6:"height";i:150;s:4:"mime";s:10:"image/jpeg";}s:6:"medium";a:4:{s:4:"file";s:23:"AOD5D9by1O3-300x170.jpg";s:5:"width";i:300;s:6:"height";i:170;s:4:"mime";s:10:"image/jpeg";}}}'));
@@ -415,6 +415,15 @@ function getExtraField($index, $name, $value){
 		</div>
 	</div>
 	<?php
+}
+
+function token($token = false){
+	if($token)
+		return isset($_POST['token']) ? $token == session('token') : false;
+	
+	$token = md5(uniqid(rand(), TRUE));
+	session('token', $token);
+	return $token;
 }
 
 

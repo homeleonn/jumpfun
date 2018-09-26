@@ -16,7 +16,7 @@ class ReviewController extends Controller{
 		]);
 	}
 	
-	public function actionAdd(){
+	public function add(){
 		$name = self::clearMsg($_POST['name'], 50);
 		$text = self::clearMsg($_POST['text'], 500);
 		$this->db->query('Insert into reviews (name, text) VALUES (\''.$name.'\', \''.$text.'\')');
@@ -95,7 +95,7 @@ class ReviewController extends Controller{
 					';
 				}break;
 				case '4':{
-					$this->actionAdd();
+					$this->add();
 					return;
 				}break;
 				

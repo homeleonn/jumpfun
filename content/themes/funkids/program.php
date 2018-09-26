@@ -36,10 +36,5 @@
 	<div class="sep"></div>
 	
 	<?php //include $this->get('comments');?>
-	<?php 
-		if(isAdmin()){
-			echo '<a href="'.SITE_URL.'admin/'.$post_type.'/edit/'.$id.'/" title="Редактировать"><span class="icon-pencil"></span></a>';
-		}
-	?>
 	<?php funKids_like($id)?>
 </div>

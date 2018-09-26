@@ -33,19 +33,25 @@ class MediaController extends Controller{
 		$thumbSrcList = [];
 		$insert = [];
 		$i = 0;
+			
+		// Игнорим возникновение ошибок при ломаных изображениях
+		ini_set('gd.jpeg_ignore_warning', 1);
 		
 		while(isset($files['name'][$i])){
+			if($files['size'][$i] > 2 * 1024 * 1024){
+				Msg::json(['error' => 'Изображение слишком большое, попробуйте сначала уменьшить размер']);
+			}
+			
 			if(($result = $uploader->img($files['tmp_name'][$i], $files['name'][$i])) !== false){
 				$src = $upDir . $result['new_name'];
 				$thumbSrcList[$i]['orig'] = $urlDir . $result['new_name'];
 				
 				$meta = [
 					'width' => $result['w'],
-					'height' => $result['h']
+					'height' => $result['h'],
+					'dir' => $upDir
 				];
 				
-				// Игнорим возникновение ошибок при ломаных изображениях
-				ini_set('gd.jpeg_ignore_warning', 1);
 				
 				// Создаем миниатюру если ширина или высота больше предполагаемых размеров миниатюры
 				if($result['w'] > $thumbW || $result['h'] > $thumbH){
@@ -62,7 +68,7 @@ class MediaController extends Controller{
 				// Ресайзим до средней ширины если ширина или высота больше предполагаемых размеров миниатюры
 				if($result['w'] > $mediumW || $result['h'] > $mediumH){
 					list($mediumName, $width, $height) = $this->resize($dir, $result['new_name'], $mediumW, $mediumH);
-					$thumbSrcList[$i]['medium'] = $urlDir . $mediumName;
+					//$thumbSrcList[$i]['medium'] = $urlDir . $mediumName;
 					
 					$meta['sizes']['medium'] = [
 						'file' => $mediumName,
@@ -71,6 +77,11 @@ class MediaController extends Controller{
 						'mime' => $result['mime'],
 					];
 				}
+				
+				$metaForMediaShow = $meta;
+				unset($metaForMediaShow['sizes']['thumbnail']);
+				$thumbSrcList[$i]['meta'] = json_encode($metaForMediaShow);
+				$thumbSrcList[$i]['dir'] = UPLOADS . $meta['dir'];
 				
 				$meta = serialize($meta);
 				
@@ -97,7 +108,7 @@ class MediaController extends Controller{
 		}
 	}
 	
-	private function resize($destDir, $source, $destW, $destH, $quality = 75){
+	private function resize($destDir, $source, $destW, $destH, $quality = 70){
 		$fullPath = $destDir . $source;
 		$sizes = getimagesize($fullPath);
 		if($destW > $sizes[0]) $destW = $sizes[0]; 

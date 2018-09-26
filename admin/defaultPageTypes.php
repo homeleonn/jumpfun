@@ -1,27 +1,29 @@
 <?php
 
-// addPageType([
-		// 'type' => 'post',
-		// 'title' => '',
-		// 'title_for_admin' => 'Записи',
-		// 'description' => 'Записи',
-		// 'add' => 'Добавить запись',
-		// 'edit' => 'Редактировать запись',
-		// 'delete' => 'Удалить запись',
-		// 'common' => 'записей',
-		// 'hierarchical' => false,
-		// 'has_archive'  => false,
-		// 'taxonomy' => [
-			// 'category' => [
-				// 'title' => 'Категория',
-				// 'add' => 'Добавить категорию',
-				// 'edit' => 'Редактировать категорию',
-				// 'delete' => 'Удалить категорию',
-				// 'hierarchical' => false,
-			// ],
-		// ],
-		// 'rewrite' => ['slug' => '%category%', 'with_front' => true, 'paged' => 20],
-// ]);
+addPageType([
+		'type' => 'post',
+		'title' => 'Блог',
+		'title_for_admin' => 'Записи',
+		'description' => 'Блог',
+		'add' => 'Добавить запись',
+		'edit' => 'Редактировать запись',
+		'delete' => 'Удалить запись',
+		'common' => 'записей',
+		'hierarchical' => false,
+		'has_archive'  => 'blog',
+		'taxonomy' => [
+			'category' => [
+				'title' => 'Категория',
+				'add' => 'Добавить категорию',
+				'edit' => 'Редактировать категорию',
+				'delete' => 'Удалить категорию',
+				'hierarchical' => false,
+			],
+		],
+		'rewrite' => ['slug' => 'blog/%category%', 'with_front' => false, 'paged' => 20],
+]);
+
+
 
 addPageType([
 		'type' => 'page',

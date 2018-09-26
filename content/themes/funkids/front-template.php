@@ -25,27 +25,25 @@ if(isset($content)){
 	//funKids_popular();
 	?>
 	</div>
-	<?php
-	funKids_services();
-	?>
+	<?php funKids_services()?>
 	<div class="s-about" id="s-about">
-		<div class="girl-left"><img src="<?=THEME?>img/girl2.jpg" alt="Веселая девочка на празднике"></div>
+		<div class="girl-left sprite"></div>
 		<h2 class="section-title">О нас</h2>
 		<div class="container">
 			<div class="row">
 				<div class="col-md-4">
 					<h3>Дети хотят веселья!</h3>
-					<div class="floatimg"><img src="<?=THEME?>img/about1.jpg" alt="Дети хотят веселья! Организация праздников Одесса"></div>
+					<div class="floatimg sprite about1"></div>
 					<p>Если Ваш ребёнок уже в том прекрасном возрасте, когда пришло время устраивать громкий праздник - FUNKIDS тут как тут! Мы организуем программу с самыми интересными и веселыми героями.</p>
 				</div>
 				<div class="col-md-4">
 					<h3>Мы с детьми на "ты"</h3>
-					<div class="floatimg"><img src="<?=THEME?>img/about2.jpg" alt="Дети на празднике Одесса, разноцветные шарики"></div>
+					<div class="floatimg sprite about2"></div>
 					<p>Наши аниматоры всегда находят подход ко всем детям, Заказывая программу FUNKIDS можете быть уверены, что ребёнок запомнит этот праздник надолго и будет рассказывать своим друзьям.</p>
 				</div>
 				<div class="col-md-4">
 					<h3>Оплачивайте как Вам удобно</h3>
-					<div class="floatimg"><img src="<?=THEME?>img/about3.jpg" alt="Удобная оплата детского праздника"></div>
+					<div class="floatimg sprite about3"></div>
 					<p>Мы доверяем своим клиентам, поэтому оплата возможна в момент выступления. Также мы принимаем оплату на карту ПриватБанка.</p>
 				</div>
 			</div>

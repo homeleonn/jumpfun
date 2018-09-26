@@ -152,7 +152,8 @@ class PostController extends Controller{
 		
 		// Если правильная ссылка на запись и пришедшая не совпадают - отправляем по правильному адресу
 		if(\langUrl(FULL_URL) != $post['url']){
-			dd('$this->request->location('.$post['url'].')');
+			$this->request->location($post['url']);
+			//dd('$this->request->location('.$post['url'].')');
 		}
 		
 		// Указываем что выводить данную запись следует шаблоном single
@@ -272,7 +273,8 @@ class PostController extends Controller{
 		}else{
 			// taxonomy validation
 			if(!$this->isFront && !Common::checkValidation($hierarchy, '/^' . URL_PATTERN . '$/')){
-				exit('404-5 - taxonomy validation failed by URL_PATTERN');
+				$this->request->location(null, 404);
+				//exit('404-5 - taxonomy validation failed by URL_PATTERN');
 			}
 			
 			
@@ -302,7 +304,10 @@ class PostController extends Controller{
 					break;
 				}
 			}
-			if(!$findTerm) exit('404-3');
+			if(!$findTerm) {
+				$this->request->location(null, 404);
+				//exit('404-3');
+			}
 			
 			// 1.3
 			list($termsOnIds, $termsOnParents) = Common::itemsOnKeys($terms, ['id', 'parent']);

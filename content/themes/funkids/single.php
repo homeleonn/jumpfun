@@ -9,9 +9,4 @@
 	<?php if(isset($terms)) echo $terms;?>
 	<div  class="tcontent"><?=$content?></div>
 	<?php //include $this->get('comments');?>
-	<?php 
-		if(isAdmin()){
-			echo '<a href="'.SITE_URL.'admin/'.$post_type.'/edit/'.$id.'/" title="Редактировать"><span class="icon-pencil"></span></a>';
-		}
-	?>
 </div>

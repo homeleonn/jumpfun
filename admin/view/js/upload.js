@@ -67,7 +67,7 @@ $(function(){
 		
 		var files = $('#upload-img')[0].files;
 		for(var i=0;i<files.length;i++){
-			if(checkImg(files[i]))
+			//if(checkImg(files[i]))
 				filesUpload.push(files[i]);
 		}
 		send1();
@@ -181,8 +181,10 @@ function send1(){
 			if(typeof(data.thumbSrcList) != "undefined")
 				data.thumbSrcList.forEach(function(item, i){
 					//$('<div/>').prependTo('.thumbs').html('<img src="'+item+'">').addClass('media_thumb');
-					$('.media-thumbs').prepend('<div class="media-thumb"><img src="'+item.thumb+'" data-original="'+item.orig+'" data-id="'+item.id+'"></div>');
+					$('.media-thumbs').prepend('<div class="media-thumb"><img src="'+item.thumb+'" data-original="'+item.orig+'" data-id="'+item.id+'" data-meta=\''+item.meta+'\' data-dir="'+item.dir+'"></div>');
 				});
+			else
+				alert(data.error);
 		}
 	});
 	filesUpload = [];

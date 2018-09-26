@@ -7,7 +7,7 @@
 	<link rel="stylesheet" href="<?=THEME?>css/bootstrap.min.css">
 	<link rel="stylesheet" href="<?=THEME?>css/fontello.css">
 	<link rel="stylesheet" href="<?=THEME?>css/style.css">
-	<link href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,700italic,400,800,700,600" rel="stylesheet" type="text/css">
+	<link href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,700" rel="stylesheet" type="text/css">
 	<link rel="shortcut icon" href="<?=ROOT_URI?>favicon.ico" type="image/x-icon">
 	<script>
 		// add callbacks onload window
@@ -32,9 +32,9 @@
 			<?php endif;?>
 			<div class="top-line"></div>
 			<div class="top-sky">
-				<div class="clouds"></div>
-				<div class="air-balloons-left"></div>
-				<div class="air-balloons-right"></div>
+				<div class="clouds sprite"></div>
+				<div class="air-balloons-left sprite"></div>
+				<div class="air-balloons-right sprite"></div>
 			</div>
 			<div class="header-content">
 				<div class="container">
@@ -57,6 +57,13 @@
 					<?php getMenu() ?>
 					<?php if(isMain()):?>
 					<!--SLIDER(+-)-->
+					<script>
+						$$(function(){
+							$('.slider > .ss > .item:not(.active)').each(function(i){
+								$(this).prepend('<img src="<?=THEME?>img/mini-gallery/5'+(i+1)+'.jpg" />');
+							});
+						});
+					</script>
 					<div class="slider-wrapper">
 						<div class="slider">
 							<div class="ss">
@@ -64,21 +71,18 @@
 									<div class="yout"><div class="yplay">&#9658;</div><img data-youtube="ZfZfm1twto8" src="<?=THEME?>img/mini-gallery/50.jpg"></div>
 								</div>
 								<div class="item">
-									<img src="<?=THEME?>img/1x1.gif" data-src="<?=THEME?>img/mini-gallery/51.jpg" alt="Праздник дня рождения с аниматорами Одессв" />
 									<div class="slider-title">
 										<div>Праздник дня рождения</div>
 										<div>Веселые ребята и их родители с нашими аниматорами</div>
 									</div>
 								</div>
 								<div class="item">
-									<img src="<?=THEME?>img/1x1.gif" data-src="<?=THEME?>img/mini-gallery/52.jpg" alt="Детский праздник, шоу программа человек-паук и Оптимус Прайм" />
 									<div class="slider-title">
 										<div>Детский праздник в Одессе</div>
 										<div>Аниматоры человек-паук и Оптимус Прайм, дети остаются довольными</div>
 									</div>
 								</div>
 								<div class="item">
-									<img src="<?=THEME?>img/1x1.gif" data-src="<?=THEME?>img/mini-gallery/53.jpg" alt="Красивые картинки детский праздник Одесса" />
 									<div class="slider-title">
 										<div>Бэтмен на защите праздника</div>
 										<div>Детская шоу программа Бэтмена - яркие впечатления детей</div>
