@@ -17,9 +17,9 @@ class ReviewController extends Controller{
 	}
 	
 	public function add(){
-		$name = self::clearMsg($_POST['name'], 50);
-		$text = self::clearMsg($_POST['text'], 500);
-		$this->db->query('Insert into reviews (name, text) VALUES (\''.$name.'\', \''.$text.'\')');
+		$name = $this->clearMsg($_POST['name'], 50);
+		$text = $this->clearMsg($_POST['text'], 500);
+		$this->db->query('Insert into reviews (name, text) VALUES (?s, ?s)', $name, $text);
 		exit('Спасибо за Ваш отзыв, после проверки сообщения Ваш отзыв появится на сайте и его смогут прочитать все желающие, мы ценим каждого клиента! <br>С наилучшими пожеланиями. © команда FunKids');
 	}
 	
@@ -73,7 +73,7 @@ class ReviewController extends Controller{
 				
 			switch($_POST['type']){
 				case '3':{
-					$tel = self::clearMsg($_POST['tel'], 50);
+					$tel = $this->clearMsg($_POST['tel'], 50);
 					$mess .= '
 						<tr><td colspan="2">Пользователь запросил обратный звонок</td></tr>
 						<tr><td width="20%">Телефон</td><td>'.$tel.'</td></tr>
@@ -81,10 +81,10 @@ class ReviewController extends Controller{
 					';
 				}break;
 				case '2':{
-					$name = self::clearMsg($_POST['name'], 50);
-					$mail = self::clearMsg($_POST['mail'], 100);
-					$tel = self::clearMsg($_POST['tel'], 50);
-					$text = self::clearMsg($_POST['text'], 500);
+					$name = $this->clearMsg($_POST['name'], 50);
+					$mail = $this->clearMsg($_POST['mail'], 100);
+					$tel = $this->clearMsg($_POST['tel'], 50);
+					$text = $this->clearMsg($_POST['text'], 500);
 					
 					$mess .= '
 						<tr><td width="20%">Имя:</td><td>'.$name.'</td></tr>
@@ -118,7 +118,7 @@ class ReviewController extends Controller{
 		exit;
 	}
 	
-	private static function clearMsg($text, $cut){
+	private function clearMsg($text, $cut){
 		return htmlspecialchars(trim(mb_substr($text, 0, $cut)), ENT_NOQUOTES);
 	}
 }

@@ -1,5 +1,6 @@
 <?php
 
+session_start();
 define('ENV', 'admin');
 define('ADMIN', '');
 

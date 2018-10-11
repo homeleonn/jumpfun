@@ -2,6 +2,8 @@
 
 namespace frontend\controllers;
 
+\session_start();
+
 use Jump\Controller;
 use Jump\helpers\Session;
 use Jump\helpers\Common;

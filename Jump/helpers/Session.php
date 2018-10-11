@@ -1,6 +1,8 @@
 <?php
 namespace Jump\helpers;
 
+if(!session_id()) \session_start();
+
 class Session
 {
 	public static function get($key = NULL)
