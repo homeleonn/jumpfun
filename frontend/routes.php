@@ -1,7 +1,5 @@
 <?php
 
-
-
 return [
 	// ['news/('.URL_PATTERN.')', 'news:single/$1'],
 	// ['news/([a-zA-Z0-9-,=;]+[^;])', 'news:list/$1'],
@@ -31,4 +29,3 @@ return [
 	['reviews', 'review|list', 'GET'],
 	['reviews/mail', 'review|mail', 'POST'],
 ];
-
