@@ -4,7 +4,6 @@ return [
 	// ['news/('.URL_PATTERN.')', 'news:single/$1'],
 	// ['news/([a-zA-Z0-9-,=;]+[^;])', 'news:list/$1'],
 	// ['news', 'news:list'],
-	//
 	['', 'post|index'],
 	['('.URL_PATTERN_SLASH.')', 'post|single|$1'],
 	['user', 'user|index', 'GET'],
