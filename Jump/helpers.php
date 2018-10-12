@@ -11,7 +11,8 @@ use Jump\DI\DI;
  *  
  *  @return array paths to main file of plugins
  */
-function plugins(array $activePlugins = []){
+function plugins(array $activePlugins = []):array
+{
 	static $activated = false;
 	
 	$pluginsRootFolder = ROOT . 'content/plugins/';
