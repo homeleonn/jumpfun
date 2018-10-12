@@ -22,12 +22,6 @@ class Jump{
 		}else{
 			$this->di->get('request')->location(NULL, 404);
 		}
-		$this->stats();
-	}
-	
-	private function stats(){
-		global $start;
-		echo '<div style="display: table;clear:both;float:none;"></div>';
-		var_dump($this->di->get('db')->getStats(), 'Время обработки скрипта: ' . substr((microtime(true) - $start), 0, 6));
+		requestStats();
 	}
 }

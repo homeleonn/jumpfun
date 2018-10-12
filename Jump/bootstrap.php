@@ -32,7 +32,6 @@ try{
 	// User functions
 	require_once THEME_DIR . 'functions.php';
 	
-	
 	$di->set('models', []);
 	
 	$jump = new Jump($di);
