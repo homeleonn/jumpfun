@@ -20,8 +20,8 @@ abstract class Facade{
 				// throw new \Exception('Service \'' . static::getFacadeAccessor() . '\' not found');
 			// }
 			
-			throw new \Exception('Service \'' . static::getFacadeAccessor() . '\' not found');
+			throw new \Exception(sprintf('Service "%s" not found', static::getFacadeAccessor()));
 		}
-		call_user_func_array([$object, $name], $arguments);
+		return call_user_func_array([$object, $name], $arguments);
 	}
 }

@@ -122,22 +122,23 @@ class MenuController extends Controller{
 	public function actionEdit(){
 		$menu = json_decode($_POST['menu']);
 		if(empty($menu)) return;
+		$menuId = (int)$_POST['menu_id']
 		//dd($menu, $_POST['menu']);
 		$queryFull = 'INSERT INTO menu (menu_id, object_id, name, origname, url, type, parent, `sort`) VALUES ';
 		$queryItems = ''; 
 		$sort = $subSort = 0;
 		foreach($menu as $item){
-			$queryItems .= $this->cols($item, -1, $sort++, $_POST['menu_id']);
+			$queryItems .= $this->cols($item, -1, $sort++, $menuId);
 			
 			if(isset($item->children)){
 				$subSort = 0;
 				foreach($item->children as $childItem){
-					$queryItems .= $this->cols($childItem, $item->id, $subSort++, $_POST['menu_id']);
+					$queryItems .= $this->cols($childItem, $item->id, $subSort++, $menuId);
 				}
 			}
 		}
 		$queryFull .= substr($queryItems, 0, -1);
-		$this->db->query('Delete from menu where menu_id = ' . $_POST['menu_id']);
+		$this->db->query('Delete from menu where menu_id = ?i', $menuId);
 		$this->db->query($queryFull);
 		unlink(UPLOADS_DIR . 'cache/menu/menu.html');
 	}
