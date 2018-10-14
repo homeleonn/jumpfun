@@ -38,7 +38,7 @@ class Uploader{
 	public function img($src, $name, $rights = 0644){
 		$validMime = ['image/gif', 'image/jpeg', 'image/png'];
 		
-		if($imgData = @getimagesize($src)){dd($imgData);
+		if($imgData = @getimagesize($src)){
 			if(!in_array($imgData['mime'], $validMime))
 				return false; //'Недопустимый тип изображения';
 			

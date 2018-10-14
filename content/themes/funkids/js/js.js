@@ -182,6 +182,7 @@ function Slider(element){
 	var fnForResize = fnOnTimeout(carouselWidgetResize);
 	
 	$(function(){
+		if(!$('.carousel-widget').length) return;
 		$('.carousel-widget .controls').click(function(e){
 			if(widgetSlide) return;
 			var $widget 		= $(this).closest('.carousel-widget');
@@ -325,6 +326,7 @@ function animate(){
 var yout = false, slider, animateId;
 $(function(){
 	Shower('.shower');
+	//setTimeout(function(){$('body').addClass('loaded');}, 2000);
 	$('body').addClass('loaded');
 	
 	if(isFrontPage()){
@@ -356,17 +358,13 @@ $(function(){
 	}else{
 		(function(){
 			if($('.heroes-catalog-wrapper').length){
-				var load = false;
-				$('.heroes-catalog .item').hover(function(){
-					if(!load){
-						load = true;
-						$('.heroes-catalog img').each(function(){
-							var data = $(this).data('src');
-							if(data){
-								this.src = data;
-							}
-						});
-					}
+				$('.heroes-catalog .list').one('mouseover', function(){
+					$('.heroes-catalog img').each(function(){
+						var data = $(this).data('src');
+						if(data){
+							this.src = data;
+						}
+					});
 				});
 				
 				// var fn = function(){
@@ -607,16 +605,43 @@ function Note(){
 ;(function($){
 	var lazyImgs = [];
 	var prevScrollTop = 0;
-	var step = 300;
+	var step = 200;
 	var winHeight = $(window).height()
-	var beforeImgStep = winHeight + 300;
+	var beforeImgStep = winHeight + 700;
 	var find = false;
+	var fn = fnOnTimeout(() => {
+		var scroll = $(window).scrollTop()
+		if(scroll > prevScrollTop + step)
+		{
+			prevScrollTop = scroll;
+			
+			lazyImgs.forEach(function(item, i){
+				if(item[2] - (beforeImgStep) < prevScrollTop){
+					find = true;
+					delete(lazyImgs[i]);
+					
+					var newImg = new Image();
+					newImg.onload = function(){
+						item[0].src = item[1];
+					}
+					newImg.src = item[1];
+				}
+			});
+			
+			if(find) {
+				find = false;
+				recounting();
+			}
+		}
+	}, 500);
 	
 	function recounting(){
 		lazyImgs.forEach(function(item, i){
 			lazyImgs[i][2] = $(item[0]).offset().top;
 		});
 	}
+	
+	
 	
 	$(function(){
 		$('img.lazy').each(function(){
@@ -625,28 +650,7 @@ function Note(){
 		});
 		
 		$(window).scroll(function(){
-			if($(this).scrollTop() > prevScrollTop + step)
-			{
-				prevScrollTop = $(this).scrollTop();
-				
-				lazyImgs.forEach(function(item, i){
-					if(item[2] - (beforeImgStep) < prevScrollTop){
-						find = true;
-						delete(lazyImgs[i]);
-						
-						var newImg = new Image();
-						newImg.onload = function(){
-							item[0].src = item[1];
-						}
-						newImg.src = item[1];
-					}
-				});
-				
-				if(find) {
-					find = false;
-					recounting();
-				}
-			}
+			fn();
 		});
 	});
 })(jQuery);

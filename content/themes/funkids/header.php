@@ -4,17 +4,12 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<?php jmpHead() ?>
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&subset=latin,cyrillic" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" href="<?=THEME?>css/bootstrap.min.css">
 	<link rel="stylesheet" href="<?=THEME?>css/fontello.css">
 	<link rel="stylesheet" href="<?=THEME?>css/style.css">
-	<link href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,700" rel="stylesheet" type="text/css">
 	<link rel="shortcut icon" href="<?=ROOT_URI?>favicon.ico" type="image/x-icon">
-	<script>
-		// add callbacks onload window
-		function $$(callback){
-			window.addEventListener('load', callback);
-		}
-	</script>
+	<script>function $$(callback){window.addEventListener('load', callback);}</script>
 </head>
 <body>
 	<div class="wrapper<?=isMain()?' main':''?>" id="wrapper">
@@ -46,7 +41,7 @@
 					</div>
 					<div class="row">
 						<div class="logo-text">
-							<a href="<?=SITE_URL?>"><img src="<?=THEME?>img/logo_trnsprnt1.png" alt="Логотип. Организация детских праздников Одесса. Аниматоры. Шоу программы. Низкие цены"></a>
+							<a href="<?=SITE_URL?>"><img alt="Логотип. Организация детских праздников Одесса. Аниматоры. Шоу программы. Низкие цены" src="<?=THEME?>img/logo_trnsprnt1.png"></a>
 						</div>
 						<div class="tels fs25">
 							<a href="tel:+380677979385">(067) 797-93-85</a>
@@ -59,16 +54,19 @@
 					<!--SLIDER(+-)-->
 					<script>
 						$$(function(){
-							$('.slider > .ss > .item:not(.active)').each(function(i){
-								$(this).prepend('<img src="<?=THEME?>img/mini-gallery/5'+(i+1)+'.jpg" />');
-							});
+							let sliderImgs = ['51.jpg', '52.jpg', '53.jpg'];
+							setTimeout(function(){
+								$('.slider > .ss > .item:not(.active)').each(function(i){
+									$(this).prepend('<img src="<?=THEME?>img/1x1.gif" data-src="<?=THEME?>img/mini-gallery/'+sliderImgs[i]+'" />');
+								});
+							}, 500);
 						});
 					</script>
 					<div class="slider-wrapper">
 						<div class="slider">
 							<div class="ss">
 								<div class="item active">
-									<div class="yout"><div class="yplay">&#9658;</div><img data-youtube="ZfZfm1twto8" src="<?=THEME?>img/mini-gallery/50.jpg"></div>
+									<div class="yout"><div class="yplay">&#9658;</div><img data-youtube="ZfZfm1twto8" src="<?=THEME?>img/mini-gallery/50.jpg" alt="Аниматор трансформер Оптимус Прайм на детский праздник Одесса"></div>
 								</div>
 								<div class="item">
 									<div class="slider-title">

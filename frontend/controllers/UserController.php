@@ -2,6 +2,8 @@
 
 namespace frontend\controllers;
 
+if(empty($_COOKIE[ini_get('session.name')])) session_start();
+
 use Jump\Controller;
 use Jump\helpers\Session;
 use Jump\helpers\Common;
@@ -20,11 +22,13 @@ class UserController extends Controller{
 	
 	public function actionAuth(){
 		if(!isset($_POST['email']) || !isset($_POST['pass']) || !isset($_POST['token']) || !token($_POST['token'])){
+			dd($_POST, !token($_POST['token']));
 			$this->authFail();
 		}
 		
 		$user = $this->db->getRow("Select * from users where email = ?s and pass = ?s", $_POST['email'], md5(md5($_POST['pass'])));
 		if($user){
+			
 			$accesslevel = $this->db->getRow("Select * from usermeta where user_id = {$user['id']} and meta_key = 'accesslevel'");
 			Session::set([
 				'id' => $user['id'],
