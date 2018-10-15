@@ -295,7 +295,7 @@ function funKids_like($id){
 				?>
 					<article class="item">
 						<div class="img2">
-							<img src="<?=postImgSrc($item, 'medium')?>" alt="<?=$item['short_title'] ?: $item['title']?> - похожие шоу программы, аниматоры" />
+							<img src="<?=postImgSrc($item, 'medium')?>" data-src="<?=postImgSrc($item)?>" class="lazy" alt="<?=$item['short_title'] ?: $item['title']?> - похожие шоу программы, аниматоры" />
 						</div>
 						<h1 class="inline-title"><?=$item['title']?></h1>
 						<?=funkids_clearTags(mb_substr($item['content'], 0 ,200)).'...'?>
@@ -335,14 +335,10 @@ function funKids_catalogHeroes(){
 	<script>
 		$$(function(){
 			var heroesImgs = <?=json_encode($heroesImgs)?>;
-			var load = false;
-			$('.heroes-catalog .item').hover(function(){
-				if(!load){
-					load = true;
-					$('.heroes-catalog > .list > article > .preview').each(function(i){console.log(i);
-						$(this).prepend('<img src="'+heroesImgs[i]+'">');
-					});
-				}
+			$('.heroes-catalog .list').one('mouseover', function(){
+				$('.heroes-catalog > .list > article > .preview').each(function(i){
+					$(this).prepend('<img src="'+heroesImgs[i]+'">');
+				});
 			});
 		});
 	</script>

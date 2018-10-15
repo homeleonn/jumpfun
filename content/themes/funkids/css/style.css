@@ -1,10 +1,15 @@
 html, body{
-	font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-family: "Open Sans",Tahoma, "Helvetica Neue",Helvetica,Arial,sans-serif;
+	~font-family: Tahoma, Arial,sans-serif;
 	font-size: 16px;
 	color: #a71111;
 	~letter-spacing: 3px;
 	font-weight: 400;
 	
+}
+
+body.loaded{
+	font-family: "Open Sans", Tahoma, Arial,sans-serif;
 }
 
 ul{
@@ -410,8 +415,8 @@ a:hover .inline-title{
 }
 	
 .header > .top-sky > .clouds{
-	background-repeat: repeat-x;
-	height: 190px;
+	~background-repeat: repeat-x;
+	height: 185px;
 	transition: 20s all linear;
 	background-position-x: 0px;
 	background-position-y: -1px;
@@ -443,18 +448,7 @@ body.loaded .header > .top-sky > .clouds{
 body.loaded .header > .top-sky > .air-balloons-left,
 body.loaded .header > .top-sky > .air-balloons-right
 {
-	~background-image: url(../img/sky-balloons.png);
 	background-position: -25px -317px;
-}
-
-.main .air-balloons-left,
-.main .air-balloons-right{
-	~z-index: 999;
-}
-
-.main.animate .air-balloons-left,
-.main.animate .air-balloons-right{
-	~animation: move 3s infinite linear;
 }
 
 @keyframes move {
@@ -670,8 +664,8 @@ nav{
 }
 
 nav label > div:before{
-	font-family: "fontello";
-	content: '\f0c9';
+	~font-family: "fontello";
+	content: '≡';
 	position: absolute;
     top: -230px;
 	right: 0px;
@@ -945,7 +939,8 @@ footer > .plain{
 }
 
 body.loaded .plain{
-	background-image: url(../img/plain.png);
+	background-position: -10px -185px;
+	height: 122px;
 }
 
 footer.index > .plain{
@@ -1218,11 +1213,6 @@ footer .social-bottom a{
 	background: linear-gradient(to top, #b4ffac, #b7d9ff);
 }
 
-.extra-services.front-page.test-back2{
-	background-image: url(../img/front-slider/2.jpg);
-	background-attachment: fixed; 
-	background-size: cover;
-}
 
 .extra-services.front-page.test-back2,
 .extra-services.front-page.test-back2 a{
@@ -1383,7 +1373,7 @@ body.loaded .s-about:after{
 }
 
 body.loaded .sprite{
-	background-image: url(../img/sprite2.png);
+	background-image: url(../img/sprite.png);
 	background-repeat: no-repeat;
 }
 

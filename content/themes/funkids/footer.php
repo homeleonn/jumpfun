@@ -1,6 +1,6 @@
 	</div>
 	<footer class="<?=URI=='/'?'index':''?>">
-			<div class="plain"></div>
+			<div class="plain sprite"></div>
 			<div class="container-fluid">
 				<div class="container">
 					<div class="row top">

@@ -36,6 +36,6 @@ try{
 	
 	$jump = new Jump($di);
 	$jump->run();
-}catch(Exception $e){	
+}catch(Exception $e){
 	Common::exceptionMessage($e);
 }

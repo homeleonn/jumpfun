@@ -619,6 +619,8 @@ function Note(){
 		});
 	}
 	
+	
+	
 	$(function(){
 		$('img.lazy').each(function(){
 			if(this.dataset['src'])

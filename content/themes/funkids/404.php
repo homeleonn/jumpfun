@@ -19,7 +19,7 @@
 <body>
 	<div id="content" style="text-align: center;">
 		<h1>404 страница не найдена | page not found</h1>
-		<div><img src="<?=THEME?>img/batman.jpg" alt="страницы не существует" title="страницы не существует"></div>
+		<div><img src="<?=THEME?>img/batman-404.jpg" alt="страницы не существует" title="страницы не существует"></div>
 		<div><a href="<?=SITE_URL?>" title="Главная страница">Главная страница</a></div>
 	</div>
 </body>
