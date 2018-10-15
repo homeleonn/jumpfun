@@ -3,15 +3,10 @@
 namespace Jump\DI;
 
 class DI{
+	use \Jump\traits\Singletone;
 	public $container = [];
-	private static $_instance;
 	
 	private function __construct(){}
-	public static function getInstance(){
-		if(!self::$_instance)
-			self::$_instance = new self;
-		return self::$_instance;
-	}
 	
 	public function set($dependencyName, $dependency){
 		$this->container[$dependencyName] = $dependency;

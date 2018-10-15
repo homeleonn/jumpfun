@@ -182,6 +182,7 @@ function Slider(element){
 	var fnForResize = fnOnTimeout(carouselWidgetResize);
 	
 	$(function(){
+		if(!$('.carousel-widget').length) return;
 		$('.carousel-widget .controls').click(function(e){
 			if(widgetSlide) return;
 			var $widget 		= $(this).closest('.carousel-widget');
@@ -325,7 +326,14 @@ function animate(){
 var yout = false, slider, animateId;
 $(function(){
 	Shower('.shower');
+	//setTimeout(function(){$('body').addClass('loaded');}, 2000);
 	$('body').addClass('loaded');
+	
+	$('.get-review-form').click(function(e){
+		e.preventDefault();
+		note.get('Оставить отзыв', 4);
+		$('#captcha').prop('src', root + 'get-captcha-for-comment/');
+	});
 	
 	if(isFrontPage()){
 		slider = new Slider('slider');
@@ -348,25 +356,18 @@ $(function(){
 			$('body,html').animate({scrollTop: top - 50}, 500);
 		});
 		
-		$('.get-review-form').click(function(e){
-			e.preventDefault();
-			note.get('Оставить отзыв', 4);
-			$('#captcha').prop('src', root + 'get-captcha-for-comment/');
-		});
+		
 	}else{
+		
 		(function(){
 			if($('.heroes-catalog-wrapper').length){
-				var load = false;
-				$('.heroes-catalog .item').hover(function(){
-					if(!load){
-						load = true;
-						$('.heroes-catalog img').each(function(){
-							var data = $(this).data('src');
-							if(data){
-								this.src = data;
-							}
-						});
-					}
+				$('.heroes-catalog .list').one('mouseover', function(){
+					$('.heroes-catalog img').each(function(){
+						var data = $(this).data('src');
+						if(data){
+							this.src = data;
+						}
+					});
 				});
 				
 				// var fn = function(){
@@ -607,9 +608,9 @@ function Note(){
 ;(function($){
 	var lazyImgs = [];
 	var prevScrollTop = 0;
-	var step = 300;
+	var step = 200;
 	var winHeight = $(window).height()
-	var beforeImgStep = winHeight + 300;
+	var beforeImgStep = winHeight + 700;
 	var find = false;
 	
 	function recounting(){
@@ -625,9 +626,10 @@ function Note(){
 		});
 		
 		$(window).scroll(function(){
-			if($(this).scrollTop() > prevScrollTop + step)
+			var scroll = $(window).scrollTop()
+			if(scroll > prevScrollTop + step)
 			{
-				prevScrollTop = $(this).scrollTop();
+				prevScrollTop = scroll;
 				
 				lazyImgs.forEach(function(item, i){
 					if(item[2] - (beforeImgStep) < prevScrollTop){
