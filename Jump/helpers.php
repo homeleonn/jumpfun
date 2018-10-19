@@ -123,7 +123,7 @@ function requestStats(){
 	global $di, $start;
 	echo '<div style="display: table;clear:both;float:none;"></div><hr>';
 	$dbStats = $di->get('db')->getStats();
-	var_dump(!is_null($dbStats) ? $dbStats: 'Подключения и запросы к БД не производились', 'Время обработки скрипта: ' . substr((microtime(true) - $start), 0, 6));
+	vd(!is_null($dbStats) ? $dbStats: 'Подключения и запросы к БД не производились', 'Время обработки скрипта: ' . substr((microtime(true) - $start), 0, 6));
 }
 
 function session(){

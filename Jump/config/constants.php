@@ -27,7 +27,8 @@ if(strpos($fullUri, 'en/') === 0) {
 	define('LANG', 'ru');
 
 
-define('FULL_URI', $fullUri != '' ? $fullUri : '/');
+define('FULL_URI', $fullUri != '' ? (strpos($fullUri, '?') === 0 ? '/' . $fullUri : $fullUri) : '/');
+unset($fullUri, $replaceCount);
 
 define('URI', explode('?', FULL_URI)[0]);
 

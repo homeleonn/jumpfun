@@ -554,7 +554,7 @@ class SafeMySQL
 		{
 			return 'NULL';
 		}
-		return	"'".mysqli_real_escape_string($this->conn ? $this->conn : $this->getConn(),$value)."'";
+		return	"'".mysqli_real_escape_string($this->getConn(),$value)."'";
 	}
 
 	private function escapeIdent($value)
@@ -652,7 +652,7 @@ class SafeMySQL
 	}
 	
 	public function getConn(){
-		return ($this->conn) ? $this->conn : $this->lazyConnect();
+		return $this->conn ?? $this->lazyConnect();
 	}
 }
 
