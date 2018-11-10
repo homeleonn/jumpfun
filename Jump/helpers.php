@@ -476,6 +476,12 @@ function addPostImgForm($img = false){
 	<?php
 }
 
+function sessStart(){
+	if(!isset($_SESSION)){
+		session_start();
+	}
+}
+
 
 function getMenu(){
 	$cacheFileName = 'menu/menu';

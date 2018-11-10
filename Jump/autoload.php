@@ -5,7 +5,8 @@ $aliases = [
 	'Router' => Jump\core\router\Router::class,
 	'Options' => frontend\models\post\Options::class,
 	'Cache' => Jump\core\cache\Cache::class,
-	'Responce1' => Jump\supports\facades\Responce::class,
+	'Responce' => Jump\supports\facades\Responce::class,
+	'DB' => Jump\supports\facades\DB::class,
 ];
 
 spl_autoload_register(function($class){//var_dump($class);exit;

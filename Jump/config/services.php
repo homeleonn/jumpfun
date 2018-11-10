@@ -6,5 +6,4 @@ return [
 	Jump\services\RequestProvider::class,
 	Jump\services\RouterProvider::class,
 	Jump\services\ViewProvider::class,
-	Jump\services\ResponceProvider::class,
 ];
