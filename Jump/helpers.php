@@ -106,7 +106,7 @@ function applyFilter(){
 function vd(){
 	$trace = debug_backtrace()[1];
 	echo '<small style="color: green;"><pre>',$trace['file'],':',$trace['line'],':</pre></small><pre>';
-	call_user_func_array('var_dump', func_get_args()[0] ?: [NULL]);
+	call_user_func_array('var_dump', func_get_args()[0] ? [func_get_args()[0]]: [NULL]);
 }
 
 function d(){

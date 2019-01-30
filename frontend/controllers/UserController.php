@@ -29,7 +29,7 @@ class UserController extends Controller{
 		$user = $this->db->getRow("Select * from users where email = ?s and pass = ?s", $_POST['email'], md5(md5($_POST['pass'])));
 		if($user){
 			
-			$accesslevel = $this->db->getRow("Select * from usermeta where user_id = {$user['id']} and meta_key = 'accesslevel'");
+			$accesslevel = $this->db->getOne("Select meta_value from usermeta where user_id = {$user['id']} and meta_key = 'accesslevel'");
 			Session::set([
 				'id' => $user['id'],
 				'user' => [

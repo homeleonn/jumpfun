@@ -5,7 +5,7 @@ php_flag display_startup_errors on
 
 <IfModule mod_rewrite.c>
 RewriteEngine On
-RewriteBase /funkids/
+RewriteBase /funkids2/
 
 
 # ЗАПРЕЩЁННЫЕ ФАЙЛЫ
