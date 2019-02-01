@@ -11,7 +11,7 @@ class ReviewController extends Controller{
 		$reviews = $this->di->get('db')->getAll('Select * from reviews where 1=1 '.(!$all ? 'and status = 1 ':'').'order by id DESC LIMIT 30');
 		$this->config->addBreadCrumbs('reviews', 'Отзывы');
 		$this->view->render('reviews/index', [
-			'title' => 'Отзывы наших клиентов об организации детских праздников в Одессе - FunKids', 
+			'title' => 'Отзывы наших клиентов об организации детских торжеств в Одессе - FunKids', 
 			'reviews' => $reviews
 		]);
 	}

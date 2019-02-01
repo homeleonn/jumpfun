@@ -239,6 +239,10 @@ class PostController extends Controller{
 	}
 	
 	public function actionList($taxonomy = null, $taxonomySlug = null, $page = 1, $limit = false, $orderBy = false){//dd(func_get_args(), $this->options);
+	
+		if ($orderBy == false) {
+			$orderBy = applyFilter('before_action_list_args', $orderBy, $this->options['type']);
+		}
 		global $thatCache;//dd($thatCache);
 		if($taxonomy == '' && $taxonomySlug == '' && !$thatCache){
 			global $funkidsFileCacheName;

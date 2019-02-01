@@ -5,6 +5,7 @@ html, body{
 	color: #a71111;
 	~letter-spacing: 3px;
 	font-weight: 400;
+	background-image: url(../img/holiday-christmas-bg.png);
 	
 }
 
@@ -317,7 +318,12 @@ h2{
 
 .subtitle,
 .inline-title,
-.section-title, h1, h2, h3{
+.section-title, 
+h1, 
+h2, 
+h3,
+.inline-title-margin
+{
 	~font-family: "Alice", "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-size: 25px;
 	word-wrap:  break-word;
@@ -344,9 +350,18 @@ h2{
 	margin: 5px 0;
 }
 
-.inline-title.small{
+.inline-title.small,
+.inline-title-margin{
 	font-size: 20px
 }
+
+.inline-title-margin{
+	font-weight: bold;
+	color:#a71111;
+	margin: 20px 0;
+}
+
+
 
 a.under{
 	text-decoration: underline;
@@ -891,7 +906,7 @@ nav .submenu li a{
 .popular{
 	~padding-top: 300px;
 	~border-top: 5px lightgreen solid;
-	background: #fdffe4;
+	~background: #fdffe4;
 	position: relative;
 }
 
@@ -900,10 +915,10 @@ nav .submenu li a{
 
 .girl-left{
 	position: absolute;
-	top: 400px;
-	left: 400px;
-	width: 328px;
-	height: 419px;
+	top: 100px;
+	left: 150px;
+	width: 88px;
+	height: 120px;
 	overflow: hidden;
 	z-index: 0;
 	transition: .5s;
@@ -1300,7 +1315,7 @@ footer .social-bottom a{
 
 .all-progs{
 	padding-top: 20px;
-	background: white;
+	~background: white;
 }
 
 .s-about,
@@ -1320,7 +1335,7 @@ footer .social-bottom a{
 
 body.loaded .all-progs:after,
 body.loaded .s-about:after{
-	background: url('../img/bottom-wave.svg') center bottom no-repeat;
+	~background: url('../img/bottom-wave.svg') center bottom no-repeat;
 }
 
 
@@ -1345,6 +1360,10 @@ body.loaded .s-about:after{
 
 .all-progs .item{
 	margin: 20px 0;
+}
+
+.all-progs .item a{
+	background: transparent !important;
 }
 
 .all-progs .inline-title{
@@ -2640,7 +2659,6 @@ border-width: 1em 20px 0 0;
     padding: 5px 26px;
     font-size: 27px;
 }
-
 
 .yout img, .yout1 img{
 	max-width: 100%;

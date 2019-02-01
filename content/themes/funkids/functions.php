@@ -28,27 +28,36 @@ function funkids_extra_fields_keys($extraFieldKeys){
 
 addPageType([
 		'type' => 'new',
-		'title' => 'Новости',
-		'_seo_title' => 'Новостная лента организаторов детских праздников Одесса',
-		'h1' => 'Новости организации детских праздников в Одессе | FunKids',
-		'title_for_admin' => 'Новости',
-		'description' => 'Новости организации детских праздников в Одессе, узнавайте о праздновениях только актуальные новости, новые аниматоры, костюмы, шоу программы | FunKids',
-		'add' => 'Добавить новость',
-		'edit' => 'Редактировать новость',
-		'delete' => 'Удалить новость',
-		'common' => 'новостей',
+		'title' => 'Блог',
+		'_seo_title' => 'Наш блог, статьи, новости | FunKids',
+		'h1' => 'Блог',
+		'title_for_admin' => 'Блог',
+		'description' => 'Последние новости, узнавайте о праздновениях только актуальные новости и статьи | FunKids',
+		'add' => 'Добавить запись',
+		'edit' => 'Редактировать запись',
+		'delete' => 'Удалить запись',
+		'common' => 'Записей',
 		'hierarchical' => false,
-		'has_archive'  => 'news',
-		'rewrite' => ['slug' => 'news', 'with_front' => false, 'paged' => 20],
+		'has_archive'  => 'blog',
+		'rewrite' => ['slug' => 'blog/%newcat%', 'with_front' => false, 'paged' => 20],
+		'taxonomy' => [
+			'newcat' => [
+				'title' => 'Категории',
+				'add' => 'Добавить категорию',
+				'edit' => 'Редактировать категорию',
+				'delete' => 'Удалить категорию',
+				'hierarchical' => true,
+			]
+		]
 ]);
 
 addPageType([
 		'type' => 'service',
-		'title' => 'Доп. Услуги',
-		'_seo_title' => 'Дополнительные услуги на день рождения ребенка, заказ организация торжеств для детей в Одессе',
+		'title' => 'Доп. услуги',
+		'_seo_title' => 'Дополнительные услуги к детскому празднику в Одессе',
 		'h1' => 'Дополнительные услуги для праздника',
-		'title_for_admin' => 'Доп. Услуги',
-		'description' => 'Дополнительные услуги для организации детских праздников в Одессе | FunKids',
+		'title_for_admin' => 'Доп. услуги',
+		'description' => 'Дополнительные услуги для организации детских праздников в Одессе, мыльные пузыри, сладкая вата, всё что бы разнообразить праздничный день, запоминающиеся мгновения жизни ребенка | FunKids',
 		'add' => 'Добавить услугу',
 		'edit' => 'Редактировать услугу',
 		'delete' => 'Удалить услугу',
@@ -115,9 +124,9 @@ addPageType([
 		'type' => 'program',
 		'title' => 'Программы',
 		'_seo_title' => 'Детские аниматоры, шоу программы Одесса | Заказать праздник для ребенка недорого',
-		'h1' => 'Шоу программы, аниматоры на детский праздник в Одессе',
+		'h1' => 'Аниматоры, шоу программы на детский праздник в Одессе',
 		'title_for_admin' => 'Программы',
-		'description' => 'Заказать детского аниматора на день рождения ребенка Одесса, широкий выбор аниматоров и шоу программы, а так же красочные детские ведущие, которые порадуют детей интересными конкурсами и подарят массу ярких впечатлений. Все останутся довольны. Заказать аниматора для ребенка на праздник. Цена',
+		'description' => 'Заказать детского аниматора на день рождения ребенка на дом Одесса, широкий выбор аниматоров и шоу программы, а так же красочные детские ведущие, которые порадуют детей интересными конкурсами и подарят массу ярких впечатлений. Все останутся довольны. Заказать аниматора для ребенка на праздник. Цена',
 		'add' => 'Добавить программу',
 		'edit' => 'Редактировать программу',
 		'delete' => 'Удалить программу',
@@ -141,6 +150,12 @@ addFilter('edit_admin_menu', function($sections){
 	return array_merge($sections, 
 		['Отзывы||comment' => 'reviews']
 	);
+});
+
+addFilter('before_action_list_args', function($orderBy, $postType){
+	if ($postType == 'program' || $postType == 'service') {
+		return [['created'], 'ASC'];
+	}
 });
 
 
@@ -181,7 +196,7 @@ function funKids_all(){
 	global $funKidsCacheFileNames, $thatCache;
 	$thatCache = true;
 	if(Common::getCache($funKidsCacheFileNames['programs_all'], -1)) return;
-	$popular = (new PostController('program'))->actionList(NULL, NULL, 1, 30, [['visits'], 'DESC']);
+	$popular = (new PostController('program'))->actionList(NULL, NULL, 1, 30,  [['created'], 'ASC'] );
 	?>
 	<div class="all-progs" id="all-progs">
 		<h2 class="section-title">Шоу программы аниматоров</h2>
@@ -191,7 +206,7 @@ function funKids_all(){
 				<div class="item col-md-3 col-sm-6 col-xs-12 center">
 				<a href="<?=$item['permalink']?>">
 					<div class="img-wrapper">
-						<img src="<?=postImgSrc($item, 'medium')?>" data-src="<?=postImgSrc($item)?>" class="lazy" alt="<?=$item['short_title'] ?: $item['title']?> - шоу программа funkids Одесса, аниматоры" />
+						<img src="<?=postImgSrc($item, 'medium')?>" data-src="<?=postImgSrc($item)?>" class="lazy" alt="<?=$item['short_title'] ?: $item['title']?>" />
 					</div>
 					<div class="inline-title"><?=$item['short_title'] ?: $item['title']?></div>
 				</a>
@@ -210,7 +225,7 @@ $funKidsCacheFileNames['popular'] = 'funkids/popularHeroes';
 function funKids_popular(){
 	global $funKidsCacheFileNames;
 	if(Common::getCache($funKidsCacheFileNames['popular'], -1)) return;
-	$popular = (new PostController('program'))->actionList(NULL, NULL, 1, 5, [['visits'], 'DESC']);
+	$popular = (new PostController('program'))->actionList(NULL, NULL, 1, 5, [['created'], 'ASC']);
 	?>
 	<div class="popular-progs" id="popular-progs">
 		<h2 class="section-title">Популярные программы</h2>
@@ -225,7 +240,7 @@ function funKids_popular(){
 			<div class="widget-content">
 				<div class="inside-content shower center">
 				<?php foreach($popular['__list'] as $item): ?>
-					<div class="item"><div class="img"><img src="<?=postImgSrc($item, 'medium')?>" data-src="<?=postImgSrc($item)?>" class="lazy" alt="<?=$item['short_title'] ?: $item['title']?> - популярный аниматор в Одессе" /></div><div class="inline-title"><?=$item['short_title'] ?: $item['title']?></div><?=funkids_clearTags(mb_substr($item['content'], 0 ,200)).'...'?><div><a href="<?=$item['permalink']?>" class="button">Перейти</a></div></div>
+					<div class="item"><div class="img"><img src="<?=postImgSrc($item, 'medium')?>" data-src="<?=postImgSrc($item)?>" class="lazy" alt="<?=$item['short_title'] ?: $item['title']?>" /></div><div class="inline-title"><?=$item['short_title'] ?: $item['title']?></div><?=funkids_clearTags(mb_substr($item['content'], 0 ,200)).'...'?><div><a href="<?=$item['permalink']?>" class="button">Перейти</a></div></div>
 				<?php endforeach; ?>
 				</div>
 			</div>
@@ -243,7 +258,7 @@ function funKids_services(){
 	global $funKidsCacheFileNames, $thatCache;
 	$thatCache = true;
 	if(Common::getCache($funKidsCacheFileNames['services'], -1)) return;
-	$services = (new PostController('service'))->actionList(NULL, NULL, 1);
+	$services = (new PostController('service'))->actionList(NULL, NULL, 1, 10, [['created'], 'ASC']);
 	?>
 	<div class="extra-services front-page" id="extra-services">
 		<h2 class="section-title"><div>Дополнительные</div> <div>услуги</div></h2>
@@ -254,7 +269,7 @@ function funKids_services(){
 				<div class="item">
 					<a href="<?=$item['permalink']?>">
 						<div class="img2">
-							<img src="<?=postImgSrc($item, 'medium')?>" data-src="<?=postImgSrc($item)?>" class="lazy" alt="<?=$item['short_title'] ?: $item['title']?> - дополнительная услуга детский праздник" />
+							<img src="<?=postImgSrc($item, 'medium')?>" data-src="<?=postImgSrc($item)?>" class="lazy" alt="<?=$item['short_title'] ?: $item['title']?>" />
 						</div>
 						<div class="inline-title center"><?=$item['short_title'] ?: $item['title']?></div>
 					</a>
@@ -295,7 +310,7 @@ function funKids_like($id){
 				?>
 					<article class="item">
 						<div class="img2">
-							<img src="<?=postImgSrc($item, 'medium')?>" data-src="<?=postImgSrc($item)?>" class="lazy" alt="<?=$item['short_title'] ?: $item['title']?> - похожие шоу программы, аниматоры" />
+							<img src="<?=postImgSrc($item, 'medium')?>" data-src="<?=postImgSrc($item)?>" class="lazy" alt="<?=$item['short_title'] ?: $item['title']?>" />
 						</div>
 						<h1 class="inline-title"><?=$item['title']?></h1>
 						<?=funkids_clearTags(mb_substr($item['content'], 0 ,200)).'...'?>
@@ -318,14 +333,15 @@ function funKids_catalogHeroes(){
 	global $funKidsCacheFileNames, $thatCache;
 	$thatCache = true;
 	if(Common::getCache($funKidsCacheFileNames['catalog'], -1)) return;
-	$heroes = (new PostController('program'))->actionList();
+	$heroes = (new PostController('program'))->actionList(NULL, NULL, 1, 30, [['created'], 'ASC']);
+	$heroes = array_reverse($heroes);
 	$heroesImgs = [];
 	foreach($heroes['__list'] as $h){
 		$heroesImgs[] = postImgSrc($h, 'medium');
 		?>
 		<article class="item"><a href="<?=$h['permalink']?>"><?=$h['short_title'] ?: $h['title']?></a>
 			<div class="preview center">
-				<noscript><img src="<?=postImgSrc($h, 'medium')?>" alt="<?=$h['title']?> - герой, аниматор, детский праздник в Одессе" /></noscript>
+				<noscript><img src="<?=postImgSrc($h, 'medium')?>" alt="<?=$h['title']?>" /></noscript>
 				<div class="inline-title"><h1><?=$h['short_title'] ?: $h['title']?></h1></div><?=funkids_clearTags(mb_substr($h['content'], 0 ,200)).'...'?>
 			</div>
 		</article>

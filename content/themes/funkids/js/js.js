@@ -612,6 +612,31 @@ function Note(){
 	var winHeight = $(window).height()
 	var beforeImgStep = winHeight + 700;
 	var find = false;
+	var fn = fnOnTimeout(() => {
+		var scroll = $(window).scrollTop()
+		if(scroll > prevScrollTop + step)
+		{
+			prevScrollTop = scroll;
+			
+			lazyImgs.forEach(function(item, i){
+				if(item[2] - (beforeImgStep) < prevScrollTop){
+					find = true;
+					delete(lazyImgs[i]);
+					
+					var newImg = new Image();
+					newImg.onload = function(){
+						item[0].src = item[1];
+					}
+					newImg.src = item[1];
+				}
+			});
+			
+			if(find) {
+				find = false;
+				recounting();
+			}
+		}
+	}, 500);
 	
 	function recounting(){
 		lazyImgs.forEach(function(item, i){
@@ -628,29 +653,7 @@ function Note(){
 		});
 		
 		$(window).scroll(function(){
-			var scroll = $(window).scrollTop()
-			if(scroll > prevScrollTop + step)
-			{
-				prevScrollTop = scroll;
-				
-				lazyImgs.forEach(function(item, i){
-					if(item[2] - (beforeImgStep) < prevScrollTop){
-						find = true;
-						delete(lazyImgs[i]);
-						
-						var newImg = new Image();
-						newImg.onload = function(){
-							item[0].src = item[1];
-						}
-						newImg.src = item[1];
-					}
-				});
-				
-				if(find) {
-					find = false;
-					recounting();
-				}
-			}
+			fn();
 		});
 	});
 })(jQuery);

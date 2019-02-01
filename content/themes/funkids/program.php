@@ -1,5 +1,6 @@
 <?//=dd(get_defined_vars())?>
 <div class="container program">
+	<noindex>
 	<div class="col-md-3 col-xs-0 heroes-catalog-wrapper">
 		<div class="heroes-catalog">
 			<div class="ribbon"><div class="title center ribbon-content">КАТАЛОГ ГЕРОЕВ</div></div>
@@ -8,6 +9,7 @@
 			</div>
 		</div>
 	</div>
+	</noindex>
 	<div class="col-md-9 shower">
 		<?=isset($h1)?'<h1>'.$h1.'</h1>':''?>
 		<div class="floatimg main-img">
@@ -18,6 +20,7 @@
 		<?php if(isset($terms)) echo $terms;?>
 		<div class="tcontent"><?=$content?></div>
 	</div>
+	<noindex>
 	<div class="sep"></div>
 	<div class="container">
 		<div class="inline-title">В программу входят</div>
@@ -37,4 +40,5 @@
 	
 	<?php //include $this->get('comments');?>
 	<?php funKids_like($id)?>
+	</noindex>
 </div>

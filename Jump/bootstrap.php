@@ -1,7 +1,7 @@
 <?php
 define('JUMP', __DIR__);
 
-require_once JUMP . '/config/constants.php';
+require_once ROOT . 'constants.php';
 require_once 'autoload.php';
 
 

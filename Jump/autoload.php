@@ -9,7 +9,7 @@ $aliases = [
 	'DB' => Jump\supports\facades\DB::class,
 ];
 
-spl_autoload_register(function($class){//var_dump($class);exit;
+spl_autoload_register(function($class){
 	global $aliases;
 	$className = $class;
 	$isAlias = isset($aliases[$class]);

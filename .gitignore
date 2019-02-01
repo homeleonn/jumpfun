@@ -1,6 +1,6 @@
 Jump/config/.htaccess
-Jump/config/db.php
 Jump/config/options.php
+config.php
 other/
 content/uploads/
 tasks.txt
