@@ -803,6 +803,10 @@ $(function(){
 		$active.parent().addClass('active').closest('li.top-menu').addClass('active')
 	}
 	
+	if($('.filters').length) {
+		$('.filters a[href="'+document.location.href+'"]').addClass('active');
+	}
+	
 	$('.heroes-catalog a[href="'+document.URL+'"]').addClass('active');
 	
 	$('#comments-block-form').submit(function(e){

@@ -383,7 +383,7 @@ function postImgSrc($post, $thumbnail = 'orig'){
 		return UPLOADS . substr($post['_jmp_post_img'], 0, strrpos($post['_jmp_post_img'], '/') + 1) . $post['_jmp_post_img_meta']['sizes'][$thumbnail]['file'];
 	}
 	
-	return isset($post['_jmp_post_img']) ? UPLOADS . $post['_jmp_post_img'] : THEME . 'img/002.jpg';
+	return isset($post['_jmp_post_img']) ? UPLOADS . $post['_jmp_post_img'] : THEME . 'img/logo_trnsprnt1.png';
 }
 
 

@@ -1607,6 +1607,62 @@ body.loaded .holyday{
 	width: 200px;
 }
 
+.terms{
+	display: flex;
+}
+
+.terms > li{
+	padding: 10px;
+	border-radius: 5px;
+	border: 2px lightgreen solid;
+}
+
+.filters-inline{
+	background: #fff;
+	margin: 0 15px 20px;
+}
+
+.filters{
+	display: flex;
+}
+
+.filters > .title{
+	font-size: 18px;
+	font-weight: bold;
+	background: lightgreen;
+	padding: 10px;
+	display: inline-block;
+	~float: left;
+}
+
+.filters > .content{
+	display: flex;
+}
+
+.filters > .content > a{
+	display: inline-block;
+	padding: 10px;
+	border-radius: 5px;
+	border: 2px lightgreen solid;
+	margin: 0 5px;
+}
+
+.filters > .content > a.active{
+	background: rgb(42, 147, 110);
+	color: white;
+}
+
+
+.filters-inline .filters > .content > a:not(:last-child):after{
+	~content: ', ';
+}
+
+.filters-inline .filters > .content:after{
+	content: ' ';
+	display: table;
+	clear: both;
+}
+
 #pagenation{
 	text-align: center;
 	padding: 80px 10px 0px;

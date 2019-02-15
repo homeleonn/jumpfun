@@ -38,8 +38,8 @@ addPageType([
 		'delete' => 'Удалить запись',
 		'common' => 'Записей',
 		'hierarchical' => false,
-		'has_archive'  => 'blog',
-		'rewrite' => ['slug' => 'blog/%newcat%', 'with_front' => false, 'paged' => 20],
+		'has_archive'  => 'news',
+		'rewrite' => ['slug' => 'news/%newcat%', 'with_front' => false, 'paged' => 20],
 		'taxonomy' => [
 			'newcat' => [
 				'title' => 'Категории',

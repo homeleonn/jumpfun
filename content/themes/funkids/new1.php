@@ -9,7 +9,7 @@
 		<div class="col-sm-4 list-item center">
 			<div>
 				<a href="<?=$item['url']?>">	
-					<img src="<?=(isset($item['_jmp_post_img']) ? UPLOADS . $item['_jmp_post_img'] : THEME . 'img/002.jpg')?>" alt="">
+					<img src="<?=(isset($item['_jmp_post_img']) ? UPLOADS . $item['_jmp_post_img'] : THEME . 'img/logo_trnsprnt1.png')?>" alt="">
 					<div class="itemcontent">
 						<div class="inline-title"><?=$item['title']?></div>
 					</div>

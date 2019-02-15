@@ -3,7 +3,7 @@
 	<?=isset($h1)?'<h1>'.$h1.'</h1>':''?>
 	<div class="floatimg main-img">
 		<a href="<?=postImgSrc($post)?>" class="shower">
-			<img src="<?=postImgSrc($post, 'medium')?>" alt="<?=isset($h1)?$h1:''?>">
+			<img src="<?=postImgSrc($post, 'medium')?>" alt="<?=$h1??''?>">
 		</a>
 	</div>
 	<?php if(isset($terms)) echo $terms;?>

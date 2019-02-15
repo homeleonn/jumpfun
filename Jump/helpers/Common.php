@@ -160,7 +160,7 @@ class Common{
 			}
 			$html = substr($html, 0, -1) . '</li>';
 		}
-		return $html;
+		return '<ul class="terms">' . $html . '</ul>';
 	}
 	
 	public static function archiveTermsHTML($taxonomies, $archive){
@@ -168,8 +168,9 @@ class Common{
 		$html = '';
 		foreach($taxonomies as $taxName => $terms){
 			$html .= '<div class="filters"><div class="title">' . $taxName . '</div><div class="content">';
+			$html .= " <a href='". SITE_URL . langUrl() . $archive . "'>Все</a>";
 			foreach($terms as $termName => $termLink){
-				$html .= " <a href='". SITE_URL . langUrl() . $archive . "{$termLink}/'>{$termName}</a><br>";
+				$html .= " <a href='". SITE_URL . langUrl() . $archive . "{$termLink}/'>{$termName}</a>";
 			}
 			$html .= '</div></div>';
 		}

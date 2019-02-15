@@ -214,7 +214,8 @@ class Post extends Model{
 		}
 		
 		if($isPost){
-			$url = ROOT_URI . ($this->options['hierarchical'] ? ROOT_URI . $urlHierarchy . Options::getArchiveSlug() . $item['url'] . '/' : Options::getArchiveSlug() . $item['url'] . '/');
+			$url = $item['url'];
+			// $url = ROOT_URI . ($this->options['hierarchical'] ? ROOT_URI . $urlHierarchy . Options::getArchiveSlug() . $item['url'] . '/' : Options::getArchiveSlug() . $item['url'] . '/');
 		}else{
 			$url = ROOT_URI . Options::getArchiveSlug() . $item['taxonomy'] . '/' . $urlHierarchy . $item['slug'] . '/' ;
 		}

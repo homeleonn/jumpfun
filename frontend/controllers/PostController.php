@@ -468,9 +468,10 @@ class PostController extends Controller{
 		
 		if($type){
 			if(is_array($value)) $value = implode(' > ', $value);
-			$this->addBreadCrumbsHelper($taxonomyTitle, $value, $taxonomyTitle, $post['short_title'] ?: $post['title']);
+			$post['short_title'] = $post['short_title'] ?? $post['title'];
+			$this->addBreadCrumbsHelper($taxonomyTitle, $value, $taxonomyTitle, $post['short_title']);
 		}elseif(isset($post['id']) && $this->config->front_page != $post['id']){
-			$this->config->addBreadCrumbs($post['url'], $post['short_title'] ?: $post['title']);
+			$this->config->addBreadCrumbs($post['url'], $post['short_title'] ?? $post['title']);
 			//if(isset($this->options['rewrite']['slug']))
 			if($this->options['title']){
 				$post['h1'] = $post['title'];

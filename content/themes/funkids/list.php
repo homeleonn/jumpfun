@@ -73,7 +73,10 @@
 			endif;
 		?></div> <?=$pagenation?><?php
 			else:
-			?><div class="col-sm-12 news"><?php
+			?>
+				<div class="filters-inline"><?=$filters??''?></div>
+				<div class="col-sm-12 news">
+			<?php
 			if($this->haveChild()):
 			while($item = $this->theChild()):
 			//dd($item);
