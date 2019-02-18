@@ -82,17 +82,18 @@
 			//dd($item);
 		?>
 			<div class="item clearfix">
-				<div class="title">
-					<a href="<?=$item['url']?>">
-						<span class="inline-title"><?=$item['short_title']?:$item['title']?></span>
-					</a>
-				</div>
-				<div class="ncontent">
-					<img src="<?=postImgSrc($item, 'medium')?>" alt="<?=$item['title']?>" style="width: 200px;" class="floatimg">
 				
+				<div class="ncontent" >
+						<img src="<?=postImgSrc($item, 'medium')?>" alt="<?=$item['title']?>" style="height: 320px; width: 320px;
+object-fit: cover;" class="floatimg">
+					<div class="title" >
+						<a href="<?=$item['url']?>">
+							<span class="inline-title"><?=$item['short_title']?:$item['title']?></span>
+						</a>
+					</div>	
+					<div class="time"><b>Дата:</b> <?=funkidsDate($item['created'])?></div>
 					<span><?=funkids_clearTags(mb_substr($item['content'], 0 ,500)).'...'?></span>
-					<br>
-					<div class="right"><?=substr($item['created'], 0, -9)?></div>
+					<div class="right"><a href="<?=$item['url']?>" class="button">Читать</a></div>
 				</div>
 			</div>
 		<?php

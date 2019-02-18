@@ -38,8 +38,8 @@ addPageType([
 		'delete' => 'Удалить запись',
 		'common' => 'Записей',
 		'hierarchical' => false,
-		'has_archive'  => 'news',
-		'rewrite' => ['slug' => 'news/%newcat%', 'with_front' => false, 'paged' => 20],
+		'has_archive'  => 'blog',
+		'rewrite' => ['slug' => 'blog/%newcat%', 'with_front' => false, 'paged' => 20],
 		'taxonomy' => [
 			'newcat' => [
 				'title' => 'Категории',
@@ -144,6 +144,25 @@ addPageType([
 			// ],
 		// ]
 ]);
+
+function funkidsDate($date){
+	$months = [
+		'01' => 'января',
+		'02' => 'февраля',
+		'03' => 'марта',
+		'04' => 'апреля',
+		'05' => 'мая',
+		'06' => 'июня',
+		'07' => 'июля',
+		'08' => 'августа',
+		'09' => 'сентября',
+		'10' => 'октября',
+		'11' => 'ноября',
+		'12' => 'декабря',
+	];
+	$str = date('d-m-Y', strtotime($date));
+	return substr_replace($str, ' ' . $months[substr($str, 3, 2)] . ' ', 2, 4);
+}
 
 
 addFilter('edit_admin_menu', function($sections){

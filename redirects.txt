@@ -1,0 +1,2 @@
+Redirect 301 /news/u-nas-poyavilsya-novuij-kostyum/ /blog/news/u-nas-poyavilsya-novuij-kostyum/
+Redirect 301 /news/zapusk-sajta/ /blog/news/zapusk-sajta/

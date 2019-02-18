@@ -5,7 +5,7 @@ html, body{
 	color: #a71111;
 	~letter-spacing: 3px;
 	font-weight: 400;
-	background-image: url(../img/holiday-christmas-bg.png);
+	~background-image: url(../img/holiday-christmas-bg.png);
 	
 }
 
@@ -259,9 +259,10 @@ iframe{
 }
 
 .floatimg + p:not(.quote, .quote-big):after,
-.reviews.list .item:before
+.reviews.list .item:before,
+.filters-inline .filters > .content:after
 {
-	content: '' !important;
+	content: ' ' !important;
 	display: table !important;
 	clear: both !important;
 }
@@ -1335,7 +1336,7 @@ footer .social-bottom a{
 
 body.loaded .all-progs:after,
 body.loaded .s-about:after{
-	~background: url('../img/bottom-wave.svg') center bottom no-repeat;
+	background: url('../img/bottom-wave.svg') center bottom no-repeat;
 }
 
 
@@ -1445,9 +1446,9 @@ body.loaded .sprite{
 	font-size: 20px;
 }
 
-.ncontent > img{
-	width: 200px;
-}
+/* .ncontent > img{ */
+	/* width: 200px; */
+/* } */
 
 .holyday{
 	background-repeat: no-repeat;
@@ -1588,14 +1589,15 @@ body.loaded .holyday{
 
 
 .news > .item{
-	background: #eed290; 
+	background: #eaebff;
 	margin-bottom: 30px;
 	border-radius: 10px;
 }
 
-.news > .item > .title{
-	background: linear-gradient(to left, #5bf557, #16189c); 
-	border-radius: 10px 10px 0 0;
+.news > .item .title{
+	/* background: linear-gradient(to left, #5bf557, #16189c);  */
+	/* border-radius: 10px 10px 0 0; */
+	text-decoration: underline !important;
 }
 
 .news > .item > .title,
@@ -1603,8 +1605,24 @@ body.loaded .holyday{
 	padding: 10px;
 }
 
+
 .news > .item > .ncontent > img{
 	width: 200px;
+	~margin-bottom: 0;
+}
+
+.news > .item > .ncontent > img.floatimg{
+	border: 3px #ddd solid;
+	~border-radius: 0;
+}
+
+.news .time{
+	font-size: 14px;
+	padding-bottom: 20px;
+}
+
+.news a.button{
+	margin-top: 20px;
 }
 
 .terms{
@@ -1618,12 +1636,18 @@ body.loaded .holyday{
 }
 
 .filters-inline{
-	background: #fff;
+	background: #efefee;
 	margin: 0 15px 20px;
 }
 
 .filters{
 	display: flex;
+}
+
+.filters > *{
+	flex-wrap: wrap;
+	flex-direction: row;
+
 }
 
 .filters > .title{
@@ -1633,6 +1657,11 @@ body.loaded .holyday{
 	padding: 10px;
 	display: inline-block;
 	~float: left;
+}
+
+.filters-inline,
+.filters > .title{
+	border-radius: 10px 0 0 10px;
 }
 
 .filters > .content{
@@ -1645,6 +1674,8 @@ body.loaded .holyday{
 	border-radius: 5px;
 	border: 2px lightgreen solid;
 	margin: 0 5px;
+	flex-wrap: wrap;
+	flex-direction: row;
 }
 
 .filters > .content > a.active{
@@ -1657,10 +1688,10 @@ body.loaded .holyday{
 	~content: ', ';
 }
 
-.filters-inline .filters > .content:after{
-	content: ' ';
-	display: table;
-	clear: both;
+
+.page-photo-block{
+	text-align: center;
+	margin: 15px 0 20px;
 }
 
 #pagenation{
@@ -1733,7 +1764,8 @@ body.loaded .holyday{
 }
 
 #shower img{
-	width: 100%;
+	~width: 100%;
+	width: auto;
 }
 
 
@@ -1850,6 +1882,12 @@ body.loaded .holyday{
 	text-align: center;
 	cursor: pointer;
 }
+
+/* @media screen and (-webkit-min-device-pixel-ratio:0) { */
+   /* #shower img{ */
+	   /* width: auto; */
+   /* } */
+/* } */
 /*SHOWER-*/
 
 
@@ -2120,6 +2158,18 @@ textarea, input[type="text"]{
 	margin-bottom: 15px;
 }
 
+.program .price{
+    color: black;
+    font-size: 35px;
+    font-weight: bold;
+    margin: 0 0 20px;
+    text-align: right;
+    display: inline-block;
+    padding: 3px 10px 6px;
+    border-radius: 10px;
+    background: #eee;
+}
+
 /*LOGIN*/
 #loginform{
 	width: 300px;
@@ -2306,6 +2356,10 @@ textarea, input[type="text"]{
 	#order-question .inp{
 		float: none;
 		padding: 0 5px;
+	}
+	
+	.terms{
+		display: inline-block;
 	}
 }
 

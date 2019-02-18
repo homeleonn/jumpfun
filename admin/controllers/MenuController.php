@@ -122,7 +122,7 @@ class MenuController extends Controller{
 	public function actionEdit(){
 		$menu = json_decode($_POST['menu']);
 		if(empty($menu)) return;
-		$menuId = (int)$_POST['menu_id']
+		$menuId = (int)$_POST['menu_id'];
 		//dd($menu, $_POST['menu']);
 		$queryFull = 'INSERT INTO menu (menu_id, object_id, name, origname, url, type, parent, `sort`) VALUES ';
 		$queryItems = ''; 

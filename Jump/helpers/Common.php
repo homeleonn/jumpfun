@@ -168,10 +168,10 @@ class Common{
 		$html = '';
 		foreach($taxonomies as $taxName => $terms){
 			$html .= '<div class="filters"><div class="title">' . $taxName . '</div><div class="content">';
-			$html .= " <a href='". SITE_URL . langUrl() . $archive . "'>Все</a>";
 			foreach($terms as $termName => $termLink){
 				$html .= " <a href='". SITE_URL . langUrl() . $archive . "{$termLink}/'>{$termName}</a>";
 			}
+			$html .= " <a href='". SITE_URL . langUrl() . $archive . "'>Все</a>";
 			$html .= '</div></div>';
 		}
 		return $html;

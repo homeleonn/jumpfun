@@ -681,6 +681,7 @@ function Shower(cl)
 		var $img = $imgWrap.children('img');
 		var $title = $imgWrap.children('#shower-title');
 		var self = this;
+		var isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
 		
 		this.index = 0;
 		
@@ -695,34 +696,36 @@ function Shower(cl)
 			var showImg = new Image();
 			showImg.onload = function(){
 				$img.attr({'src':src.href});
-				
+				console.log($img[0].naturalWidth, $img[0].naturalHeight);
 				if(!$wrapper.hasClass('block')){
 					$wrapper.addClass('block');
 					$wrapper.animate({'opacity': 1}, 500);
 				}
 				
-				var nw = $img[0].naturalWidth;
-				var nh = $img[0].naturalHeight;
+				var nw = showImg.naturalWidth;
+				var nh = showImg.naturalHeight;
 				
-				//$img.css({'width': nw, 'height': nh,'max-height': wh - 100});
-				$img.css({'width': 'auto', 'height': 'auto','max-height': wh - 100});
-				//$img.css({'max-height': wh - 100});
-				var h = $img.height();
-				if(h != nh){
-					var newWidth = nw * (h / nh);
-					if(newWidth > ww){
-						$img.css('height', nw * (newWidth / nw));
-					}
-					$img.css('width', newWidth);
-				}
-				
-				$imgWrap.css({
-					'margin-left': ((-$imgWrap.width()/2-20)+'px'), 
-					'margin-top': (($imgWrap.height() > wh ? 0 : 20)+'px'), 
-					'visibility':'visible'
+				$img.animate({'width': 'auto', 'height': 'auto','max-height': wh - 100}, 50, function(){
+					//$img.css({'max-height': wh - 100});
+					// console.log($img.width(), $img.height());
+					// var h = $img.height();
+					// if(h != nh){
+						// var newWidth = nw * (h / nh);
+						// if(newWidth > ww){
+							// $img.css('height', nw * (newWidth / nw));
+						// }
+						// console.log(newWidth, h, nh);
+						// $img.css('width', newWidth);
+					// }
+					
+					$imgWrap.css('visibility','visible');
+					$imgWrap.animate({
+						'margin-left': ((-$imgWrap.width()/2-20)+'px'), 
+						'margin-top': (($imgWrap.height() > wh ? 0 : 20)+'px')
+					}, 50);
+					
+					$img.animate({'opacity': 1}, 300);
 				});
-				
-				$img.animate({'opacity': 1}, 300);
 			}
 			showImg.src = src.href;
 			$title.text(src.title);
@@ -787,6 +790,10 @@ function Shower(cl)
 		});
 	}
 }
+
+function findActiveLink(parent, href = document.location.href){
+	return $(parent + ' a[href="'+href+'"]');
+}
 	
 $(function(){
 	$('.nav a[href="'+document.location.pathname+'"]').addClass('active');
@@ -803,8 +810,13 @@ $(function(){
 		$active.parent().addClass('active').closest('li.top-menu').addClass('active')
 	}
 	
-	if($('.filters').length) {
-		$('.filters a[href="'+document.location.href+'"]').addClass('active');
+	if ($('.filters').length) {
+		let $activeFilter = findActiveLink('.filters');
+		if ($activeFilter.length) {
+			$activeFilter.addClass('active');
+		} else {
+			findActiveLink('.filters', document.location.href.split(/page\/\d+\//)[0]).addClass('active');
+		}
 	}
 	
 	$('.heroes-catalog a[href="'+document.URL+'"]').addClass('active');

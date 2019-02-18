@@ -18,7 +18,10 @@
 			</a>
 		</div>
 		<?php if(isset($terms)) echo $terms;?>
-		<div class="tcontent"><?=$content?></div>
+		<div class="tcontent">
+			<div class="price">0 грн/час</div><br>
+			<?=$content?>
+		</div>
 	</div>
 	<noindex>
 	<div class="sep"></div>

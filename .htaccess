@@ -3,6 +3,11 @@ AddDefaultCharset utf-8
 php_flag display_errors on
 php_flag display_startup_errors on
 
+
+<Files ~ ".*\.(dat|txt)$">
+	deny from all
+</Files>
+
 <IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteBase /funkids/
@@ -11,9 +16,8 @@ RewriteBase /funkids/
 # ЗАПРЕЩЁННЫЕ ФАЙЛЫ
 RewriteRule .htaccess - [F]
 
-<Files ~ ".*\.(dat|txt)$">
-	 deny from all
-</Files>
+Redirect 301 /news/u-nas-poyavilsya-novuij-kostyum/ /blog/news/u-nas-poyavilsya-novuij-kostyum/
+Redirect 301 /news/zapusk-sajta/ /blog/news/zapusk-sajta/
 
 RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
 RewriteRule ^(.*)$ http://%1/$1 [R=301,L]
@@ -30,6 +34,7 @@ RewriteCond %{REQUEST_URI} !.*\.(ico|gif|jpg|jpeg|png|js|css)
 RewriteRule .* index.php [L]
 
 </IfModule>
+
 
 
 # сжатие text, html, javascript, css, xml:
