@@ -672,7 +672,7 @@ function Shower(cl)
 	});
 	
 	function Shower1(cl){
-		$('body').append('<div id="shower"><span></span><div id="img"><img src="" alt="Просмотр изображения"><div id="shower-tools"><div id="shower-prev"></div><div id="shower-next"></div></div><div id="counter">0 / 0</div><div id="shower-title"></div><div id="close">x</div></div></div>');
+		$('body').append('<div id="shower"><div id="shower-tools"><div id="shower-prev"></div><div id="shower-next"></div></div><span></span><div id="img"><img src="" alt="Просмотр изображения"><div id="counter">0 / 0</div><div id="shower-title"></div><div id="close">x</div></div></div>');
 		var cl = cl || '.shower';
 		
 		var $imgs = $('a' + cl);
@@ -773,7 +773,7 @@ function Shower(cl)
 			self.setCounter();
 		});
 		
-		$('#shower-next').click(function(){
+		$('#shower-next, #shower img').click(function(){
 			self.index++;
 			if(self.index >= $imgs.length){
 				self.index = 0;

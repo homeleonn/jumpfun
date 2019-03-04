@@ -7,6 +7,7 @@
 		</a>
 	</div>
 	<?php if(isset($terms)) echo $terms;?>
+	<?=applyFilter('single_before_content', $post)?>
 	<div  class="tcontent"><?=$content?></div>
 	<?php //include $this->get('comments');?>
 </div>

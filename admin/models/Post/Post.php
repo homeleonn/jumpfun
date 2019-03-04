@@ -679,7 +679,7 @@ class Post extends Model{
 	public function getAllPosts($postType, $columns = []){
 		$key = empty($columns) ? '*' : implode(',', $columns); 
 		if(!isset($this->allPosts[$postType][$key])){
-			$this->allPosts[$postType][$key] = $this->db->getAll('Select ' . $key . ' from posts where post_type = ?s order by id', $postType);
+			$this->allPosts[$postType][$key] = $this->db->getAll('Select ' . $key . ' from posts where post_type = ?s order by id DESC', $postType);
 		}
 		
 		return $this->allPosts[$postType][$key];

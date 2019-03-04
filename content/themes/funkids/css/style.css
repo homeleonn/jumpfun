@@ -311,6 +311,11 @@ iframe{
 	margin-bottom: 30px;
 }
 
+.mtable td,
+.mtable th{
+	padding: inherit;
+}
+
 
 
 h2{
@@ -1802,17 +1807,18 @@ body.loaded .holyday{
     color: white;
 	text-shadow: 0px 1px 15px black;
 	height: 100%;
+	width: 50px;
 	top: 0;
+	z-index: 2;
+	cursor:pointer;
 }
 
 #shower #shower-prev{
-	width: 25%;
 	left: 0;
 }
 
 #shower #shower-next{
-	width: 75%;
-	left: 25%;
+	right: 0;
 }
 
 #shower #shower-prev:after,
@@ -1822,7 +1828,7 @@ body.loaded .holyday{
     margin-top: -50px;
 	font-family: 'fontello';
 	content: '\e82c';
-	opacity: 0;
+	opacity: .3;
 }
 
 #shower #shower-prev:after{
@@ -1968,6 +1974,12 @@ a.shower:before{
 a.shower:hover:after,
 a.shower:hover:before{
 	opacity: 1;
+}
+
+.tcontent .shower img{
+	width: 100%;
+	height: 300px;
+	object-fit: cover;
 }
 
 .img.link:before{
@@ -2158,16 +2170,25 @@ textarea, input[type="text"]{
 	margin-bottom: 15px;
 }
 
-.program .price{
-    color: black;
+.price{
+    color: white;
     font-size: 35px;
     font-weight: bold;
     margin: 0 0 20px;
-    text-align: right;
+    ~text-align: right;
     display: inline-block;
     padding: 3px 10px 6px;
     border-radius: 10px;
     background: #eee;
+	background: #4CCEB2; /* Для браузеров, которые не поддерживают градиенты */
+	background: -webkit-radial-gradient(#4CCEB2, #2F8FD8); /* Для Opera 11.1 - 12.0 */
+	background: -o-radial-gradient(#4CCEB2, #2F8FD8); /* Для Opera 11.1 - 12.0 */
+	background: -moz-radial-gradient(#4CCEB2, #2F8FD8); /* Для Firefox 3.6 - 15 */
+	background: radial-gradient(#4CCEB2, #2F8FD8); /* Стандартный синтаксис */
+}
+
+.program .tcontent .price{
+	font-size: 20px;
 }
 
 /*LOGIN*/

@@ -19,7 +19,6 @@
 		</div>
 		<?php if(isset($terms)) echo $terms;?>
 		<div class="tcontent">
-			<div class="price">0 грн/час</div><br>
 			<?=$content?>
 		</div>
 	</div>

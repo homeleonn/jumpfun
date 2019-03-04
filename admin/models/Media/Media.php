@@ -6,7 +6,7 @@ use Jump\Model;
 
 class Media extends Model{
 	public function getAll(){
-		return $this->db->getAll('Select * from media');
+		return $this->db->getAll('Select * from media order by id DESC');
 	}
 	
 	public function insert($values){

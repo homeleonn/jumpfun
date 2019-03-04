@@ -36,6 +36,11 @@
 	border-radius: 5px;
 }
 
+.mtable td,
+.mtable th{
+	padding: 5px;
+}
+
 .right{
 	text-align: right;
 }

@@ -4,26 +4,44 @@ use Jump\DI\DI;
 use Jump\helpers\Common;
 
  
-function funkids_programPrice(){
-	global $post;
-	$price = isset($post['_jmp_program_price']) ? $post['_jmp_program_price'] : '';
+function funkids_programPrice($options = null){
+	global $post; //d($options, $post);
+	if (($options && $options['type'] == 'program' || $options['type'] == 'service') || (isset($post['post_type']) && $post['post_type'] == 'program' || $post['post_type'] == 'service')) {
+	
 	//dd($post);
 	?>
-	Стоимость: <input type="text" name="_jmp_program_price" value="<?=$price?>"> грн
+	<table class="mtable" cellpadding="2" border="0">
+		<tr>
+			<td>Стоимость:</td>
+			<td><input type="text" name="_jmp_program_price" value="<?=$post['_jmp_program_price'] ?? ''?>"></td>
+		</tr>
+		<tr>
+			<td>Время:</td>
+			<td><input type="text" name="_jmp_program_price_time" value="<?=$post['_jmp_program_price_time'] ?? ''?>"></td>
+		</tr>
+	</table>
 	<?php
+	}
 }
 
-// addAction('add_post_after', 'funkids_programPrice', true);
-// addAction('edit_post_after', 'funkids_programPrice', true);
-// addFilter('extra_fields_keys', 'funkids_extra_fields_keys');
+addAction('add_post_after', 'funkids_programPrice', true);
+addAction('edit_post_after', 'funkids_programPrice', true);
+addFilter('extra_fields_keys', 'funkids_extra_fields_keys');
 
 function funkids_extra_fields_keys($extraFieldKeys){
 	$extraFieldKeys = array_merge(
 		$extraFieldKeys, 
-		['_jmp_program_price']
+		['_jmp_program_price', '_jmp_program_price_time']
 	);
 	
 	return $extraFieldKeys;
+}
+
+addFilter('single_before_content', 'funkids_single_price');
+
+function funkids_single_price($post){
+	if (isset($post['_jmp_program_price']))
+		echo '<div class="price">', $post['_jmp_program_price'], (isset($post['_jmp_program_price_time']) ? '/' . $post['_jmp_program_price_time'] : ''), '</div>';
 }
 
 addPageType([
