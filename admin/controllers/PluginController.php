@@ -4,6 +4,7 @@ namespace admin\controllers;
 
 use Jump\Controller;
 use Jump\helpers\Common;
+use Jump\helpers\HelperDI;
 
 class PluginController extends Controller{
 	private $folder = ROOT . 'content/plugins/';
@@ -59,5 +60,20 @@ class PluginController extends Controller{
 		
 		Common::setOption('plugins_activated', serialize($this->activePlugins));
 		redirect('admin/plugins');
+	}
+	
+	public function actionSettings($pluginFolder)
+	{
+		ob_start();
+		doAction('plugin_settings');
+		//HelperDI::get('view')->rendered = true;
+		$content = ob_get_clean();
+		
+		return ['content' => $content];
+	}
+	
+	public function actionSettingsSave()
+	{
+		doAction('plugin_settings_save');
 	}
 }

@@ -17,6 +17,7 @@ return [
 	['get-captcha-for-comment', 'post|getCaptcha', 'GET'],
 	
 	['search', 'search', 'GET'],
+	['test', 'test', 'GET'],
 	
 	// ['('.URL_PATTERN.')-c(\d+)(/(' . FILTER_PATTERN . '))?', 'category|single|$1|$2|$4'],
 	// ['('.URL_PATTERN.')-p(\d+)', 'product|single|$1|$2'],

@@ -23,6 +23,8 @@ return [
 	['menu/activate', 'menu/activate', 'POST'],
 	
 	['plugins', 'plugin', 'GET'],
+	['plugins/settings/(.*)(/(.*))?', 'plugin/settings/$1', 'GET'],
+	['plugins/settings', 'plugin/settingsSave', 'POST'],
 	['plugins/toggle/(.*)/(.*)', 'plugin/toggle/$1/$2', 'GET'],
 	
 	

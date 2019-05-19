@@ -111,7 +111,7 @@ class ReviewController extends Controller{
 			$headers  = "MIME-Version: 1.0\r\n";
 			$headers .= "Content-type: text/html; charset=utf-8\r\n";
 			$headers .= "From:info@funkids.od.ua\r\n";
-			//mail($to, $mail_title, $mess, $headers);
+			mail($to, $mail_title, $mess, $headers);
 			
 			exit('Спасибо за Ваше сообщение. <br>С наилучшими пожеланиями. © команда FunKids');
 		}

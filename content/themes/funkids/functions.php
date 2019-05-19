@@ -3,10 +3,45 @@
 use Jump\DI\DI;
 use Jump\helpers\Common;
 
+function funkids_inProgram(){
+	?>
+	<div class="inline-title">В программу включено</div>
+	<div class="row center prog-filling flex line">
+		<div><img src="<?=THEME?>img/costumes.jpg" alt="Костюмы аниматоров"><div class="inline-title">Красочные костюмы</div></div>
+		<div><img src="<?=THEME?>img/interactive.jpg" alt="Детская интерактивная программа Одесса"><div class="inline-title">Интерактивная программа</div></div>
+		<div><img src="<?=THEME?>img/props.jpg" alt="Реквизит на шоу программу, праздник"><div class="inline-title">Реквизит</div></div>
+		<div><img src="<?=THEME?>img/musical-equipment.jpg" alt="Музыка, музыкальный реквизит для детских аниматоров в Одессе"><div class="inline-title">Музыкальная аппаратура и сопровождение</div></div>
+		<div><img src="<?=THEME?>img/dj.jpg" alt="Диджей, DJ, Ди-джей, музыка на день рождения ребенка"><div class="inline-title">Диджей</div></div>
+	</div>
+	<?php
+}
+
+function funkids_readyToHolyday(){
+	?>
+	<div class="holyday" id="holyday">
+		<h2 class="section-title">Готовимся к празднику уже сейчас</h2>
+		<div id="order-question">
+			Напишите нам и наш менеджер ответит на все Ваши вопросы
+			<div class="inp1">
+				<input type="text" id="qname" name="name" placeholder="Имя*">
+				<input type="text" id="qtel" name="tel" placeholder="Телефон*">
+				<input type="text" id="qmail" name="email" placeholder="Электронная почта">
+			</div>
+			<div class="captcha-wrapper none center">
+				<img alt="captcha" class="captcha pointer captcha-reload">
+				<span class="icon-arrows-cw captcha-reload" title="Обновить капчу"></span><br>Введите символы с картинки 
+				<input type="text" class="captcha-code">
+			</div>
+			<input type="button" class="button1" id="q-set" value="Отправить">
+		</div>
+	</div>
+	<?php
+}
+
  
 function funkids_programPrice($options = null){
 	global $post; //d($options, $post);
-	if (($options && $options['type'] == 'program' || $options['type'] == 'service') || (isset($post['post_type']) && $post['post_type'] == 'program' || $post['post_type'] == 'service')) {
+	if (($options && $options['type'] == 'program' || $options['type'] == 'service') || (isset($post['post_type']) && ($post['post_type'] == 'program' || $post['post_type'] == 'service'))) {
 	
 	//dd($post);
 	?>
@@ -72,10 +107,10 @@ addPageType([
 addPageType([
 		'type' => 'service',
 		'title' => 'Доп. услуги',
-		'_seo_title' => 'Дополнительные услуги к детскому празднику в Одессе',
-		'h1' => 'Дополнительные услуги для праздника',
+		'_seo_title' => 'Дополнительные услуги | Funkids',
+		'h1' => 'Дополнительные услуги',
 		'title_for_admin' => 'Доп. услуги',
-		'description' => 'Дополнительные услуги для организации детских праздников в Одессе, мыльные пузыри, сладкая вата, всё что бы разнообразить праздничный день, запоминающиеся мгновения жизни ребенка | FunKids',
+		'description' => 'Дополнительные услуги на детский праздник, мыльные пузыри, сладкая вата, всё что бы разнообразить праздничный день, запоминающиеся мгновения жизни ребенка | FunKids',
 		'add' => 'Добавить услугу',
 		'edit' => 'Редактировать услугу',
 		'delete' => 'Удалить услугу',
@@ -141,10 +176,10 @@ addPageType([
 addPageType([
 		'type' => 'program',
 		'title' => 'Программы',
-		'_seo_title' => 'Детские аниматоры, шоу программы Одесса | Заказать праздник для ребенка недорого',
+		'_seo_title' => 'Детские аниматоры на день рождения Одесса, утренник, выпускной. Пригласить аниматора для ребенка',
 		'h1' => 'Аниматоры, шоу программы на детский праздник в Одессе',
 		'title_for_admin' => 'Программы',
-		'description' => 'Заказать детского аниматора на день рождения ребенка на дом Одесса, широкий выбор аниматоров и шоу программы, а так же красочные детские ведущие, которые порадуют детей интересными конкурсами и подарят массу ярких впечатлений. Все останутся довольны. Заказать аниматора для ребенка на праздник. Цена',
+		'description' => 'Заказать детского аниматора на день рождения ребенка на дом либо на утренник или выпускной в Одессе, широкий выбор аниматоров и шоу программы, а так же красочные детские ведущие, которые порадуют детей интересными конкурсами и подарят массу ярких впечатлений. Все останутся довольны. Заказать аниматора для ребенка на праздник. Цена',
 		'add' => 'Добавить программу',
 		'edit' => 'Редактировать программу',
 		'delete' => 'Удалить программу',

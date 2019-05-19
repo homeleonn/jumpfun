@@ -25,14 +25,7 @@
 	<noindex>
 	<div class="sep"></div>
 	<div class="container">
-		<div class="inline-title">В программу входят</div>
-		<div class="row center prog-filling flex line">
-			<div><img src="<?=THEME?>img/costumes.jpg" alt="Костюмы аниматоров"><div class="inline-title">Костюмы</div></div>
-			<div><img src="<?=THEME?>img/interactive.jpg" alt="Детская интерактивная программа Одесса"><div class="inline-title">Интерактивная программа</div></div>
-			<div><img src="<?=THEME?>img/props.jpg" alt="Реквизит на шоу программу, праздник"><div class="inline-title">Реквизит</div></div>
-			<div><img src="<?=THEME?>img/musical-equipment.jpg" alt="Музыка, музыкальный реквизит для детских аниматоров в Одессе"><div class="inline-title">Музыкальная аппаратура</div></div>
-			<div><img src="<?=THEME?>img/dj.jpg" alt="Диджей, DJ, Ди-джей, музыка на день рождения ребенка"><div class="inline-title">Диджей</div></div>
-		</div>
+		<?=funkids_inProgram()?>
 		<div class="sep"></div>
 		<div class="inline-title small center">Не забывайте о наших <a class="under" href="<?=uri('services')?>">дополнительных услугах</a>, что бы сделать праздник еще ярче! <br><a href="<?=uri('services')?>" class="button">Перейти к доп. услугам</a></div>
 		

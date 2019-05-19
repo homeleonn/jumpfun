@@ -14,9 +14,9 @@ addAction('add_post_after', 'seo');
 addAction('edit_post_after', 'seo');
 function seo(){
 	global $post;
-	$title = isset($post['_seo_title']) ? $post['_seo_title'] : '';
-	$descr = isset($post['_seo_description']) ? $post['_seo_description'] : '';
-	$keys = isset($post['_seo_keywords']) ? $post['_seo_keywords'] : '';
+	$title = $post['_seo_title'] ?? '';
+	$descr = $post['_seo_description'] ?? '';
+	$keys  = $post['_seo_keywords'] ?? '';
 	include 'view.php';
 }
 

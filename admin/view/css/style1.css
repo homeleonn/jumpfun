@@ -499,7 +499,8 @@ table.admin td{
 }
 
 .comment-content-cell,
-.option-cell
+.option-cell,
+.option-cell > td
 {
 	position: relative;
 }
