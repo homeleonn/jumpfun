@@ -185,6 +185,41 @@ img{
 	display: block !important;
 }
 
+.table-wrapper{
+	display: block;
+	text-align: center;
+	overflow-x: auto;
+	margin: 10px auto 40px;
+}
+
+.pricetable{
+	border: 0px lightblue solid;
+	text-align: center;
+	min-width: 55%;
+	max-width: 100%;
+	margin: 0 auto;
+}
+
+.pricetable td, th{
+	padding: 10px;
+	border: 1px lightblue solid;
+}
+
+.pricetable th{
+	background: #b696ff;
+	color: #f0f0f0;
+}
+
+.row{
+	max-width: 100%;
+}
+
+.pricepage img{
+	border-radius: 50%;
+}
+
+
+
 .img img, 
 .imgfull img,
 .imgfull,
@@ -1325,12 +1360,15 @@ footer .social-bottom a{
 }
 
 .s-about,
-.all-progs{
+.all-progs,
+.wave1{
 	position: relative;
 }
 
 .all-progs:after,
-.s-about:after{
+.s-about:after,
+.wave1:before,
+.wave1:after{
 	content: '';
 	position: absolute;
 	height: 98px;
@@ -1340,8 +1378,20 @@ footer .social-bottom a{
 }
 
 body.loaded .all-progs:after,
-body.loaded .s-about:after{
+body.loaded .s-about:after,
+.wave1:before,
+.wave1:after{
 	background: url('../img/bottom-wave.svg') center bottom no-repeat;
+}
+
+.wave1:before{
+	bottom: auto;
+	top: 0;
+}
+
+.wave1:after{
+	bottom: 0px;
+	transform: rotate(180deg);
 }
 
 

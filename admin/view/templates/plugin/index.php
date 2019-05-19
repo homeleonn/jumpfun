@@ -13,6 +13,7 @@ if(isset($data['empty'])): echo $data['empty']; else:
 			<?=$plugin['Plugin Name']?>
 			<div class="options">
 				[<span style="color: coral;" class="pointer edit"><a href="toggle/<?=$plugin['path']?>/"><?=$plugin['active']?'Деа':'А'?>ктивировать</a></span>] 
+				<?php if (file_exists(dirname($plugin['src']) . '/settings.php')) echo '[<a href="settings/', $plugin['path'], '">Настройки</a>] ';?>
 				[<span style="color: red;" class="pointer remove">Удалить</span>]
 			</div>
 		</td>

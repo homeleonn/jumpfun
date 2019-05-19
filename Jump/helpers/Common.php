@@ -215,9 +215,11 @@ class Common{
 		return $unsrlz ? unserialize($option) : $option;
 	}
 	
-	public static function setOption($key, $value){
+	public static function setOption($key, $value, $ser = false){
 		$optionsFileName = JUMP . '/config/options.php';
 		$options = file_get_contents($optionsFileName);
+		
+		if ($ser) $value = serialize($value);
 		
 		$optionPattern = '~(\''.$key.'\'\s*=>\s*)\'(.*)\'~';
 		$optionReplace = '$1\''.$value.'\'';

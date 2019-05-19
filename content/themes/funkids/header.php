@@ -49,52 +49,8 @@
 							<div class="phone-top"><span class="icon-phone"></span><span>Заказать обратный звонок</span></div>
 						</div>
 					</div>
-					<?php getMenu() ?>
-					<?php if(isMain()):?>
-					<!--SLIDER(+-)-->
-					<script>
-						$$(function(){
-							let sliderImgs = ['51.jpg', '52.jpg', '53.jpg'];
-							setTimeout(function(){
-								$('.slider > .ss > .item:not(.active)').each(function(i){
-									$(this).prepend('<img src="<?=THEME?>img/1x1.gif" data-src="<?=THEME?>img/mini-gallery/'+sliderImgs[i]+'" />');
-								});
-							}, 500);
-						});
-					</script>
-					<div class="slider-wrapper">
-						<div class="slider">
-							<div class="ss">
-								<div class="item active">
-									<div class="yout"><div class="yplay">&#9658;</div><img data-youtube="ZfZfm1twto8" src="<?=THEME?>img/mini-gallery/50.jpg" alt="Аниматор трансформер Оптимус Прайм на детский праздник Одесса"></div>
-								</div>
-								<div class="item">
-									<div class="slider-title">
-										<div>Праздник дня рождения</div>
-										<div>Веселые ребята и их родители с нашими аниматорами</div>
-									</div>
-								</div>
-								<div class="item">
-									<div class="slider-title">
-										<div>Детский праздник в Одессе</div>
-										<div>Аниматоры человек-паук и Оптимус Прайм, дети остаются довольными</div>
-									</div>
-								</div>
-								<div class="item">
-									<div class="slider-title">
-										<div>Бэтмен на защите праздника</div>
-										<div>Детская шоу программа Бэтмена - яркие впечатления детей</div>
-									</div>
-								</div>
-							</div>
-							<div class="controls">
-								<div class="arr-left"></div>
-								<div class="arr-right"></div>
-							</div>
-							<div class="progressbar"></div>
-						</div>
-					</div>
-					<?php endif;?>
+					<?php getMenu(); ?>
+					<?php if(isMain()) doAction('header_after_menu', 'glavnii');?>
 				</div>
 			</div>
 		</div>

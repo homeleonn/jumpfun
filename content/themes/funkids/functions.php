@@ -3,10 +3,45 @@
 use Jump\DI\DI;
 use Jump\helpers\Common;
 
+function funkids_inProgram(){
+	?>
+	<div class="inline-title">В программу включено</div>
+	<div class="row center prog-filling flex line">
+		<div><img src="<?=THEME?>img/costumes.jpg" alt="Костюмы аниматоров"><div class="inline-title">Красочные костюмы</div></div>
+		<div><img src="<?=THEME?>img/interactive.jpg" alt="Детская интерактивная программа Одесса"><div class="inline-title">Интерактивная программа</div></div>
+		<div><img src="<?=THEME?>img/props.jpg" alt="Реквизит на шоу программу, праздник"><div class="inline-title">Реквизит</div></div>
+		<div><img src="<?=THEME?>img/musical-equipment.jpg" alt="Музыка, музыкальный реквизит для детских аниматоров в Одессе"><div class="inline-title">Музыкальная аппаратура и сопровождение</div></div>
+		<div><img src="<?=THEME?>img/dj.jpg" alt="Диджей, DJ, Ди-джей, музыка на день рождения ребенка"><div class="inline-title">Диджей</div></div>
+	</div>
+	<?php
+}
+
+function funkids_readyToHolyday(){
+	?>
+	<div class="holyday" id="holyday">
+		<h2 class="section-title">Готовимся к празднику уже сейчас</h2>
+		<div id="order-question">
+			Напишите нам и наш менеджер ответит на все Ваши вопросы
+			<div class="inp1">
+				<input type="text" id="qname" name="name" placeholder="Имя*">
+				<input type="text" id="qtel" name="tel" placeholder="Телефон*">
+				<input type="text" id="qmail" name="email" placeholder="Электронная почта">
+			</div>
+			<div class="captcha-wrapper none center">
+				<img alt="captcha" class="captcha pointer captcha-reload">
+				<span class="icon-arrows-cw captcha-reload" title="Обновить капчу"></span><br>Введите символы с картинки 
+				<input type="text" class="captcha-code">
+			</div>
+			<input type="button" class="button1" id="q-set" value="Отправить">
+		</div>
+	</div>
+	<?php
+}
+
  
 function funkids_programPrice($options = null){
 	global $post; //d($options, $post);
-	if (($options && $options['type'] == 'program' || $options['type'] == 'service') || (isset($post['post_type']) && $post['post_type'] == 'program' || $post['post_type'] == 'service')) {
+	if (($options && $options['type'] == 'program' || $options['type'] == 'service') || (isset($post['post_type']) && ($post['post_type'] == 'program' || $post['post_type'] == 'service'))) {
 	
 	//dd($post);
 	?>

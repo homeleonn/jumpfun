@@ -337,7 +337,7 @@ $(function(){
 	
 	if(isFrontPage()){
 		slider = new Slider('slider');
-		slider.run();
+		//slider.run();
 		animateId = animate();
 		toggleForScroll('body', 'offanimate', 900, 
 			function(){

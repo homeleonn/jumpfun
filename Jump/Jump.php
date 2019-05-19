@@ -28,5 +28,6 @@ class Jump
 			(new Responce())->view('404', Responce::HTTP_NOT_FOUND);
 		}
 		requestStats();
+		echo '<!--', scriptTime(), '-->';
 	}
 }

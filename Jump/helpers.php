@@ -120,10 +120,15 @@ function dd(){
 }
 
 function requestStats(){
-	global $di, $start;
+	global $di;
 	echo '<div style="display: table;clear:both;float:none;"></div><hr>';
 	$dbStats = $di->get('db')->getStats();
-	vd(!is_null($dbStats) ? $dbStats: 'Подключения и запросы к БД не производились', 'Время обработки скрипта: ' . substr((microtime(true) - $start), 0, 6));
+	d((!is_null($dbStats) ? $dbStats: 'Подключения и запросы к БД не производились'), 'Время обработки скрипта: ' .scriptTime());
+}
+
+function scriptTime(){
+	global $start;
+	return substr((microtime(true) - $start), 0, 6);
 }
 
 function session(){
@@ -195,6 +200,9 @@ function getTermsByTaxonomies(){
 function jmpHead(){
 	global $post;
 	$post = applyFilter('jhead', $post);
+	if (!isset($post['title'])) {
+		$post['title'] = 'no title';
+	}
 echo <<<EOT
 <title>{$post['title']}</title>\n\t
 EOT;
@@ -597,12 +605,12 @@ function __($key){
 	return isset($langText[$key]) ? $langText[$key] : 'undefined';
 }
 
-function getOption($key){
-	return Common::getOption($key);
+function getOption($key, $unser = false){
+	return Common::getOption($key, $unser);
 }
 
-function setOption($key, $value){
-	Common::setOption($key, $value);
+function setOption($key, $value, $ser = false){
+	Common::setOption($key, $value, $ser);
 }
 
 function langUrl($url = false){
