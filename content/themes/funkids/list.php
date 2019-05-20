@@ -64,7 +64,7 @@
 			while($item = $this->theChild()):
 		?>
 		
-		<div class="col-md-6 list-item center">
+		<div class="col-md-4 list-item center">
 			<div>
 				<a href="<?=$item['url']?>">
 					<div class="img1"><img src="<?=postImgSrc($item, 'medium')?>" alt="<?=$item['short_title']?:$item['title']?> - дополнительная услуга к детскому празднику на день рождения"></div>

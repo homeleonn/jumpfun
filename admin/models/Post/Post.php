@@ -204,18 +204,20 @@ class Post extends Model{
 	
 	private function hierarchyListHtml($item, $level, $urlHierarchy){
 		$isPost = !isset($item['taxonomy']);
+		$buildLinkFlag = false;
 		if($isPost && !$this->options['hierarchical']){
 			if(!empty($terms = Common::itemsOnKeys(getTermsByTaxonomies(), ['id', 'parent']))){
 				list($termsOnId, $termsOnParent) = $terms;
 				$termsByPostId = getTermsByPostId($item['id']);
 				$permalink 	 = SITE_URL . trim(Options::slug(), '/') . '/' . $item['url'] . '/';
 				$item['url'] = applyFilter('postTypeLink', $permalink, $termsOnId, $termsOnParent, $termsByPostId);
+				$buildLinkFlag = true;
 			}
 		}
 		
 		if($isPost){
-			$url = $item['url'];
-			// $url = ROOT_URI . ($this->options['hierarchical'] ? ROOT_URI . $urlHierarchy . Options::getArchiveSlug() . $item['url'] . '/' : Options::getArchiveSlug() . $item['url'] . '/');
+			//$url = $item['url'];
+			$url = ($this->options['hierarchical'] ? ROOT_URI . $urlHierarchy . Options::getArchiveSlug() . $item['url'] . '/' : ($buildLinkFlag ? $item['url'] : ROOT_URI . Options::getArchiveSlug() . $item['url'] . '/'));
 		}else{
 			$url = ROOT_URI . Options::getArchiveSlug() . $item['taxonomy'] . '/' . $urlHierarchy . $item['slug'] . '/' ;
 		}

@@ -1,2 +1,21 @@
 Redirect 301 /news/u-nas-poyavilsya-novuij-kostyum/ /blog/news/u-nas-poyavilsya-novuij-kostyum/
 Redirect 301 /news/zapusk-sajta/ /blog/news/zapusk-sajta/
+
+
+
+Redirect 301 /programs/detskaya-shou-programma-cheruinj-chelovek-pauk-krasochnuij-animator-v-odesse/ /programs/chernij-chelovek-pauk/
+
+
+Redirect 301 /programs/fiksiki-animatorui-na-detskij-prazdnik/ /programs/fiksiki/
+Redirect 301 /programs/detskaya-shou-programma-chelovek-pauk-krasochnuij-animator-v-odesse/ /programs/flesh/
+Redirect 301 /programs/animatorui-transformerui-bamblbi/ /programs/bamblbi/
+Redirect 301 /programs/animatorui-xolodnoe-serdcze-na-vash-prazdnik/ /programs/holodnoe-serdcze/
+Redirect 301 /programs/geroi-v-maskax-detskaya-shou-programma/ /programs/geroi-v-maskax/
+Redirect 301 /programs/kuklui-lol-animator-na-detskij-prazdnik/ /programs/kuklui-lol/
+Redirect 301 /programs/shou-programma-kapitan-amerika-krasochnuij-animator-v-odesse/ /programs/kapitan-amerika/
+Redirect 301 /programs// /programs//
+
+
+
+
+http://funkids.od.ua/programs/detskaya-shou-programma-cheruinj-chelovek-pauk-krasochnuij-animator-v-odesse/

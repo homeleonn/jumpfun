@@ -584,6 +584,9 @@ body.loaded .header-img > .back-img{
 
 .header-img .logo-text{
 	float: none;
+	z-index: 1;
+	position: relative;
+	text-align: center;
 }
 
 .h1-main{
