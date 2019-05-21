@@ -119,7 +119,6 @@ function mySliderView($slider){
 				
 				$('.slider > .ss').append('<div class="item'+(active1)+'"><img src="'+img1+img+'" /><div class="slider-title"><div>'+title+'</div><div>'+text+'</div></div></div>');
 				$('.slider-wrapper').removeClass('none');
-				console.log(1);
 			}
 		});
 	</script>

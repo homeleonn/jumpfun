@@ -98,8 +98,7 @@ object-fit: cover;" class="floatimg">
 						<a href="<?=$item['url']?>">
 							<span class="inline-title"><?=$item['short_title']?:$item['title']?></span>
 						</a>
-					</div>	
-					<div class="time"><b>Дата:</b> <?=funkidsDate($item['created'])?></div>
+					</div>
 					<span><?=funkids_clearTags(mb_substr($item['content'], 0 ,500)).'...'?></span>
 					<div class="right"><a href="<?=$item['url']?>" class="button">Читать</a></div>
 				</div>

@@ -19,6 +19,7 @@
 		</div>
 		<?php if(isset($terms)) echo $terms;?>
 		<div class="tcontent">
+			<?=applyFilter('single_before_content', $post)?>
 			<?=$content?>
 		</div>
 	</div>

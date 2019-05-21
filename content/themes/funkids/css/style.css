@@ -5,7 +5,7 @@ html, body{
 	color: #a71111;
 	~letter-spacing: 3px;
 	font-weight: 400;
-	~background-image: url(../img/holiday-christmas-bg.png);
+	~background-image: url(../img/435318770.gif);
 	
 }
 
@@ -343,7 +343,7 @@ iframe{
 }
 
 .mb30{
-	margin-bottom: 30px;
+	margin-bottom: 30px !important;
 }
 
 .mtable td,
@@ -1364,14 +1364,16 @@ footer .social-bottom a{
 
 .s-about,
 .all-progs,
-.wave1{
+.wave1,
+.holyday{
 	position: relative;
 }
 
 .all-progs:after,
 .s-about:after,
 .wave1:before,
-.wave1:after{
+.wave1:after,
+.holyday:before{
 	content: '';
 	position: absolute;
 	height: 98px;
@@ -1382,6 +1384,7 @@ footer .social-bottom a{
 
 body.loaded .all-progs:after,
 body.loaded .s-about:after,
+body.loaded .holyday:before,
 .wave1:before,
 .wave1:after{
 	background: url('../img/bottom-wave.svg') center bottom no-repeat;
@@ -1392,7 +1395,8 @@ body.loaded .s-about:after,
 	top: 0;
 }
 
-.wave1:after{
+.wave1:after,
+body.loaded .holyday:before{
 	bottom: 0px;
 	transform: rotate(180deg);
 }

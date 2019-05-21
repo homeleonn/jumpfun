@@ -41,18 +41,22 @@ function funkids_readyToHolyday(){
  
 function funkids_programPrice($options = null){
 	global $post; //d($options, $post);
-	if (($options && $options['type'] == 'program' || $options['type'] == 'service') || (isset($post['post_type']) && ($post['post_type'] == 'program' || $post['post_type'] == 'service'))) {
+	$types = ['program', 'service'];
+	if (($options && in_array($options['type'], $types)) || (isset($post['post_type']) && in_array($post['post_type'], $types))) {
 	
 	//dd($post);
 	?>
-	<table class="mtable" cellpadding="2" border="0">
+	<table class="mtable" cellpadding="2" border="0" width="100%">
 		<tr>
 			<td>Стоимость:</td>
-			<td><input type="text" name="_jmp_program_price" value="<?=$post['_jmp_program_price'] ?? ''?>"></td>
+			<td>
+				<textarea name="_jmp_program_price" id="_jmp_program_price" rows="3" style="width:100%"><?=$post['_jmp_program_price'] ?? ''?></textarea>
+				<!--<input type="text" name="_jmp_program_price" value="<?=$post['_jmp_program_price'] ?? ''?>">-->
+			</td>
 		</tr>
 		<tr>
 			<td>Время:</td>
-			<td><input type="text" name="_jmp_program_price_time" value="<?=$post['_jmp_program_price_time'] ?? ''?>"></td>
+			<td><input type="text" name="_jmp_program_price_time" class="w100" value="<?=$post['_jmp_program_price_time'] ?? ''?>"></td>
 		</tr>
 	</table>
 	<?php
@@ -76,7 +80,7 @@ addFilter('single_before_content', 'funkids_single_price');
 
 function funkids_single_price($post){
 	if (isset($post['_jmp_program_price']))
-		echo '<div class="price">', $post['_jmp_program_price'], (isset($post['_jmp_program_price_time']) ? '/' . $post['_jmp_program_price_time'] : ''), '</div>';
+		echo '<div class="price">', htmlspecialchars_decode($post['_jmp_program_price']), (isset($post['_jmp_program_price_time']) ? '/' . $post['_jmp_program_price_time'] : ''), '</div>';
 }
 
 addPageType([
@@ -335,7 +339,7 @@ function funKids_services(){
 	<div class="extra-services front-page" id="extra-services">
 		<h2 class="section-title"><div>Дополнительные</div> <div>услуги</div></h2>
 		<div class="container">
-			<h3 class="center">Вы можете заказать дополнительные атрибуты к празднику, которые оставят незабываемые впечатления!</h3>
+			<h3 class="center">Хотите чего-то необычного?<br> Закажите дополнительные атрибуты к детскому празднику, которые оставят незабываемые впечатления!</h3>
 			<div class="flex">
 			<?php foreach($services['__list'] as $item): ?>
 				<div class="item">
@@ -348,7 +352,7 @@ function funKids_services(){
 				</div>
 			<?php endforeach; ?>
 			</div>
-			<div class="center"><a href="<?=uri('services')?>" class="button">Все доп. услуги</a></div>
+			<?php  /*<!--<div class="center"><a href="<?=uri('services')?>" class="button">Все доп. услуги</a></div>-->*/?>
 		</div>
 	</div>
 	<?php
@@ -392,10 +396,57 @@ function funKids_like($id){
 				</div>
 			</div>
 		</div>
-		<div class="center"><a href="<?=uri('programs')?>" class="button">Все программы</a></div>
+		<div class="center"><a href="<?=ROOT_URI?>#all-progs" class="button">Все программы</a></div>
 	</div>
 	<?php
 	echo Common::setCache($funKidsCacheFileNames['like'].$id);
+}
+
+
+
+function funkids_ilike($id, $type, $title){
+	global $funKidsCacheFileNames, $thatCache;
+	$funKidsCacheFileNames[$type] = 'funkids/' . $type;
+	$thatCache = true;
+	if(Common::getCache($funKidsCacheFileNames[$type].$id, 86400)) return;
+	$popular = (new PostController($type))->actionList(NULL, NULL, 1, 5, [['id'], ['DESC', 'ASC'][mt_rand(0, 1)]]);
+	shuffle($popular['__list']);
+	//dd($popular['__list']);
+	?>
+	<noindex>
+	<div class="sep"></div>
+	<div>
+		<div class="carousel-widget container" data-carousel-widget-column="3">
+			<div class="widget-head">
+				<div class="title">Вам так же подойдут</div>
+				<div class="controls">
+					<div class="rightside"></div>
+					<div class="leftside"></div>
+				</div>
+			</div>		
+			<div class="widget-content">
+				<div class="inside-content center">
+				<?php 
+					foreach($popular['__list'] as $item): 
+					if($item['id'] == $id) continue; 
+				?>
+					<article class="item">
+						<div class="img2">
+							<img src="<?=postImgSrc($item, 'medium')?>" data-src="<?=postImgSrc($item)?>" class="lazy" alt="<?=$item['short_title'] ?: $item['title']?>" />
+						</div>
+						<h1 class="inline-title"><?=$item['title']?></h1>
+						<?=funkids_clearTags(mb_substr($item['content'], 0 ,200)).'...'?>
+						<div><a href="<?=$item['permalink']?>" class="button">Перейти</a></div>
+					</article>
+				<?php endforeach; ?>
+				</div>
+			</div>
+		</div>
+		<div class="center"><a href="<?=uri('services')?>" class="button">Все <?=$title?></a></div>
+	</div>
+	</noindex>
+	<?php
+	echo Common::setCache($funKidsCacheFileNames[$type] . $id);
 }
 
 
@@ -453,10 +504,13 @@ function funkids_getLastReviews(){
 	if(Common::getCache($funKidsCacheFileNames['reviews'], -1)) return;
 	$reviews = DI::getD('db')->getAll('Select * from reviews where status = 1 order by id DESC limit 10');
 	?>
+	
+	<h3 class="inline-title center mb30">Последние отзывы наших клиентов</h3>
+	
 	<div class="reviews topoffset" id="reviews">
 		<div class="carousel-widget container" data-carousel-widget-column="2">
 			<div class="widget-head">
-				<div class="title"><h2>Последние отзывы наших клиентов</h2></div>
+				<div class="title"></div>
 				<div class="controls">
 					<div class="rightside"></div>
 					<div class="leftside"></div>

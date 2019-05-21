@@ -10,4 +10,5 @@
 	<?=applyFilter('single_before_content', $post)?>
 	<div  class="tcontent"><?=$content?></div>
 	<?php //include $this->get('comments');?>
+	<?php if($post_type == 'service') funkids_ilike($id, $post_type, getPageOptionsByType($post_type)['title']);?>
 </div>
