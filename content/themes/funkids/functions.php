@@ -5,7 +5,7 @@ use Jump\helpers\Common;
 
 function funkids_inProgram(){
 	?>
-	<div class="inline-title">В программу включено</div>
+	<div class="inline-title in-program">В программу включено</div>
 	<div class="row center prog-filling flex line">
 		<div><img src="<?=THEME?>img/costumes.jpg" alt="Костюмы аниматоров"><div class="inline-title">Красочные костюмы</div></div>
 		<div><img src="<?=THEME?>img/interactive.jpg" alt="Детская интерактивная программа Одесса"><div class="inline-title">Интерактивная программа</div></div>
@@ -80,7 +80,7 @@ addFilter('single_before_content', 'funkids_single_price');
 
 function funkids_single_price($post){
 	if (isset($post['_jmp_program_price']))
-		echo '<div class="price">', htmlspecialchars_decode($post['_jmp_program_price']), (isset($post['_jmp_program_price_time']) ? '/' . $post['_jmp_program_price_time'] : ''), '</div>';
+		echo '<div class="price">', htmlspecialchars_decode($post['_jmp_program_price']), (isset($post['_jmp_program_price_time']) ? '/' . $post['_jmp_program_price_time'] : ''), '</div><br>';
 }
 
 addPageType([
@@ -518,7 +518,7 @@ function funkids_getLastReviews(){
 			</div>
 			<div class="widget-content">
 				<div class="inside-content">
-				<?php foreach($reviews as $review): ?>
+				<?php foreach($reviews as $review):?>
 					<div class="item">
 						<div class="floatimg sprite reviewimg"></div>
 						<p class="quote-big">

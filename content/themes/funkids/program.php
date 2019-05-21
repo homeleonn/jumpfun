@@ -10,7 +10,7 @@
 		</div>
 	</div>
 	</noindex>
-	<div class="col-md-9 shower">
+	<div class="col-md-9 shower prog-content">
 		<?=isset($h1)?'<h1>'.$h1.'</h1>':''?>
 		<div class="floatimg main-img">
 			<a href="<?=postImgSrc($post)?>" title="<?=$short_title?>" class="shower">
@@ -24,7 +24,6 @@
 		</div>
 	</div>
 	<noindex>
-	<div class="sep"></div>
 	<div class="container">
 		<?=funkids_inProgram()?>
 		<div class="sep"></div>

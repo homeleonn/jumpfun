@@ -2244,9 +2244,12 @@ textarea, input[type="text"]{
 	background: radial-gradient(#4CCEB2, #2F8FD8); /* Стандартный синтаксис */
 }
 
-.program .tcontent .price{
+.price{
 	font-size: 20px;
+	max-width: 50%;
 }
+
+
 
 /*LOGIN*/
 #loginform{
@@ -2566,6 +2569,12 @@ border-width: 1em 20px 0 0;
 	.main .header > .top-line{
 		padding-top: 0px;
 	}
+	
+	.price{
+		font-size: 20px;
+		max-width: 100%;
+	}
+
 }
 
 @media (min-width: 1200px) and (max-width: 1600px){
@@ -3086,4 +3095,96 @@ footer.index .top > div:nth-child(1){
 
 
 
+.heroes-catalog .list .item a{
+	border: 0px #3b76a8 solid;
+	background: #3b76a8;
+	display: block;
+	text-align: left;
+	margin-left: 10px;
+	margin-top: 10px;
+	height: 40px;
+	line-height: 33px;
+	top: 2px;
+	position: relative;
+	padding-left: 20px;
+	padding-right: 3px;
+	width: 90%;
+}
 
+.heroes-catalog .list .item a:before,
+.heroes-catalog .list .item a:after{
+	content: '';
+	display: inline-block;
+	position: absolute;
+	top: 0px;
+}
+
+.heroes-catalog .list .item a:before{
+	left: -20px;
+	border: 20px #3b76a8 solid;
+	border-left: 20px transparent solid;
+	border-right: 5px #3b76a8 solid;
+}
+
+.heroes-catalog .list .item a:after{
+	left: 100%;
+	margin-left: -3px;
+	top: 0px;
+	border: 20px transparent solid;
+	border-left: 20px #3b76a8 solid;
+}
+
+.heroes-catalog .list .item a.active{
+	~border: 1px #9a01a9 solid;
+	background: #9a01a9;
+}
+
+.heroes-catalog .list .item a.active:after{
+	border: 20px transparent solid;
+	border-left: 20px #9a01a9 solid;
+}
+
+.heroes-catalog .list .item a.active:before{
+	border: 20px #9a01a9 solid;
+	border-left: 20px transparent solid;
+	border-right: 5px #9a01a9 solid;
+}
+
+.heroes-catalog .list .item a:not(.active):hover:after{
+	border: 20px transparent solid;
+	border-left: 20px lightblue solid;
+}
+
+.heroes-catalog .list .item a:not(.active):hover:before{
+	border: 20px lightblue solid;
+	border-left: 20px transparent solid;
+	border-right: 5px lightblue solid;
+}
+
+
+.heroes-catalog .list .item a:before{
+	~display: none;
+}
+
+.program .prog-content{
+	margin-bottom: 50px;
+}
+
+.heroes-catalog .list .item:before{
+	content: '✦';
+	position:absolute;
+	left: -20px;
+	top: 10px;
+	color: #a551ff;
+}
+
+.heroes-catalog .list .item{
+	position: relative;
+}
+
+
+.main .my li{
+	font-family: 'Hermes', sans-serif;
+	font-size: 18px;
+	margin-top: 5px;
+}
