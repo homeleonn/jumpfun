@@ -1408,6 +1408,16 @@ body.loaded .holyday:before{
 	background: #fff;
 }
 
+.s-about .section-title:after,
+.s-about .section-title:before,
+.all-progs .section-title:after,
+.all-progs .section-title:before{
+	content: '✦';
+	margin: 0 10px;
+	color: #07da1f;
+	~font-size: 13px;
+}
+
 
 
 .all-progs .img-wrapper{
