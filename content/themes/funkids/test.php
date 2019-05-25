@@ -2,184 +2,176 @@
 include THEME_DIR . 'header.php';
 ?>
 
-
-<h1 class="section-title">Стоимость организации праздников FunKids.</h1>
-
-<div class="table-wrapper">
-<table border="1" class="pricetable">
-	<tr>
-		<th colspan="4">Стандартная программа</th>
-	</tr>
-	<tr>
-		<th>Продолжительность</th>
-		<th>Встреча</th>
-		<th>Количество<br> персонажей</th>
-		<th>Стоимость</th>
-	</tr>
-	<tr>
-		<td rowspan="3">1 час</td>
-		<td rowspan="3">700</td>
-		<td>1</td>
-		<td>900</td>
-	</tr>
-	<tr>
-		<td>2</td>
-		<td>1400</td>
-	</tr>
-	<tr>
-		<td>Каждый последующий</td>
-		<td> + 500</td>
-	</tr>
-</table>
-</div>
-
-<div class="table-wrapper">
-<table border="1" class="pricetable">
-	<tr>
-		<th colspan="6">Нестандартные программы</th>
-	</tr>
-	<tr>
-		<th>Программа</th>
-		<th>Продолжительность</th>
-		<th>Встреча</th>
-		<th>Количество<br> персонажей</th>
-		<th>Стоимость</th>
-		<th>+ персонаж</th>
-	</tr>
-	<tr>
-		<td>Железный человек</td>
-		<td>1 час</td>
-		<td>1000</td>
-		<td>2</td>
-		<td>1700</td>
-		<td rowspan="5">500</td>
-	</tr>
-	<tr>
-		<td>Оптимус Прайм</td>
-		<td>1 час</td>
-		<td>1400</td>
-		<td>2</td>
-		<td>2000</td>
-	</tr>
-	<tr>
-		<td rowspan="2">Танцевальная программа,<br>Футбольная программа</td>
-		<td rowspan="2">1 час</td>
-		<td rowspan="2"></td>
-		<td>1</td>
-		<td>1000</td>
-	</tr>
-	<tr>
-		<td>2</td>
-		<td>1400</td>
-	</tr>
-	<tr>
-		<td>Майнкрафт</td>
-		<td colspan="4">
-			<ul class="disc" style="padding-left: 10px;">
-				<li>Ведущий и Ростовая кукла на выбор (Стив или Крипер) – 1400 грн</li>
-				<li>Ведущий и Две ростовые куклы ( Стив и Крипер) – 1800 грн</li>
-			</ul>
-		</td>
-	</tr>
-</table>
-</div>
-
-<div class="table-wrapper">
-<table border="1" class="pricetable">
-	<tr>
-		<th colspan="4">Дополнительные услуги</th>
-	</tr>
-	<tr>
-		<th>Название</th>
-		<th>Цена</th>
-	</tr>
-	<tr>
-		<td>Научное шоу</td>
-		<td>
-			<ul class="disc" style="padding-left: 10px;">
-				<li>1 человек 1000 грн</li>
-				<li>2 человека 1300 грн</li>
-			</ul>
-		</td>
-	</tr>
-	<tr>
-		<td>Шоу мыльных пузырей</td>
-		<td>20-30 минут 800 грн</td>
-	</tr>
-	<tr>
-		<td>Сладкая вата</td>
-		<td>800 грн</td>
-	</tr>
-	<tr>
-		<td>Аквагрим</td>
-		<td>1 час 500 грн</td>
-	</tr>
-	<tr>
-		<td>Генератор мыльных пузырей</td>
-		<td>200 грн</td>
-	</tr>
-	<tr>
-		<td>Дым машина</td>
-		<td>200 грн</td>
-	</tr>
-	<tr>
-		<td>Пиньята</td>
-		<td>Под заказ (уточняйте по телефону)</td>
-	</tr>
-	<tr>
-		<td>Бумажное шоу</td>
-		<td>
-			<ul class="disc" style="padding-left: 10px;">
-				<li>30 кг новой бумаги 3500 за последующие 10 кг по 1000 грн.</li>
-				<li>30 кг второсортной 1800 за след. 10 кг по 400 грн.</li>
-			</ul>
-		</td>
-	</tr>
-</table>
-</div>
-
-<div class="container">
-<noindex>
-		<?=funkids_inProgram()?>
-</noindex>
+<style>
 	
-	<div>
-		<noindex>
-			<p>
-			Программа состоит из более чем десятка пунктов. Конкурсы подбираются под каждую уникальную группу детей по возрасту и количеству.
-			</p>
-		</noindex>
-		<p>Приятные незабываемые впечатления гарантированы. Наши профессионалы по детским праздникам устроят потрясающее шоу для малышей.</p>
-		<p>
-			<b>Детей и родителей ждут</b>:
-			<ul class="disc" style="margin-left: 30px;">
-				<li>Шоу программы и представления</li>
-				<li>Интересные конкурсы</li>
-				<li>Веселая и атмосферная музыка</li>
-				<li>Тематический реквизит и красочные костюмы аниматоров</li>
-			</ul>
-		</p>
+	.slider-new{
+		border: 2px black solid;
+		overflow: hidden;
+		background: linear-gradient(-30deg, #000515, #6fd0da);
+	}
+	
+	#s{
+		cursor: grab;
+		width: 9999px;
+	}
+	
+	#s:active{
+		cursor: grabbing;
+	}
+	
+	.item{
+		display: inline-block;
+		~border: 1px red dashed;
+		width: 70%;
+	}
+	
+	.item img{
+		width: 100%;
+		transform: scale(.85);
+		transition: .8s;
+		border-radius: 30px;
+		border: 5px transparent solid;
+	}
+	
+	.item.active img{
+		transform: scale(1);
+		border: 5px #a7dcdc solid;
+		box-shadow: 0 0 100px #ffffff;
+	}
+	
+	
+	.item, #s1{
+		position: relative;
+		padding: 30px 0 ;
+	}
+	
+	span{
+		position: relative;
+		left: 50%;
+	}
+</style>
+
+<script>
+	$$(() => {
+		var ww = $(window).width();
+		var wcenter = ww / 2;
+		var t0;
+		var move, index = 0;
 		
-		<p>
-			<b>Места для праздников могут быть разнообразными:</b>
-			<ul class="disc" style="margin-left: 30px;">
-				<li>Детский сад или школа</li>
-				<li>Кафе</li>
-				<li>На природе</li>
-			</ul>
-		</p>
+		build();
+		var slideNew = document.getElementById('s1');
+
+		slideNew.onmousedown = function(e) {
+			t0 = performance.now();
+			$('#s1').stop();
+
+		  var coords = getCoords(slideNew);
+		  var shiftX = e.pageX - coords.left;
+		  
+		  move = coords.left;
+
+		  slideNew.style.zIndex = 1000;
+
+		  function moveAt(e) {
+			slideNew.style.left = e.pageX - shiftX + 'px';
+		  }
+
+		  document.onmousemove = function(e) {
+			moveAt(e);
+		  };
+
+		  document.onmouseup = function() {
+			document.onmousemove = null;
+			slideNew.onmouseup = null;
+			
+			move -= getCoords(slideNew).left;
+			
+			if (performance.now() - t0 < 200) {
+				index = move > 0 ? index + 1 : index - 1;
+				
+				if (index < 0) index = 0;
+				else if (index + 1 > $('.item').length) index = $('.item').length - 1;
+			} else {
+				var center = false;
+				var coords;
+				$('.item').each(function(i){
+					coords = $(this).offset().left + ($(this).width() / 2) - wcenter;
+					
+					
+					if (center === false || Math.abs(coords) < Math.abs(center)) {
+						center = coords;
+						index = i;
+					}
+				});
+			}
+			
+			makeActive(index);
+		  };
+		}
+
+		slideNew.ondragstart = function() {
+		  return false;
+		};
+
+		function getCoords(elem) {   // кроме IE8-
+		  var box = elem.getBoundingClientRect();
+		  return {
+			left: box.left + pageXOffset
+		  };
+		}
 		
-		<p><b>Доступные цены. Аниматоры и детские шоу программы давно перестали быть непозволительной роскошью.</b></p>
+		function build(){
+			$('.item').css('width', ww * 0.7 + 'px');
+			makeActive(0);
+		}
 		
-		<p>Стоимость услуг на сайте указана ориентировочная. Детали и окончательную цену необходимо обсудить с нашим менеджером.</p>
+		function makeActive(index){
+			var parentPos = $('.item').parent().offset();
+			var $activeItem = $('.item:nth-child('+(index + 1)+')');
+			var left = wcenter - $activeItem.width() / 2;
+			left -= $activeItem.offset().left - parentPos.left;
+			
+			setTimeout(() => {$('.item').removeClass('active');}, 0);
+			setTimeout(() => {$activeItem.addClass('active');}, 0);
+			$('#s1').stop().animate({'left': left}, 1000);
+			setTimeout(() => {$('#s1')}, 1000);
+			//go(left)();
+			
+		}
+		
+		function go(left){
+			var currentPos = +$('#s1').css('left').split('px')[0];
+			var stepCount = 40;
+			var step = left / stepCount;
+			var up = currentPos < left;
+			
+			
+			return function(){
+				if (--stepCount) {
+					currentPos = up ? currentPos + step : currentPos - step;
+					setTimeout(() => {$('#s1').css({'left': currentPos});}, 25);
+					console.log(1);
+				}
+			}
+		}
+		
+		function fastScroll(){
+			
+		}
+	});
+</script>
+
+<div class="slider-new clearfix" id="slider-new">
+	<span>©</span>
+	<div id="s">
+	<div id="s1">
+		<div class="item"><img src="<?=THEME . 'img/002.jpg'?>"></div>
+		<div class="item"><img src="<?=THEME . 'img/002.jpg'?>"></div>
+		<div class="item"><img src="<?=THEME . 'img/002.jpg'?>"></div>
+		<div class="item"><img src="<?=THEME . 'img/002.jpg'?>"></div>
+	</div>
 	</div>
 </div>
-<noindex>
-<div class="wave1" style="margin: 20px 0;">
-<?=funkids_readyToHolyday()?>
-</div>
-</noindex>
-
 <?php
 include THEME_DIR . 'footer.php';
 ?>
