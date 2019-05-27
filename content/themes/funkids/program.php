@@ -26,6 +26,11 @@
 		</div>
 	</div>
 	
+	<noindex>
+	<div class="container">
+		<?=funkids_inProgram()?>
+	</div>
+	</noindex>
 </div>
 
 <?php
@@ -37,7 +42,6 @@
 <div class="container">
 <noindex>
 	<div class="container">
-		<?=funkids_inProgram()?>
 		<div class="sep"></div>
 		<div class="inline-title small center">Не забывайте о наших <a class="under" href="<?=uri('services')?>">дополнительных услугах</a>, что бы сделать праздник еще ярче! <br><a href="<?=uri('services')?>" class="button">Перейти к доп. услугам</a></div>
 		

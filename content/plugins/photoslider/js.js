@@ -5,18 +5,17 @@ if(!window.jQuery)
 (function(){
 	$$(() => {
 		
-		if($('.newslider').length) {
-			newSliderBuild($('.newslider').data('src').split(','));
-		} else {
+		if(!$('.newslider').length) {
 			return;
 		}
 		setTimeout(() => {
 		
 		var ww;
+		var mobile = $(window).width() < 600;
 		var wh;
 		var wcenter;
 		var t0;
-		var move, index = 1;
+		var move, index = mobile ? 0 : 1;
 		var speed = 0.5;
 		var stepTime = stepTimeFix = false;
 		var left;
@@ -96,15 +95,16 @@ if(!window.jQuery)
 				} else {
 					var center = false;
 					var coords;
-					$('.item').each(function(i){
+					$('.slider-new .item').each(function(i){
 						coords = $(this).offset().left + ($(this).width() / 2) - wcenter;
 						
 						
 						if (center === false || Math.abs(coords) < Math.abs(center)) {
 							center = coords;
 							index = i;
-						}
+						}console.log(i, index, length);
 					});
+					
 				}
 				
 				makeActive(index);
@@ -136,7 +136,7 @@ if(!window.jQuery)
 				$('.slider-new .controls-indicators').append('<div class="citem">');
 			}
 			
-			makeActive(1);
+			makeActive(index);
 		}
 		
 		function createSizes(){
@@ -147,8 +147,8 @@ if(!window.jQuery)
 			if (ww < 600) {
 				mw = mh = 1;
 			} else {
-				mw = 0.5
-				mh = 0.7;
+				mw = 0.75;
+				mh = 0.85;
 			}
 			
 			$('.slider-new .item').css('max-width', ww * mw + 'px');
@@ -220,32 +220,38 @@ if(!window.jQuery)
 		});
 		
 		
-		}, 100);
+		}, 1);
 		
-		function newSliderBuild(src){
-				// <div class="item"><img src="http://localhost/funkids/content/uploads/2018/09/M28wjj62UMd.jpg"></div>
-				// <div class="item"><img src="http://localhost/funkids/content/uploads/2018/09/wNNTI312Te6d.jpg"></div>
-				// <div class="item"><img src="http://localhost/funkids/content/uploads/2018/09/1016aExaTNdTN.jpg"></div>
-				// <div class="item"><img src="http://localhost/funkids/content/plugins/slider/images/glavnii/1.jpg"></div>
-				// <div class="item"><img src="http://localhost/funkids/content/plugins/slider/images/glavnii/1.jpg"></div>
-			$('.newslider').html(`
-			<div class="slider-new clearfix" id="slider-new">
-				<div id="s">
-					<div id="s1"></div>
-				</div>
-				<div class="controls">
-					<div class="prev">&#9668;</div>
-					<div class="next">&#9658;</div>
-				</div>
-				<div class="controls-indicators"></div>
-			</div>
-			`);
-			
-			src.forEach(function(item){
-				$('.slider-new #s1').append('<div class="item"><img src="'+item+'"></div>')
-			});
-		}
+		
 	});
+	function newSliderBuild(src){
+			// <div class="item"><img src="http://localhost/funkids/content/uploads/2018/09/M28wjj62UMd.jpg"></div>
+			// <div class="item"><img src="http://localhost/funkids/content/uploads/2018/09/wNNTI312Te6d.jpg"></div>
+			// <div class="item"><img src="http://localhost/funkids/content/uploads/2018/09/1016aExaTNdTN.jpg"></div>
+			// <div class="item"><img src="http://localhost/funkids/content/plugins/slider/images/glavnii/1.jpg"></div>
+			// <div class="item"><img src="http://localhost/funkids/content/plugins/slider/images/glavnii/1.jpg"></div>
+		document.getElementsByClassName('newslider')[0].innerHTML = `
+		<div class="slider-new clearfix" id="slider-new">
+			<div id="s">
+				<div id="s1"></div>
+			</div>
+			<div class="controls">
+				<div class="prev">&#9668;</div>
+				<div class="next">&#9658;</div>
+			</div>
+			<div class="controls-indicators"></div>
+		</div>
+		`;
+		
+		src.forEach(function(item){
+			//document.getElementById('s1').innerHTML += '<div class="item"><img src="'+theme+'img/1x1.gif" data-src="'+item+'" class="lazy"></div>';
+			document.getElementById('s1').innerHTML += '<div class="item"><img src="'+item+'"></div>';
+		});
+	}
+	
+	if(document.getElementsByClassName('newslider').length) {
+		newSliderBuild(document.getElementsByClassName('newslider')[0].dataset.src.split(','));
+	}	
 }());
 
 

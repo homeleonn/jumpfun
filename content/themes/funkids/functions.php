@@ -508,7 +508,7 @@ function funkids_getLastReviews(){
 	<h3 class="inline-title center mb30">Последние отзывы наших клиентов</h3>
 	
 	<div class="reviews topoffset" id="reviews">
-		<div class="carousel-widget container" data-carousel-widget-column="2">
+		<div class="carousel-widget container-fluid" data-carousel-widget-column="3">
 			<div class="widget-head">
 				<div class="title"></div>
 				<div class="controls">

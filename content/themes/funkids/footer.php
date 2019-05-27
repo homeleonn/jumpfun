@@ -38,9 +38,6 @@
 	<script type='text/javascript' src='//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js'></script>
 	<script src="<?=THEME?>js/js.js"></script>
 	<script>
-		var root = "<?=ROOT_URI?>";
-	</script>
-	<script>
 		$(function(){
 			$.getScript("https://www.googletagmanager.com/gtag/js?id=UA-124185796-1", function(){
 				window.dataLayer = window.dataLayer || [];

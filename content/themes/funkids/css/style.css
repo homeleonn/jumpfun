@@ -234,7 +234,20 @@ img.imgw100{
 }
 
 iframe{
-	max-width: 100%;
+	max-width: 1200px;
+	
+}
+
+.program iframe,
+.program-video iframe{
+	width: 100%;
+	max-width: 1200px;
+	height: 450px;
+}
+
+.program-video .section-title{
+	font-weight: bold;
+	margin-bottom: -60px;
 }
 
 
@@ -1606,6 +1619,9 @@ body.loaded .holyday{
 	border-radius: 4px;
 }
 
+.reviews{
+	margin: 0 100px;
+}
 
 .reviews.list .item{
 	margin-bottom: 20px;
@@ -1616,8 +1632,9 @@ body.loaded .holyday{
 .reviews .item,
 .popular-progs .item{
 	padding: 10px;
-	background: rgba(255, 0, 0, .2);
+	background: rgb(53, 165, 157);
 	border-radius: 10px;
+	color: white;
 }
 
 .popular-progs .item{
@@ -2998,6 +3015,16 @@ border-width: 1em 20px 0 0;
 	#shower #shower-prev:after,
 	#shower #shower-next:after{
 		opacity: .3;
+	}
+	
+	.reviews{
+		margin: 0;
+	}
+	
+	.program iframe,
+	.program-video iframe{
+		width: auto;
+		height: auto;
 	}
 	
 }

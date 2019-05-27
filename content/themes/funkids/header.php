@@ -9,7 +9,7 @@
 	<link rel="stylesheet" href="<?=THEME?>css/fontello.css">
 	<link rel="stylesheet" href="<?=THEME?>css/style.css">
 	<link rel="shortcut icon" href="<?=ROOT_URI?>favicon.ico" type="image/x-icon">
-	<script>function $$(callback){window.addEventListener('load', callback);}</script>
+	<script>let root = "<?=ROOT_URI?>", theme = "<?=THEME?>";function $$(callback){window.addEventListener('load', callback);}</script>
 </head>
 <body>
 	<div class="wrapper<?=isMain()?' main':''?>" id="wrapper">
