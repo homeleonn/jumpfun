@@ -1,62 +1,70 @@
 <?php
 include THEME_DIR . 'header.php';
+
+doAction('photoslider');
 ?>
 
-<style>
-	
-	.slider-new{
-		border: 2px black solid;
-		overflow: hidden;
-		background: linear-gradient(-30deg, #000515, #6fd0da);
-	}
-	
-	#s{
-		cursor: grab;
-		width: 9999px;
-	}
-	
-	#s:active{
-		cursor: grabbing;
-	}
-	
-	.item{
-		display: inline-block;
-		~border: 1px red dashed;
-		width: 70%;
-	}
-	
-	.item img{
-		width: 100%;
-		transform: scale(.85);
-		transition: .8s;
-		border-radius: 30px;
-		border: 5px transparent solid;
-	}
-	
-	.item.active img{
-		transform: scale(1);
-		border: 5px #a7dcdc solid;
-		box-shadow: 0 0 100px #ffffff;
-	}
-	
-	
-	.item, #s1{
-		position: relative;
-		padding: 30px 0 ;
-	}
-	
-	span{
-		position: relative;
-		left: 50%;
-	}
-</style>
 
+
+<?php /*
+<style>
+		
+		.slider-new{
+			~border: 2px black solid;
+			overflow: hidden;
+			background: linear-gradient(to bottom, #0f2e93, #fff);
+		}
+		
+		#s{
+			cursor: grab;
+			width: 9999px;
+		}
+		
+		#s:active{
+			cursor: grabbing;
+		}
+		
+		.item{
+			display: inline-block;
+			~border: 1px red dashed;
+			width: 40%;
+		}
+		
+		.item img{
+			width: 100%;
+			transform: scale(.85);
+			transition: .8s;
+			border-radius: 30px;
+			border: 5px transparent solid;
+		}
+		
+		.item.active img{
+			transform: scale(1);
+			border: 5px #a7dcdc solid;
+			box-shadow: 0 0 100px #ffffff;
+		}
+		
+		
+		.item, #s1{
+			position: relative;
+			padding: 30px 0 ;
+		}
+		
+		span{
+			position: relative;
+			left: 50%;
+		}
+</style>
+?>
 <script>
 	$$(() => {
 		var ww = $(window).width();
+		var wh = $(window).height();
 		var wcenter = ww / 2;
 		var t0;
 		var move, index = 0;
+		var speed = 0.6;
+		
 		
 		build();
 		var slideNew = document.getElementById('s1');
@@ -86,8 +94,9 @@ include THEME_DIR . 'header.php';
 			
 			move -= getCoords(slideNew).left;
 			
+			if (!move) return;
 			if (performance.now() - t0 < 200) {
-				index = move > 0 ? index + 1 : index - 1;
+				index = move > 1 ? index + 1 : index - 1;
 				
 				if (index < 0) index = 0;
 				else if (index + 1 > $('.item').length) index = $('.item').length - 1;
@@ -121,7 +130,11 @@ include THEME_DIR . 'header.php';
 		}
 		
 		function build(){
-			$('.item').css('width', ww * 0.7 + 'px');
+			//$('.item').css('width', ww * speed + 'px');
+			$('.slider-new .item').css('max-width', ww * 0.5 + 'px');
+			$('.slider-new .item img').css('max-height', wh * 0.7 + 'px');
+			// $('.slider-new #s, .slider-new #s1, .slider-new .item, .slider-new .item img').css({'max-width': ww * 0.8, 'max-height': wh * 0.8});
+			// $('.slider-new').css('height', wh * 0.8);
 			makeActive(0);
 		}
 		
@@ -133,8 +146,8 @@ include THEME_DIR . 'header.php';
 			
 			setTimeout(() => {$('.item').removeClass('active');}, 0);
 			setTimeout(() => {$activeItem.addClass('active');}, 0);
-			$('#s1').stop().animate({'left': left}, 1000);
-			setTimeout(() => {$('#s1')}, 1000);
+			$('#s1').stop().animate({'left': left}, 1000 * 0.7);
+			//setTimeout(() => {$('#s1')}, 1000);
 			//go(left)();
 			
 		}
@@ -165,13 +178,56 @@ include THEME_DIR . 'header.php';
 	<span>©</span>
 	<div id="s">
 	<div id="s1">
-		<div class="item"><img src="<?=THEME . 'img/002.jpg'?>"></div>
-		<div class="item"><img src="<?=THEME . 'img/002.jpg'?>"></div>
-		<div class="item"><img src="<?=THEME . 'img/002.jpg'?>"></div>
-		<div class="item"><img src="<?=THEME . 'img/002.jpg'?>"></div>
+		<div class="item"><img src="http://localhost/funkids/content/uploads/2018/09/M28wjj62UMd.jpg"></div>
+		<div class="item"><img src="http://localhost/funkids/content/uploads/2018/09/wNNTI312Te6d.jpg"></div>
+		<div class="item"><img src="http://localhost/funkids/content/uploads/2018/09/1016aExaTNdTN.jpg"></div>
+		<div class="item"><img src="http://localhost/funkids/content/plugins/slider/images/glavnii/1.jpg"></div>
+		<div class="item"><img src="http://localhost/funkids/content/plugins/slider/images/glavnii/1.jpg"></div>
 	</div>
 	</div>
-</div>
+</div>*/?>
+<!--<div class="slider-new clearfix" id="slider-new">
+	<span>©</span>
+	<div id="s">
+	<div id="s1">
+			<div class="item">	
+				<div class="floatimg sprite reviewimg"></div>
+				<p class="quote-big">
+					Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus, eligendi, repellendus, corrupti eius ullam nostrum similique dicta ducimus aut maiores asperiores obcaecati vel magnam minima culpa nihil optio consectetur qui?
+				</p>
+				<div class="right fs22">1111</div>
+			</div>
+			<div class="item">	
+				<div class="floatimg sprite reviewimg"></div>
+				<p class="quote-big">
+					Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus, eligendi, repellendus, corrupti eius ullam nostrum similique dicta ducimus aut maiores asperiores obcaecati vel magnam minima culpa nihil optio consectetur qui?
+				</p>
+				<div class="right fs22">1111</div>
+			</div>
+			<div class="item">	
+				<div class="floatimg sprite reviewimg"></div>
+				<p class="quote-big">
+					Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus, eligendi, repellendus, corrupti eius ullam nostrum similique dicta ducimus aut maiores asperiores obcaecati vel magnam minima culpa nihil optio consectetur qui?
+				</p>
+				<div class="right fs22">1111</div>
+			</div>
+			<div class="item">	
+				<div class="floatimg sprite reviewimg"></div>
+				<p class="quote-big">
+					Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus, eligendi, repellendus, corrupti eius ullam nostrum similique dicta ducimus aut maiores asperiores obcaecati vel magnam minima culpa nihil optio consectetur qui?
+				</p>
+				<div class="right fs22">1111</div>
+			</div>
+			<div class="item">	
+				<div class="floatimg sprite reviewimg"></div>
+				<p class="quote-big">
+					Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus, eligendi, repellendus, corrupti eius ullam nostrum similique dicta ducimus aut maiores asperiores obcaecati vel magnam minima culpa nihil optio consectetur qui?
+				</p>
+				<div class="right fs22">1111</div>
+			</div>
+	</div>
+	</div>
+</div>-->
 <?php
 include THEME_DIR . 'footer.php';
 ?>

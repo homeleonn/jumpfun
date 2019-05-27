@@ -1,4 +1,6 @@
 <?//=dd(get_defined_vars())?>
+
+
 <div class="container program">
 	<noindex>
 	<div class="col-md-3 col-xs-0 heroes-catalog-wrapper">
@@ -23,7 +25,17 @@
 			<?=$content?>
 		</div>
 	</div>
-	<noindex>
+	
+</div>
+
+<?php
+	if ($id == 100) {
+		doAction('photoslider', $id);
+	}
+?>
+
+<div class="container">
+<noindex>
 	<div class="container">
 		<?=funkids_inProgram()?>
 		<div class="sep"></div>

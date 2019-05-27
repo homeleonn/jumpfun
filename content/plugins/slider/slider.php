@@ -113,7 +113,7 @@ function mySliderView($slider){
 			function render(img, title, text, active = false){
 				let active1 = '', img1 = '<?=THEME?>img/1x1.gif" data-src="<?=PLUGINS . "slider/images/{$slider}/"?>';
 				if (active) {
-					active1 = ' active';
+					active1 = ' active1';
 					img1 = '<?=PLUGINS . "slider/images/{$slider}/"?>';
 				}
 				
@@ -125,7 +125,9 @@ function mySliderView($slider){
 	<div class="slider-wrapper none">
 		<div class="slider">
 			<div class="ss">
-				
+				<div class="item active">
+					<div class="yout"><div class="yplay">&#9658;</div><img data-youtube="ZfZfm1twto8" src="<?=THEME?>img/mini-gallery/50.jpg" alt="Аниматор трансформер Оптимус Прайм на детский праздник Одесса"></div>
+					</div>
 			</div>
 			<div class="controls">
 				<div class="arr-left"></div>

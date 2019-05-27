@@ -640,6 +640,10 @@ function cacheIsEnable(){
 	return defined('CACHE_ON') && CACHE_ON;
 }
 
+function isLocalhost(){
+	return $_SERVER['REMOTE_ADDR'] == '::1' || $_SERVER['REMOTE_ADDR'] == '127.0.0.1';
+}
+
 
 /*filesystem*/
 function do_mkdir($path, $rights = 0644){

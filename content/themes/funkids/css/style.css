@@ -211,7 +211,7 @@ img{
 }
 
 .row{
-	max-width: 100%;
+	~max-width: 100%;
 }
 
 .pricepage img{
@@ -1365,7 +1365,8 @@ footer .social-bottom a{
 .s-about,
 .all-progs,
 .wave1,
-.holyday{
+.holyday,
+.newslider{
 	position: relative;
 }
 
@@ -1373,7 +1374,8 @@ footer .social-bottom a{
 .s-about:after,
 .wave1:before,
 .wave1:after,
-.holyday:before{
+.holyday:before,
+.newslider:before{
 	content: '';
 	position: absolute;
 	height: 98px;
@@ -1386,7 +1388,8 @@ body.loaded .all-progs:after,
 body.loaded .s-about:after,
 body.loaded .holyday:before,
 .wave1:before,
-.wave1:after{
+.wave1:after,
+.newslider:before{
 	background: url('../img/bottom-wave.svg') center bottom no-repeat;
 }
 
@@ -1856,6 +1859,17 @@ body.loaded .holyday{
 	position: relative;
 	cursor: pointer;
 }
+
+
+
+	
+
+
+
+
+
+
+
 
 @media (max-width: 768px){
 	#shower > #img{
@@ -3077,6 +3091,13 @@ footer.index .top > div:nth-child(1){
 	footer .social-bottom{
 		float: none;
 		
+	}
+	
+	.s-about .section-title:after,
+	.s-about .section-title:before,
+	.all-progs .section-title:after,
+	.all-progs .section-title:before{
+		display: none;
 	}
 }
 
