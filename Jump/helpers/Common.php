@@ -210,6 +210,37 @@ class Common{
 		return $ip;
 	}
 	
+	public static function log(){
+		if(!defined('LOG_ON') || !LOG_ON) return;
+		$logPath = ROOT . 'content/uploads/logs/stats.log';
+		$ref = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'NULL';
+		$data = 
+			$_SERVER['REQUEST_METHOD']  . ' :: ' .
+			$_SERVER['REQUEST_URI'] 	. ' <- ' .
+			$ref 						. ' :: ' .
+			$_SERVER['HTTP_USER_AGENT'] . ' :: ' .
+			self::ipCollect() 			. ' :: ' .
+			date('Y.m.d H:i:s') 			. "\n";
+		
+		if(!file_exists($logPath)){
+			$f = fopen($logPath, 'w');
+			fclose($f);
+		}
+			
+		self::write($logPath, $data, 'a+');
+	}
+	
+	
+	public static function write($fname, $data, $mode = 'w'){
+		$f = fopen($fname, $mode);
+		flock($f, LOCK_EX);
+		fwrite($f, $data);
+		flock($f, LOCK_UN);
+		fclose($f);	
+	}
+	
+	
+	
 	public static function getOption($key, $unsrlz = false){
 		$option = HelperDI::get('config')->getOption($key);
 		return $unsrlz ? unserialize($option) : $option;

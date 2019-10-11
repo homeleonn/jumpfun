@@ -3,6 +3,15 @@
 use Jump\DI\DI;
 use Jump\helpers\Common;
 
+addAction('wrapper_classes', 'funkids_wrapper_classes');
+function funkids_wrapper_classes($post){
+	$classes = '';
+	if (isMain()) $classes .= ' main';
+	if (isset($post['post_type']) && $post['post_type'] == 'program') $classes .= ' program-post';
+	
+	echo $classes;
+}
+
 function funkids_inProgram(){
 	?>
 	<div class="inline-title in-program">В программу включено</div>
@@ -38,6 +47,62 @@ function funkids_readyToHolyday(){
 	<?php
 }
 
+
+
+
+/*HEADERIMAGES*/
+
+addAction('add_post_after', 'funkids_headerimage_admin');
+addAction('edit_post_after', 'funkids_headerimage_admin');
+
+function funkids_headerimage_admin(){
+	global $post;
+	$post['_headerimage_pos'] = $post['_headerimage_pos'] ?? 'center';
+	?>
+<div class="side-block">
+	<div class="block-title">Изображение заголовка страницы</div>
+	<div class="block-content">
+		Ссылка: 
+		<input type="text" class="w100" name="_headerimage" value="<?=$post['_headerimage'] ?? ''?>">
+		Позиция:
+		<select name="_headerimage_pos" id="_headerimage_pos">
+			<option value="top" <?=$post['_headerimage_pos'] == 'top' ? 'selected':''?>>top</option>
+			<option value="center" <?=$post['_headerimage_pos'] == 'center' ? 'selected':''?>>center</option>
+			<option value="bottom" <?=$post['_headerimage_pos'] == 'bottom' ? 'selected':''?>>bottom</option>
+		</select>
+	</div>
+</div>
+
+<script>
+	(function(){
+		let start = -20, select = '<?=$post['_headerimage_pos']?>';
+		for(var i = 12; i > 0; i--) {
+			$('#_headerimage_pos').append('<option value="'+start+'%" '+(select == start+'%' ? 'selected':'')+'>'+start+'%</option>');
+			start += 10;
+		}
+		
+	})();
+	
+</script>
+	<?php
+}
+
+//dd($di->get('db')->getAll('Select * from postmeta where meta_key = \'_headerimage_pos\''));
+// dd($di->get('db')->query('Delete from postmeta where meta_key = \'_headerimage_pos\''));
+// dd($di->get('db')->query('Update postmeta SET meta_key = \'_headerimage\' where meta_key = \'headerimage\''));
+
+addAction('jhead', 'funkids_headerimage');
+
+function funkids_headerimage(){
+	global $post;
+	if (isset($post['_headerimage'])) :
+	?><style>
+.program-post .top-sky{display: none;}.program-post .header{background-image: url(<?=$post['_headerimage']?>);background-position-y: <?=$post['_headerimage_pos']??'center'?>;height: 500px;background-size: cover;} .program-post .header-content{height: 100%;background: rgba(8, 0, 129, .2);} @media (max-width: 500px){ .program-post .header{background-position-x: 30%;height: auto;} .program-post .logo-text img {width: 200px;position: relative;top: -50px;} .program-post .logo-text {text-align: left !important;} .program-post nav label > div::before{} .program-post .header .row .logo-text, .program-post .header .row .tels > *:not(div){display: none;} .program-post .header .row .tels{padding-top: 300px;} } 	</style><?php endif;
+}
+
+/*-HEADERIMAGES*/
+
+/*PRICE*/
  
 function funkids_programPrice($options = null){
 	global $post; //d($options, $post);
@@ -46,19 +111,12 @@ function funkids_programPrice($options = null){
 	
 	//dd($post);
 	?>
-	<table class="mtable" cellpadding="2" border="0" width="100%">
-		<tr>
-			<td>Стоимость:</td>
-			<td>
-				<textarea name="_jmp_program_price" id="_jmp_program_price" rows="3" style="width:100%"><?=$post['_jmp_program_price'] ?? ''?></textarea>
-				<!--<input type="text" name="_jmp_program_price" value="<?=$post['_jmp_program_price'] ?? ''?>">-->
-			</td>
-		</tr>
-		<tr>
-			<td>Время:</td>
-			<td><input type="text" name="_jmp_program_price_time" class="w100" value="<?=$post['_jmp_program_price_time'] ?? ''?>"></td>
-		</tr>
-	</table>
+	<div class="side-block">
+		<div class="block-title">Стоимость</div>
+		<div class="block-content">
+			<textarea name="_jmp_program_price" id="_jmp_program_price" rows="3" style="width:100%"><?=$post['_jmp_program_price'] ?? ''?></textarea>
+		</div>
+	</div>
 	<?php
 	}
 }
@@ -70,7 +128,11 @@ addFilter('extra_fields_keys', 'funkids_extra_fields_keys');
 function funkids_extra_fields_keys($extraFieldKeys){
 	$extraFieldKeys = array_merge(
 		$extraFieldKeys, 
-		['_jmp_program_price', '_jmp_program_price_time']
+		[
+			'_jmp_program_price', 
+			'_headerimage', 
+			$_POST['_headerimage'] ? '_headerimage_pos' : ''
+		]
 	);
 	
 	return $extraFieldKeys;
@@ -80,8 +142,10 @@ addFilter('single_before_content', 'funkids_single_price');
 
 function funkids_single_price($post){
 	if (isset($post['_jmp_program_price']))
-		echo '<div class="price">', htmlspecialchars_decode($post['_jmp_program_price']), (isset($post['_jmp_program_price_time']) ? '/' . $post['_jmp_program_price_time'] : ''), '</div><br>';
+		echo '<div class="price">', htmlspecialchars_decode($post['_jmp_program_price']), '</div><br>';
 }
+
+/*PRICE*/
 
 addPageType([
 		'type' => 'new',
@@ -272,7 +336,27 @@ function funKids_all(){
 	global $funKidsCacheFileNames, $thatCache;
 	$thatCache = true;
 	if(Common::getCache($funKidsCacheFileNames['programs_all'], -1)) return;
-	$popular = (new PostController('program'))->actionList(NULL, NULL, 1, 30,  [['created'], 'ASC'] );
+	$ord = 'ASC';
+	if ($order = getPostOrderType('program')) {
+		if ($order['order'] == 'DESC' || $order['order'] == 'ASC') {
+			$ord = $order['order'];
+			$order = false;
+		}
+	}
+	$popular = (new PostController('program'))->actionList(NULL, NULL, 1, 30,  [['id'], 'ASC'] );
+	
+	// If distinct order
+	if ($order) {
+		$buff = [];
+		foreach ($popular['__list'] as $p) {
+			$buff[$p['id']] = $p;
+		}
+		$popular['__list'] = [];
+		foreach (explode(',', $order['value']) as $id) {
+			$popular['__list'][] = $buff[$id];
+		}
+	}
+	
 	?>
 	<div class="all-progs" id="all-progs">
 		<h2 class="section-title">Шоу программы аниматоров</h2>

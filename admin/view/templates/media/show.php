@@ -29,13 +29,15 @@
 		<div class="media-thumb"><img src="<?=$img;?>" data-original="<?=$orig?>" data-id="<?=$media['id']?>" data-meta='<?=json_encode($meta)?>' data-dir="<?=UPLOADS . $meta['dir'];?>"></div>
 	<?php endforeach;?>
 	</div>
-	<div id="media-original-show" class=" none">
-		<img src="" class="shower">
-		<div class="padd5 size b"></div>
-		<div class="padd5">Путь:<input type="text" class="w100"></div>
-		<span class="icon-pencil"></span>
-		<span class="icon-cancel media-delete" id="media-delete"></span><br>
-		<div class="btn none padd10" id="select-for-post">Выбрать</div>
-		<div class="thumbnails"></div>
+	<div id="wrap-media" >
+		<div id="media-original-show" class=" none">
+			<img src="" class="shower">
+			<div class="padd5 size b"></div>
+			<div class="padd5">Путь:<input type="text" class="w100"></div>
+			<span class="icon-pencil"></span>
+			<span class="icon-cancel media-delete" id="media-delete"></span><br>
+			<div class="btn none padd10" id="select-for-post">Выбрать</div>
+			<div class="thumbnails"></div>
+		</div>
 	</div>
 </div>

@@ -1,7 +1,50 @@
 <?php
+
+use Jump\DI\DI;
+use Jump\helpers\Common;
+
 include THEME_DIR . 'header.php';
 
-doAction('photoslider');
+
+$db = DI::getD('db');
+
+dd($db->getAll('Select * from posts where post_type = "program" and id in(106, 136, 135)'));
+
+
+// $foo = [['id' => 1],['id' => 3]];
+// $bar = '2,3,4';
+// dd(str_replace([',4', '4,'], '', $bar));
+// foreach (explode(',', $bar) as $id) {
+	// $sortedPosts[$id] = false;
+// }
+
+// foreach ($foo as $post) {
+	// $sortedPosts[$post['id']] = $post;
+// }
+
+// dd($sortedPosts, count($foo));
+
+
+// dd(Common::getOption('post_order_program', true));
+// $db = DI::getD('db');
+
+// // if (!Common::getOption('post_order_program', true)) {
+	// $programs = $db->getAll('Select id from posts where post_type = "program" order by id DESC');
+	
+	// //$currentOrder = $db->getOne('Select ')
+
+	// $ids = '';
+	// foreach($programs as $p){
+		// $ids .= $p['id'] . ',';
+	// }
+	// $result = ['order' => 'DISTINCT', 'value' => substr($ids, 0, -1)];
+	// //dd($result);
+	// Common::setOption('post_order_program', $result, true);
+// }
+
+
+
+//doAction('photoslider');
 ?>
 
 

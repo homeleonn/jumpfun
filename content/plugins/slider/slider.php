@@ -102,8 +102,6 @@ function mySliderView($slider){
 	<script>
 		$$(function(){
 			let sliderImgs = <?=json_encode($slider1)?>;
-			render(sliderImgs[0]['img'], sliderImgs[0]['title'], sliderImgs[0]['text'], true);
-			delete(sliderImgs[0]);
 			setTimeout(function(){
 				for (key in sliderImgs) {
 					render(sliderImgs[key]['img'], sliderImgs[key]['title'], sliderImgs[key]['text']);
@@ -117,7 +115,7 @@ function mySliderView($slider){
 					img1 = '<?=PLUGINS . "slider/images/{$slider}/"?>';
 				}
 				
-				$('.slider > .ss').append('<div class="item'+(active1)+'"><img src="'+img1+img+'" /><div class="slider-title"><div>'+title+'</div><div>'+text+'</div></div></div>');
+				$('.slider > .ss').append('<div class="item'+(active1)+'"><img src="'+img1+img+'" />'+(title && text ? ('<div class="slider-title"><div>'+title+'</div><div>'+text+'</div></div>') : '')+'</div>');
 				$('.slider-wrapper').removeClass('none');
 			}
 		});

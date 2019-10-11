@@ -30,7 +30,7 @@ class Post extends Model{
 	public function postList(){
 		// Get all posts
 		if(!$posts = $this->getAllPosts($this->options['type'], ['id', 'parent', 'title', 'short_title', 'url', 'created'])) return false;
-		
+		//dd($posts);
 		$addKeys = [];
 		if(!$this->options['hierarchical']){
 			// Get posts terms
@@ -46,7 +46,7 @@ class Post extends Model{
 		// build hierarchy
 		$postsHierarchy = $this->hierarchyItems($posts, NULL, NULL, $addKeys);
 		$postsTable = $this->hierarchy($postsHierarchy, 'table');
-		return !$postsTable ? '' : '<table class="mytable"><tr align="center"><td>title/url</td>'.($this->options['taxonomy'] ? '<td width="15%">Метки</td>' : '').'<td width="1%">Дата публикации</td></tr>' . $postsTable . '</table>';
+		return !$postsTable ? '' : '<table class="mytable posts '.$this->options['type'].'" id="draggable"><tr align="center"><td>title/url</td>'.($this->options['taxonomy'] ? '<td width="15%">Метки</td>' : '').'<td width="1%">Дата публикации</td></tr>' . $postsTable . '</table>';
 	}
 	
 	public function getComments($postId){
@@ -227,7 +227,7 @@ class Post extends Model{
 		$edit = '<a href="' . SITE_URL . 'admin/' . $this->options['type'] . '/' . ($isPost ? 'edit' : 'edit-term') . '/' . $item['id'] . '/">%s</a>';
 		ob_start();
 		?>
-			<tr>
+			<tr data-post_id="<?=$item['id']?>">
 				<td class="admin-page-list">
 					<?=str_repeat('&mdash;', $level) . ' ' . sprintf($edit, $item[$isPost ? ($item['short_title']?'short_title':'title') : 'name']);?>
 					<div style="position: absolute;">
@@ -288,6 +288,7 @@ class Post extends Model{
 		$this->save($post);
 		
 		$postId = $this->db->insertId();
+		$post['id'] = $postId;
 		
 		// build post extra fields
 		$meta = '';
@@ -305,6 +306,7 @@ class Post extends Model{
 		// Добавляем новые термины
 		$this->editTerms($postId, isset($this->request->post['terms']) ? $this->request->post['terms'] : []);
 		
+		doAction('after_post_add', $post);
 		Msg::json(array('id' => $postId), 10);
 	}
 	
@@ -672,7 +674,6 @@ class Post extends Model{
 	}
 	
 	
-	
 	public function checkUrlExists($url, $parent, $id = ''){
 		if(is_numeric($id)) $id = ' and id != ' . $id;
 		return $this->db->getOne('Select id from posts where url = ?s and parent = ?i and post_type = ?s' . $id, $url, $parent, $this->options['type']) ? true : false;
@@ -681,7 +682,61 @@ class Post extends Model{
 	public function getAllPosts($postType, $columns = []){
 		$key = empty($columns) ? '*' : implode(',', $columns); 
 		if(!isset($this->allPosts[$postType][$key])){
-			$this->allPosts[$postType][$key] = $this->db->getAll('Select ' . $key . ' from posts where post_type = ?s order by id DESC', $postType);
+			$distinct = false;
+			$order = 'DESC';
+			
+			if (isset($_GET['order']))
+			{
+				if (in_array($_GET['order'], ['DESC', 'ASC', 'DISTINCT'], false)) 
+				{
+					if ($_GET['order'] == 'DISTINCT') 
+					{
+						if ($saveOrder = getPostOrderType($this->options['type']))
+						{
+							$distinct = true;
+						}
+						
+						$order = 'ASC';
+					} 
+					else 
+					{
+						$order = $_GET['order'];
+					}
+				}
+			} 
+			else 
+			{
+				if ($saveOrder = getPostOrderType($this->options['type']))
+				{
+					if ($saveOrder['order'] == 'DISTINCT') 
+					{
+						$distinct = true;
+						$order = 'ASC';
+					} 
+					else 
+					{
+						$order = $saveOrder['order'];
+					}
+				}
+			}
+			
+			$this->allPosts[$postType][$key] = $this->db->getAll('Select ' . $key . ' from posts where post_type = ?s order by id ' . $order, $postType);
+			
+			if ($distinct) {
+				foreach (explode(',', $saveOrder['value']) as $id) {
+					$sortedPosts[$id] = false;
+				}
+				
+				// Проверим кол-во элементов, если добавили пост или удалили - отследить
+				//$preLength = count($sortedPosts);
+				
+				foreach ($this->allPosts[$postType][$key] as $post) {
+					$sortedPosts[$post['id']] = $post;
+				}
+				
+				$this->allPosts[$postType][$key] = $sortedPosts;
+				//dd($sortedPosts);
+			}
 		}
 		
 		return $this->allPosts[$postType][$key];

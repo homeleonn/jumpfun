@@ -95,8 +95,11 @@ function drawLoadingWait($el, del){
 function ExtraFiled(){
 	this.state = 0;
 	this.counter = 0;
+	var self = this;
+	this.getSetNew = false;
 	this.setNew = function(e){
 		e.preventDefault();
+		self.getSetNew = true;console.log(1);
 		if(!this.state){
 			$('#select_extra_name').addClass('none');
 			$('#input_extra_name').removeClass('none');
@@ -108,15 +111,15 @@ function ExtraFiled(){
 	}
 	
 	this.set = function(){
-		if($('#select_extra_name')[0].selectedIndex == 0){
-			console.log($('#select_extra_name')[0].selectedIndex);
+		if(!self.getSetNew && $('#select_extra_name')[0].selectedIndex == 0){
+			console.log(this.getSetNew, $('#select_extra_name'), $('#select_extra_name')[0].selectedIndex);
 			alert('Выберите имя поля или введите новое');return;
 		}else{
 			var nameEl 	= $('#input_extra_name');
 			var valueEl = $('#extra_value_editor');
 			var name 	= nameEl.val();
 			var value 	= valueEl.val();
-			if(name == ''){
+			if($('#select_extra_name')[0].selectedIndex && name == ''){
 				name = $('#select_extra_name option:selected').text();
 			}
 			if(name == ''){
@@ -293,4 +296,134 @@ $('#post-options-box > label > input').change(function(){
 		$(forBlock).addClass('none'); 
 	else 
 		$(forBlock).removeClass('none')
+});
+
+
+let draggable = false;
+;(function($){
+	let slctr = '.mytable.posts';
+	let activated = false;
+	
+	draggable = function (activate = false) {console.log(activated);
+		if (!activate) {
+			if (!activated) return;
+			activated = false;
+			$(slctr).off('drop dragover').removeAttr('id');
+			$(slctr + ' tr').off('dragstart').attr('draggable', false);
+		} else if (!activated) {
+			activated = true;
+			$(slctr).attr('id', 'draggable');
+			
+			setTimeout(function(){
+				$('#draggable' + slctr).on('drop', function (ev) {
+					ev.originalEvent.preventDefault();
+					var data = ev.originalEvent.dataTransfer.getData("text");
+
+					thisdiv = ev.originalEvent.target;
+					thisdiv = $(thisdiv).closest('tr');
+					$(document.getElementById(data)).insertBefore(thisdiv);
+					console.log(ev);
+					let sorted = [];
+					$('table.posts tr').each(function(){
+						if ($(this).data('post_id')) {
+							sorted.push($(this).data('post_id'));
+						}
+					});
+					$.post(root + 'admin/'+ postType +'/changeOrderValue/', {sorted});
+					console.log(sorted);
+				}).on('dragover', function (ev) {
+					ev.originalEvent.preventDefault();
+				});
+				 
+				$('#draggable' + slctr + ' tr').on('dragstart', function (ev) {
+					var e = ev.originalEvent;
+					e.dataTransfer.setData("text", e.target.id);
+				}).attr('draggable', true);
+				
+			}, 1);
+		}
+	}
+	
+	
+	function sort(arr, index){
+		var index = index || 'sort',
+			min, k, buff, newArr = [];
+		for(var i=1;i<arr.length;i++){
+			if(typeof arr[i] == "undefined" || !$(arr[i]).data('post_id')) continue;
+			min = parseInt($(arr[i]).data('post_id'));
+			k = i;
+			for(var j=i+1;j<arr.length;j++){
+				if(typeof arr[j] == "undefined" || !$(arr[i]).data('post_id')) continue;
+				if(parseInt($(arr[j]).data('post_id')) < min){
+					min = parseInt($(arr[j]).data('post_id'));
+					k = j;
+				}
+			}
+			
+			if(k != i){
+				buff = arr[i];
+				arr[i] = arr[k];
+				arr[k] = buff;
+			}
+			newArr.push(arr[i]);
+		}
+		//newArr.push(arr[i]);
+		//console.log(newArr);
+		
+		return newArr;
+		
+		// if (!Array.isArray(arr)) {
+			// console.log(Object.values(arr));return;
+			// let factArr = [];
+			// for (var item in arr) {
+				// factArr.push(arr[item]);
+			// }
+			// arr = factArr;
+		// }
+		
+		// return arr;
+	}
+	
+	$(function(){
+		$(slctr + ' tr').each(function(i, item){
+			if (!i) return;
+			$(item).attr('id', 'postlist-' + i);
+		});
+			
+		$('#order').change(function(){
+			let tableCaption = $('table.posts tr:first-child');
+			$.post(root + 'admin/'+ postType +'/changeOrder/' + $(this).val() + '/', function(data)
+			{
+				if ($('#order').val() == 'DISTINCT') {
+					draggable(true);
+					var sorted = [];
+					JSON.parse(data)['ids'].forEach(function(item){
+						sorted.push($('table.posts tr[data-post_id='+item+']'));
+					});
+				} else {
+					draggable(false);
+					var sorted = sort($('table.posts tr'));
+					if ($('#order').val() == 'DESC') {
+						sorted = sorted.reverse();
+					}
+				}
+				
+				$('table.posts').html('').append(tableCaption);
+				sorted.forEach(function(item){
+					$('table.posts').append(item);
+				});
+			});
+		});
+				
+		if ($('#order') && $('#order').val() == 'DISTINCT') {
+			draggable(true);
+		}
+		
+	});
+})(jQuery);
+
+
+
+$(function(){
+	
 });

@@ -1,8 +1,21 @@
 <?php 
 use Jump\helpers\Common;
-//var_dump($data);exit;
+//dd($GLOBALS['jump_actions']['before_post_add']);
+//dd($data, get_defined_vars());
 ?>
 <a href="<?=SITE_URL?>admin/<?=$options['type']?>/add/" class="action-tool plus" title="Добавить"><span class="icon-plus">Добавить</span></a>
+
+ 
+<?php if (!$options['hierarchical']) : $order = getPostOrderType($options['type'])['order'] ?? false;?>
+<form method="POST" class="whisper inline">
+	<select name="order" id="order">
+		<option value="DESC" <?=$order == 'DESC' || !$order ?'selected':''?>>Новые</option>
+		<option value="ASC"  <?=$order == 'ASC'?'selected':''?>>Старые</option>
+		<option value="DISTINCT" <?=$order == 'DISTINCT'?'selected':''?>>Произвольный</option>
+	</select>
+</form>
+<?php endif;?>
+
 <div style="overflow-x: auto;">
 	<!--<table class="mytable">
 		<tr align="center">

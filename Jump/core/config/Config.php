@@ -88,6 +88,8 @@ class Config{
 				->add($type . '/edit-term/(\d+)', $type . ':editTermForm/$1', 'GET')
 				->add($type . '/edit-term/(\d+)', $type . ':editTerm', 'POST')
 				->add($type . '/del/(post|term)/(\d+)', $type . ':del/$2/$1', 'POST')
+				->add($type . '/changeOrder/(ASC|DESC|DISTINCT)', $type . ':changeOrder/$1', 'POST')
+				->add($type . '/changeOrderValue', $type . ':changeOrderValue', 'POST')
 				->add($type, $type . ':list', 'GET');
 		}
 		

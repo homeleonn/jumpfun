@@ -168,6 +168,41 @@ class PostController extends AdminController{
 		);
 	}
 	
+	public function actionChangeOrder($order) {
+		if (postOrderTypeValidation($order)) {
+			if (!$saveOrder = getPostOrderType($this->options['type'])) {
+				$posts = $this->db->getAll('Select id from posts where post_type = "'.$this->options['type'].'" order by id DESC');
+				$ids = '';
+				foreach ($posts as $p) {
+					$ids .= $p['id'] . ',';
+				}
+				$saveOrder = ['value' => substr($ids, 0, -1)];
+			}
+			
+			$saveOrder['order'] = $order;
+			setPostOrderType($this->options['type'], $saveOrder);
+			
+			if ($order == 'DISTINCT') {
+				echo json_encode(['ids' => explode(',', $saveOrder['value'])]);
+			}
+		}
+		exit;
+	}
+	
+	public function actionChangeOrderValue() {
+		if (isset($_POST['sorted'])) {
+			$ids = implode(',', $_POST['sorted']);
+		} else {
+			exit;
+		}
+		
+		if (preg_match('/^(\d+,)+\d+$/', $ids) && ($saveOrder = getPostOrderType($this->options['type']))) {
+			$saveOrder['value'] = $ids;
+			setPostOrderType($this->options['type'], $saveOrder);
+		}
+		exit;
+	}
+	
 	
 	private function checkGettingTermType(){
 		if(!isset($this->request->get['term']) || !$this->checkValidTerms($this->request->get['term'])){

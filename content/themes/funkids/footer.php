@@ -38,6 +38,7 @@
 	<script type='text/javascript' src='//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js'></script>
 	<script src="<?=THEME?>js/js.js"></script>
 	<script>
+		<?php if (!isLocalhost()) : ?>
 		$(function(){
 			$.getScript("https://www.googletagmanager.com/gtag/js?id=UA-124185796-1", function(){
 				window.dataLayer = window.dataLayer || [];
@@ -46,10 +47,22 @@
 				gtag('config', 'UA-124185796-1');
 			});
 			
+			setTimeout(function(){
+				(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+				m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+				(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+				ym(53844553, "init", {
+					clickmap:true,
+					trackLinks:true,
+					accurateTrackBounce:true
+				});
+			}, 1000);
+			
 		});
-		
-		
+		<?php endif; ?>
 	</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/53844553" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 	<script type="application/ld+json">
 	{
 	  "@context" : "http://schema.org",

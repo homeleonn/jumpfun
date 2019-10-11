@@ -118,10 +118,12 @@ var mediaLoaded = false;
 function chooseMediaThumb(el){
 	if($(el).hasClass('chosen')) return;
 	var showBlock = '#media-original-show';
+	var wrap = '#wrap-media';
 	$('.media-thumbs').addClass('col-md-8');
 	$('.media-thumb').removeClass('chosen');
 	$(el).addClass('chosen');
-	$(showBlock).removeClass('none').addClass('col-md-4');
+	$(showBlock).removeClass('none');
+	$(wrap).addClass('col-md-4');
 	$img = $(el).children('img');
 	var originalImgSrc = $img.data('original');
 	var meta = $img.data('meta');
@@ -145,7 +147,8 @@ function mediaDelete(){
 	var id = $('.media-thumb.chosen > img').data('id');
 	$.post(root +'admin/media/del/' + id + '/');
 	$('.media-thumb.chosen').remove();
-	$('#media-original-show').removeClass('col-md-4').addClass('none').children('img').attr('src', '');
+	$('#media-original-show').addClass('none').children('img').attr('src', '');
+	$('#wrap-media').removeClass('col-md-4');
 	$('.media-thumbs').removeClass('col-md-8');
 }
 

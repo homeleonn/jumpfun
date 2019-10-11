@@ -646,6 +646,7 @@ function isLocalhost(){
 
 
 /*filesystem*/
+
 function do_mkdir($path, $rights = 0644){
 	if(file_exists($path)){
 		return false;
@@ -664,10 +665,49 @@ function do_rmdir($dir) {
 	rmdir($dir);
 }
 
+/*-*/
 
 function clientIp($compareIp = false){
 	$ip = 	 !empty($_SERVER['HTTP_CLIENT_IP'])   	  ? $_SERVER['HTTP_CLIENT_IP'] : 
 			(!empty($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR']);
 	
 	return !$compareIp ? $ip : $ip == $compareIp;
+}
+
+
+/* actions and filters */
+
+addAction('after_post_add', 'postsAddOrder');
+
+function postsAddOrder($post){
+	$saveOrder = getPostOrderType($post['post_type']);
+	if (isset($saveOrder['value'])) {
+		$saveOrder['value'] = $post['id'] . ',' . $saveOrder['value'];
+		setPostOrderType($post['post_type'], $saveOrder);
+	}
+}
+
+addAction('before_post_delete', 'postsDeleteOrder');
+
+function postsDeleteOrder($post){
+	$saveOrder = getPostOrderType($post['post_type']);
+	if (isset($saveOrder['value'])) {
+		$saveOrder['value'] = str_replace([',' . $post['id'], $post['id'] . ','], '', $saveOrder['value']);
+		setPostOrderType($post['post_type'], $saveOrder);
+	}
+}
+
+/*-*/
+
+
+function getPostOrderType($postType){
+	return Common::getOption('post_order_' . $postType, true);
+}
+
+function setPostOrderType($postType, $order){
+	Common::setOption('post_order_' . $postType, $order, true);
+}
+
+function postOrderTypeValidation($type) {
+	return in_array($type, ['ASC', 'DESC', 'DISTINCT']);
 }

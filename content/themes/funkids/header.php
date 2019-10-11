@@ -12,7 +12,7 @@
 	<script>let root = "<?=ROOT_URI?>", theme = "<?=THEME?>";function $$(callback){window.addEventListener('load', callback);}</script>
 </head>
 <body>
-	<div class="wrapper<?=isMain()?' main':''?>" id="wrapper">
+	<div class="wrapper<?=(isset($post) ? doAction('wrapper_classes', $post) : '');?>" id="wrapper">
 		<div class="header">
 			<?php if(isMain()):?>
 			<div class="front-menu flex line">

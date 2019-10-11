@@ -625,6 +625,15 @@ textarea#code{
 }
 
 
+#media-original-show{
+	position: fixed;
+	height: 90%;
+	overflow: auto;
+	top: 35px;
+	background: white;
+}
+
+
 
 
 /*input your css: end*/

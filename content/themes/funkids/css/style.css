@@ -1439,6 +1439,26 @@ body.loaded .holyday:before{
 .all-progs .img-wrapper{
 	overflow: hidden;
 	padding: 10px;
+	position: relative;
+}
+
+.all-progs .img-wrapper:after{
+	content: 'Подробнее';
+	position: absolute;
+	bottom: -50%;
+	~z-index: 2;
+	left: 50%;
+	margin-left: -40px;
+	text-align: center;
+	padding: 5px;
+	border-radius: 5px;
+	background: rgba(46, 206, 87, 0.81);
+	color: white;
+	transition: .2s bottom;
+}
+
+.all-progs .img-wrapper:hover:after{
+	bottom: 5%;
 }
 
 .all-progs img{
@@ -1474,6 +1494,10 @@ body.loaded .holyday:before{
 .s-about{
 	margin-top: 50px;
 	position: relative;
+}
+
+.s-about p{
+	text-align: justify;
 }
 
 .s-about h2{
