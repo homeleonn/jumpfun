@@ -22,7 +22,7 @@
 						</div>
 					</div>
 					
-					<div class="copyright">Copyrights © 2018: Fun Kids Odessa</div>
+					<div class="copyright">Copyrights © 2018 - 2019: FunKids Odessa</div>
 					<div class="social-bottom">	
 						<a href="https://vk.com/club163464318" rel="nofollow" target="_blank"><span class="vk icon-vk"></span></a>
 						<a href="https://www.instagram.com/funkids_odessa/" rel="nofollow" target="_blank"><span class="instagram icon-instagram"></span></a>

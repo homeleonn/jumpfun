@@ -6,7 +6,7 @@ use Jump\helpers\Common;
 use Jump\helpers\HelperDI;
 
 class Config{
-	const POSTS_PER_PAGE = 20;
+	const POSTS_PER_PAGE = 50;
 	private $db;
 	private $router;
 	private $options;
@@ -25,7 +25,8 @@ class Config{
 	
 	public function optionsLoad($fromFile = false){
 		if($fromFile){
-			$this->options = array_merge($this->options, Common::getConfig('options'));
+			//$this->options = array_merge($this->options, Common::getConfig('options'));
+			$this->options = array_merge($this->options, include ROOT . 'options.php');
 			return;
 		}
 		$options = $this->db->getAll('Select name, option_value from options where autoload = \'yes\'');
@@ -113,7 +114,7 @@ class Config{
 		return $options;
 	}
 		
-	public function __get($option){//var_dump($option, $this->getOption($option));
+	public function __get($option){//d($option, $this->getOption($option));
 		return $this->getOption($option);
 	}
 	

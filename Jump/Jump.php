@@ -27,7 +27,8 @@ class Jump
 		} else {
 			(new Responce())->view('404', Responce::HTTP_NOT_FOUND);
 		}
-		requestStats();
+		if (isLocalhost())
+			requestStats();
 		echo '<!--', scriptTime(), '-->';
 	}
 }

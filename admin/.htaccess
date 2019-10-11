@@ -14,11 +14,26 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_URI} !/$
 RewriteCond %{REQUEST_URI} !.*\.(ico|gif|jpg|jpeg|png|js|css)
+
+#RewriteCond %{HTTP_HOST} =funkids.od.ua
+#RewriteRule ^(.*)$ admin/$1/ [L]
+
+#RewriteCond %{HTTP_HOST} localhost
+#RewriteRule ^(.*)$ funkids/admin/$1/ [L]
 RewriteRule ^(.*)$ $1/ [L,R=301]
 
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_URI} !.*\.(ico|gif|jpg|jpeg|png|js|css)
+
+#RewriteCond %{HTTP_HOST} =funkids.od.ua
+#RewriteRule .* admin/index.php [L]
+
+#RewriteCond %{HTTP_HOST} localhost
+#RewriteRule .* funkids/admin/index.php [L]
+
 RewriteRule .* index.php [L]
+
+
 
 </IfModule>

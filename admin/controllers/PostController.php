@@ -185,6 +185,7 @@ class PostController extends AdminController{
 			if ($order == 'DISTINCT') {
 				echo json_encode(['ids' => explode(',', $saveOrder['value'])]);
 			}
+			Common::clearAllCache();
 		}
 		exit;
 	}
@@ -199,6 +200,7 @@ class PostController extends AdminController{
 		if (preg_match('/^(\d+,)+\d+$/', $ids) && ($saveOrder = getPostOrderType($this->options['type']))) {
 			$saveOrder['value'] = $ids;
 			setPostOrderType($this->options['type'], $saveOrder);
+			Common::clearAllCache();
 		}
 		exit;
 	}

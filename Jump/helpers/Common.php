@@ -247,7 +247,8 @@ class Common{
 	}
 	
 	public static function setOption($key, $value, $ser = false){
-		$optionsFileName = JUMP . '/config/options.php';
+		//$optionsFileName = JUMP . '/config/options.php';
+		$optionsFileName = ROOT . 'options.php';
 		$options = file_get_contents($optionsFileName);
 		
 		if ($ser) $value = serialize($value);
@@ -334,5 +335,18 @@ class Common{
 			$content = html_entity_decode($content);
 		
 		return $content;
+	}
+	
+	
+	
+	public static function clearAllCache(){
+		if ($objs = glob(CACHE_DIR."*")) {
+			foreach($objs as $obj) {
+				if(is_dir($obj)){
+					do_rmdir($obj);
+				}
+			}
+		}
+		exit;
 	}
 }

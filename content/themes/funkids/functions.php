@@ -329,33 +329,48 @@ function resizePhotos(){
 
 use frontend\controllers\PostController;
 
+function funkids_post_order_default($postType) {
+	$ord = 'ASC';
+	if ($order = getPostOrderType($postType)) {
+		if ($order['order'] == 'DESC' || $order['order'] == 'ASC') {
+			$ord = $order['order'];
+			$order = false;
+		}
+	}
+	
+	return [$order, $ord];
+}
+
+function funkids_post_order_distinct($order, $posts) {
+	if ($order) {
+		$buff = [];
+		foreach ($posts as $p) {
+			$buff[$p['id']] = $p;
+		}
+		$posts = [];
+		foreach (explode(',', $order['value']) as $id) {
+			$posts[] = $buff[$id];
+		}
+	}	
+		
+	return $posts;
+}
+
 
 $funKidsCacheFileNames['programs_all'] = 'funkids/programs_all';
 
 function funKids_all(){
 	global $funKidsCacheFileNames, $thatCache;
 	$thatCache = true;
+	$postType = 'program';
 	if(Common::getCache($funKidsCacheFileNames['programs_all'], -1)) return;
-	$ord = 'ASC';
-	if ($order = getPostOrderType('program')) {
-		if ($order['order'] == 'DESC' || $order['order'] == 'ASC') {
-			$ord = $order['order'];
-			$order = false;
-		}
-	}
-	$popular = (new PostController('program'))->actionList(NULL, NULL, 1, 30,  [['id'], 'ASC'] );
+	
+	[$order, $ord] = funkids_post_order_default($postType);
+	
+	$popular = (new PostController($postType))->actionList(NULL, NULL, 1, 30,  [['id'], $ord] );
 	
 	// If distinct order
-	if ($order) {
-		$buff = [];
-		foreach ($popular['__list'] as $p) {
-			$buff[$p['id']] = $p;
-		}
-		$popular['__list'] = [];
-		foreach (explode(',', $order['value']) as $id) {
-			$popular['__list'][] = $buff[$id];
-		}
-	}
+	$popular['__list'] = funkids_post_order_distinct($order, $popular['__list']);
 	
 	?>
 	<div class="all-progs" id="all-progs">
@@ -417,8 +432,15 @@ $funKidsCacheFileNames['services'] = 'funkids/services';
 function funKids_services(){
 	global $funKidsCacheFileNames, $thatCache;
 	$thatCache = true;
+	$postType = 'service';
 	if(Common::getCache($funKidsCacheFileNames['services'], -1)) return;
-	$services = (new PostController('service'))->actionList(NULL, NULL, 1, 10, [['created'], 'ASC']);
+	
+	[$order, $ord] = funkids_post_order_default($postType);
+	
+	$services = (new PostController($postType))->actionList(NULL, NULL, 1, 30,  [['id'], $ord] );
+	
+	// If distinct order
+	$services['__list'] = funkids_post_order_distinct($order, $services['__list']);
 	?>
 	<div class="extra-services front-page" id="extra-services">
 		<h2 class="section-title"><div>Дополнительные</div> <div>услуги</div></h2>

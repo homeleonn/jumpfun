@@ -22,7 +22,7 @@ class Router{
 		$this->fillRoutes($routes);
 	}
 	
-	public function run(){
+	public function run(){//d($this->controller);
 		$controllerName = '\\' . ENV . '\controllers\\' . ucfirst($this->controller) . 'Controller';
 		$action = 'action' . ucfirst($this->action);
 		$controller = new $controllerName();
@@ -41,7 +41,7 @@ class Router{
 		// }
 		// if(!empty($params))
 			// $this->params = array_merge($this->params, $params);
-		
+		//d($this->params);
 		if(!$this->alternate)
 			return call_user_func_array([$controller, $action], $this->params);
 		else
